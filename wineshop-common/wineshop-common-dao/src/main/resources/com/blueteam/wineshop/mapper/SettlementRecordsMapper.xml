@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.SettlementRecordsMapper">
+    <resultMap id="settlementRecords" type="com.blueteam.entity.po.SettlementRecords">
+        <id column="Id" jdbcType="INTEGER" property="id"/>
+        <result column="VendorInfoId" jdbcType="INTEGER" property="vendorInfoId"/>
+        <result column="Amounts" jdbcType="DECIMAL" property="amounts"/>
+        <result column="CreateBy" property="createBy"/>
+        <result column="CreateDate" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UpdateBy" property="updateBy"/>
+        <result column="UpdateDate" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="settlement_start" jdbcType="TIMESTAMP" property="settlement_start"/>
+        <result column="settlement_end" jdbcType="TIMESTAMP" property="settlement_end"/>
+
+        <result column="bankCard" property="bankCard"/>
+        <result column="billingInfoType" property="billingInfoType"/>
+
+    </resultMap>
+    <insert id="insertSettlementRecords" parameterType="com.blueteam.entity.po.SettlementRecords"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        insert into SettlementRecords
+        (VendorInfoId,Amounts,CreateBy,UpdateBy,CreateDate,UpdateDate,settlement_start,settlement_end)
+        values(#{vendorInfoId},#{amounts},#{createBy},#{updateBy},#{createDate},#{updateDate},#{settlement_start},#{settlement_end})
+
+    </insert>
+    <select id="listLimitVendorSettlementRecords" resultType="java.util.Map">
+        <![CDATA[ SELECT *
+FROM
+	(
+		SELECT
+			v.id AS id,
+			v.Name AS name,
+			v.TradingArea AS tradingArea,
+			ov.discountAmounts AS discountAmounts,
+			s.amounts AS amounts,
+			IFNULL(
+				date_format(s.updateDate,'%Y-%m-%d'),
+-- 				CONVERT (
+-- 					VARCHAR (12),
+-- 					dateadd(DAY ,- 1, v.CreateDate),
+-- 					23
+-- 				)
+'-'
+			) AS updateTime,
+			vii.amounts AS dayAmounts,
+			ov.discountAmounts - IFNULL(s.amounts,0) AS money,
+					IFNULL(bi.BillingInfoType, '') AS billingInfoType,
+					IFNULL(bi.AlipayCardBank, '') AS alipayCardBank,
+					IFNULL(bi.Name, '') AS alipayCardBankName
+				FROM
+					VendorInfo v
+				LEFT JOIN BillingInfo bi ON v.Id = bi.VendorInfoId
+		LEFT JOIN (
+			SELECT
+				VendorId,
+				SUM(settlement_money) AS discountAmounts
+			FROM
+				OrderInfo
+			WHERE
+				OrderStatus = 30
+			GROUP BY
+				VendorId
+		) ov ON v.Id = ov.VendorId
+		LEFT JOIN (
+			SELECT
+				VendorInfoId,
+				SUM(Amounts) AS amounts,
+				MAX(settlement_end) AS updateDate
+			FROM
+				SettlementRecords
+			GROUP BY
+				VendorInfoId
+		) s ON s.VendorInfoId = v.Id
+		LEFT JOIN (
+			SELECT
+				VendorInfoId,
+				SUM(Amounts) AS amounts
+			FROM
+				SettlementRecords
+			WHERE
+				updateDate >= CURDATE()
+			GROUP BY
+				VendorInfoId
+		) vii ON vii.VendorInfoId = v.Id
+		WHERE
+			discountAmounts IS NOT NULL 
+	) AS ovs where 1=1  ]]>
+        <if test="tradingArea != null ">
+            <![CDATA[	and ovs.tradingArea like "%"#{tradingArea}"%"]]>
+        </if>
+        <if test="vendorName != null ">
+            <![CDATA[	and ovs.name like "%"#{vendorName}"%"]]>
+        </if>
+        <if test="beginTime != null ">
+            <![CDATA[ and date_format(ovs.updateTime,'%Y-%m-%d') >= date_format(#{beginTime},'%Y-%m-%d') ]]>
+        </if>
+        <if test="endTime != null ">
+            <![CDATA[ and date_format(#{endTime},'%Y-%m-%d')  >=date_format(ovs.updateTime,'%Y-%m-%d')]]>
+        </if>
+        <![CDATA[ order by ovs.updateTime asc,
+	ovs.money DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}	]]>
+    </select>
+    <select id="countVendorSettlementRecords" resultType="int">
+        <![CDATA[ SELECT count(*)
+FROM
+	(
+		SELECT
+			v.id AS id,
+			v.Name AS name,
+			v.TradingArea AS tradingArea,
+			ov.discountAmounts AS discountAmounts,
+			s.amounts AS amounts,
+			IFNULL(
+				date_format(s.updateDate,'%Y-%m-%d'),
+			date_format(date_sub(v.CreateDate,interval 1 day),'%Y-%m-%d')
+			) AS updateTime,
+			vii.amounts AS dayAmounts,
+			ov.discountAmounts - ifnull(s.amounts,0) AS money
+		FROM
+			VendorInfo v
+		LEFT JOIN (
+			SELECT
+				VendorId,
+				SUM(settlement_money) AS discountAmounts
+			FROM
+				OrderInfo
+			WHERE
+				OrderStatus = 30
+			GROUP BY
+				VendorId
+		) ov ON v.Id = ov.VendorId
+		LEFT JOIN (
+			SELECT
+				VendorInfoId,
+				SUM(Amounts) AS amounts,
+				MAX(settlement_end) AS updateDate
+			FROM
+				SettlementRecords
+			GROUP BY
+				VendorInfoId
+		) s ON s.VendorInfoId = v.Id
+		LEFT JOIN (
+			SELECT
+				VendorInfoId,
+				SUM(Amounts) AS amounts
+			FROM
+				SettlementRecords
+			WHERE
+				updateDate >= CURDATE()
+			GROUP BY
+				VendorInfoId
+		) vii ON vii.VendorInfoId = v.Id
+		WHERE
+			discountAmounts IS NOT NULL 
+	) AS ovs where 1=1 ]]>
+        <if test="tradingArea != null ">
+            <![CDATA[	and ovs.tradingArea like "%"#{tradingArea}"%"]]>
+        </if>
+        <if test="vendorName != null ">
+            <![CDATA[  and ovs.name like "%"#{vendorName}"%"]]>
+        </if>
+        <if test="beginTime != null ">
+            <![CDATA[ and date_format(ovs.updateTime,'%Y-%m-%d') >= date_format(#{beginTime},'%Y-%m-%d') ]]>
+        </if>
+        <if test="endTime != null ">
+            <![CDATA[ and date_format(#{endTime},'%Y-%m-%d')  >=date_format(ovs.updateTime,'%Y-%m-%d')]]>
+        </if>
+    </select>
+    <select id="listSettlementRecords" resultType="java.util.Map">
+        <![CDATA[
+
+	 SELECT *
+FROM
+	(
+		SELECT
+	vi.name AS name,
+	vi.Addr AS addr,
+				IFNULL(date_format(se.UpdateDate,'%Y-%m-%d'),-1) as updateTime ,
+				IFNULL(	se.UpdateDate,-1) as updateTimess ,
+				IFNULL(
+					date_format(se.UpdateDate,'%Y-%m-%d')
+				,-1) as updateTimes ,
+IFNULL(se.Amounts,-1) as amounts,
+(
+	(
+		SELECT
+			SUM(DiscountAmount)
+		FROM
+			OrderInfo
+		WHERE
+			OrderStatus = 30
+		AND VendorId =  #{vendorInfoId}
+	) - (
+		IFNULL((SELECT
+			SUM(Amounts)
+		FROM
+			SettlementRecords
+		WHERE
+			VendorInfoId =  #{vendorInfoId}),0)
+	)
+) AS moneys,
+(
+	(
+		SELECT
+			SUM(DiscountAmount)
+		FROM
+			OrderInfo
+		WHERE
+			OrderStatus = 30
+		AND VendorId =   #{vendorInfoId}
+	) - (
+		IFNULL((SELECT
+			SUM(Amounts)
+		FROM
+			SettlementRecords
+		WHERE
+			VendorInfoId =  #{vendorInfoId} and UpdateDate <= se.UpdateDate),0)
+	)
+) AS moneyss,
+IFNULL(se.id,-1) AS id
+FROM
+	VendorInfo vi
+LEFT JOIN SettlementRecords se ON vi.Id = se.VendorInfoId
+WHERE
+	vi.Id = #{vendorInfoId}
+	
+	) AS t order by t.updateTimess DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ]]>
+    </select>
+
+    <select id="listCountSettlementRecords" resultType="int">
+        <![CDATA[
+
+		SELECT
+	 count(*)
+FROM
+	SettlementRecords se
+WHERE
+	se.VendorInfoId = #{vendorInfoId}
+		
+
+        ]]>
+    </select>
+    <!--	CONVERT (
+                VARCHAR (10),
+                dateadd(dd ,- 1, vi.CreateDate)
+                120
+            )-->
+    <select id="getVendorInfoSettlement" resultType="java.util.Map">
+        <![CDATA[
+
+			SELECT
+	vi.Id AS id,
+	vi.Image AS image,
+	vi.Name AS name,
+	vi.Addr AS addr,
+	vi.Telephone AS telephone,
+	vi.CityCode AS  cityCode,
+	IFNULL(oi.moneys, 0) AS moneys,
+	oi.counts AS counts,
+	IFNULL(srs.amounts, 0) AS amounts,
+	IFNULL(oi.moneys, 0) - IFNULL(srs.amounts, 0) AS forTen,
+	IFNULL(
+		date_format(srs.endDate,'%Y-%m-%d'),
+		date_format(date_sub(vi.CreateDate,interval 1 day) ,'%Y-%m-%d')
+	) AS endDate,
+	IFNULL(bi.BillingInfoType, '') AS billingInfoType,
+					IFNULL(bi.AlipayCardBank, '') AS alipayCardBank,
+					IFNULL(bi.Name, '') AS alipayCardBankName
+FROM
+	VendorInfo vi
+	LEFT JOIN BillingInfo bi ON vi.Id = bi.VendorInfoId
+LEFT JOIN (
+	SELECT
+		VendorId AS vendorId,
+		COUNT(id) AS counts,
+		SUM(settlement_money) AS moneys
+	FROM
+		OrderInfo
+	WHERE
+		VendorId = #{vendorInfoId}
+	AND OrderStatus = 30
+	GROUP BY
+		VendorId
+) oi ON oi.vendorId = vi.Id
+LEFT JOIN (
+	SELECT
+		VendorInfoId AS vendorInfoId,
+		MAX(settlement_end) AS endDate,
+		SUM(Amounts) AS amounts
+	FROM
+		SettlementRecords
+	WHERE
+		VendorInfoId = #{vendorInfoId}
+	GROUP BY
+		VendorInfoId
+) srs ON srs.vendorInfoId = vi.Id
+WHERE
+	vi.Id = #{vendorInfoId}
+
+        ]]>
+
+    </select>
+
+
+    <select id="listVendorInfoForTheSettlement" resultType="java.util.Map">
+        <![CDATA[
+
+		SELECT
+	o.Id AS id,
+	  date_format( o.PayTime,'%Y-%m-%d') AS payTime,
+	o.OrderNo AS orderNo,
+	ifnull(tp.third_party_nick_name,'')AS NickName,
+	cif.Type AS userTypes,
+	ui.UserTypes AS userType,
+	CASE
+WHEN cif.Type IS NOT NULL THEN
+	CASE
+WHEN ci.Condition IS NOT NULL   and CHAR_LENGTH(ci.Condition) > 1 THEN
+	INSERT(
+		'无条件立减减',
+		6,
+		1,
+		ci.Money
+	)
+ELSE
+	CONCAT(INSERT(
+		'满减',
+		2,
+		1,
+		ci.CostLimitMoney
+	),INSERT('减减', 2, 1, ci.Money))
+END
+ELSE
+	cif.Type
+END AS couponInfoName,
+ o.TotalMoney AS totalMoney,
+ o.DiscountAmount AS discountAmount,
+ o.settlement_money AS money
+FROM
+	OrderInfo o
+LEFT JOIN VendorInfo v ON o.VendorId = v.Id
+LEFT JOIN UserInfo u ON u.Id = o.UserId
+LEFT JOIN (select * from user_middle_third_party where middle_status = 1) um ON um.user_info_id = u.Id
+ LEFT JOIN
+(select * from third_party_user_info where user_type = 4 AND third_party_type = 1 and third_party_status = 1 ) tp
+ ON tp.id = um.third_party_id
+LEFT JOIN CityInfo C ON V.CityCode = C.Code
+LEFT JOIN CouponInfo ci ON ci.id = o.CouponId
+LEFT JOIN UserInfo ui ON ui.Id = ci.UserId
+LEFT JOIN CouponInfo cif ON ci.ExpandId = cif.id
+WHERE
+	o.OrderStatus = 30
+AND o.VendorId = #{vendorInfoId}
+AND  date_format( o.PayTime,'%Y-%m-%d') >= date_format(  #{startDate},'%Y-%m-%d')
+AND  date_format( o.PayTime,'%Y-%m-%d') <= date_format( #{endDate},'%Y-%m-%d')
+		 ]]>
+        <![CDATA[  ORDER BY o.PayTime DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ]]>
+    </select>
+
+
+
+
+    <select id="listCountVendorInfoForTheSettlement" resultType="java.util.Map">
+    <![CDATA[
+     SELECT
+     COUNT(*) counts,
+     IFNULL(SUM(o.settlement_money), 0) moneys
+     FROM
+     OrderInfo o
+    LEFT JOIN VendorInfo v ON o.VendorId = v.Id
+    LEFT JOIN UserInfo u ON u.Id = o.UserId
+    LEFT JOIN CityInfo C ON V.CityCode = C.Code
+    LEFT JOIN CouponInfo ci ON ci.id = o.CouponId
+    LEFT JOIN UserInfo ui ON ui.Id = ci.UserId
+    LEFT JOIN CouponInfo cif ON ci.ExpandId = cif.id
+    WHERE
+        o.OrderStatus = 30
+    AND o.VendorId = #{vendorInfoId}
+    AND  date_format(payTime,'%Y-%m-%d') >= date_format(#{startDate},'%Y-%m-%d')
+    AND  date_format(payTime,'%Y-%m-%d') <= date_format(#{endDate},'%Y-%m-%d')
+	]]>
+
+    </select>
+
+    <select id="getSettlementDate" resultType="java.util.Map">
+        <![CDATA[
+
+				SELECT
+	IFNULL(
+		sr.startDate,
+		date_format( vi.CreateDate,'%Y-%m-%d')
+	) AS startDate,
+	IFNULL(
+		sr.endDate,
+		date_format( vi.CreateDate,'%Y-%m-%d')
+	) AS endDate
+FROM
+	VendorInfo vi
+LEFT JOIN (
+	SELECT
+		VendorInfoId,
+		MIN (
+			date_format( settlement_start,'%Y-%m-%d')
+		) AS startDate,
+		MAX (
+			date_format( settlement_end,'%Y-%m-%d')
+		) AS endDate
+	FROM
+		SettlementRecords
+	WHERE
+		VendorInfoId = #{vendorInfoId}
+	GROUP BY
+		VendorInfoId
+) sr ON vi.Id = sr.VendorInfoId
+WHERE
+	vi.Id = #{vendorInfoId}
+
+        ]]>
+    </select>
+
+    <select id="getSettlementRecords" resultType="java.util.Map">
+
+        <![CDATA[
+         SELECT
+         IFNULL(oi.moneys, 0) - IFNULL(srs.Amounts, 0) AS residueMoneys,
+         IFNULL(srs.Amounts, 0)                        AS amounts,
+         date_format(sr.CreateDate, '%Y-%m-%d')        AS createDate,
+         date_format(sr.settlement_start, '%Y-%m-%d')  AS startDate,
+         date_format(sr.settlement_end, '%Y-%m-%d')    AS endDate,
+         sr.Amounts                                    AS amount
+        FROM
+  (
+    SELECT
+      VendorId,
+      SUM(settlement_money) AS moneys
+    FROM
+      OrderInfo
+    WHERE
+      VendorId =  #{vendorInfoId}
+      AND OrderStatus = 30
+    GROUP BY
+      VendorId
+  ) oi
+  LEFT JOIN (
+              SELECT
+                SUM(Amounts) AS Amounts,
+                VendorInfoId
+              FROM
+                SettlementRecords
+              WHERE
+                VendorInfoId = #{vendorInfoId}
+              GROUP BY
+                VendorInfoId
+            ) srs ON #{vendorInfoId} = srs.VendorInfoId
+                    LEFT
+          JOIN SettlementRecords sr ON #{vendorInfoId} = sr.VendorInfoId
+          WHERE
+                oi.VendorId =  #{vendorInfoId}
+                ORDER BY sr.createDate DESC
+                LIMIT ${(pageIndex-1) * pageSize}, ${pageSize}
+            ]]>
+    </select>
+
+    <select id="getCountSettlementRecords" resultType="int">
+
+        SELECT COUNT(*) FROM (
+        SELECT
+        IFNULL(oi.moneys, 0) - IFNULL(srs.Amounts, 0) AS residueMoneys,
+        IFNULL(srs.Amounts, 0) AS amounts
+        FROM
+        (
+        SELECT
+        VendorId,
+        SUM(settlement_money) AS moneys
+        FROM
+        OrderInfo
+        WHERE
+        VendorId = #{vendorInfoId}
+        AND OrderStatus = 30
+        GROUP BY
+        VendorId
+        ) oi
+        LEFT JOIN (
+        SELECT
+        SUM(Amounts) AS Amounts,
+        VendorInfoId
+        FROM
+        SettlementRecords
+        WHERE
+        VendorInfoId = #{vendorInfoId}
+        GROUP BY
+        VendorInfoId
+        ) srs ON #{vendorInfoId} = srs.VendorInfoId
+        LEFT JOIN SettlementRecords sr ON #{vendorInfoId} = sr.VendorInfoId
+        WHERE
+        oi.VendorId = #{vendorInfoId}
+        ) ss
+
+
+    </select>
+
+
+    <select id="getSettlementRecord" resultType="java.util.Map">
+        <![CDATA[
+
+			SELECT
+	se.VendorInfoId AS vendorInfoId,cif.Id AS carriersInfoId
+FROM
+	SettlementRecords se
+LEFT JOIN VendorInfo vif ON se.VendorInfoId = vif.Id
+left join CarriersInfo cif ON  locate(vif.CityCode ,ManagementArea)!=0
+WHERE
+	se.Id = #{settlementRecordId}
+
+        ]]>
+    </select>
+
+    <select id="getSettlementRecordById" resultMap="settlementRecords">
+        SELECT SR.*,BI.AlipayCardBank AS bankCard,BI.BillingInfoType FROM SettlementRecords AS SR
+        LEFT JOIN BillingInfo AS BI
+        ON SR.VendorInfoId = BI.VendorInfoId
+        WHERE SR.ID = #{id}
+    </select>
+</mapper>

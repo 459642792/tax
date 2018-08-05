@@ -1,0 +1,79 @@
+/*类型*/
+.headline{
+    border: 1px solid #797979;
+    border-radius: 10px;
+    margin-left: 20px;
+    text-align: center;
+    line-height: 120px;
+    height:120px;
+}
+.active{
+    background-color: #ccc;
+}
+/*属性*/
+.content{
+    margin-bottom: 30px;
+    border: 1px solid #797979;
+    border-radius: 10px;
+    margin-left: 8px;
+    text-align: center;
+    height: 70%;
+    margin-top: 10px;
+}
+#listContainer .theme{
+    margin-top: 10px;
+}
+.theme div:first-child{
+    float: left;
+    background-color: #ccc;
+    border: 1px solid #797979;
+    height: 130px;
+    width: 50%;
+    line-height: 130px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.theme div:last-child{
+    float: right;
+    background-color:#f0fff0;
+    border: 1px solid #797979;
+    height: 130px;
+    width: 50%;
+    line-height: 130px;
+    font-size: 20px;
+}
+.theme table{
+    height: 80%;
+    width: 80%;
+    margin-left: 20%;
+    margin-top: 10%;
+}
+
+#attributeNames td{
+    border-bottom: 1px solid #797979;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+}
+.attribute_name{
+    float: left;
+    text-align: center;
+    height: 50px;
+    line-height: 50px;
+    width: 10%;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: -webkit-body;
+}
+.attribute_name + button{
+    margin-right: 80px;
+    float: right;
+    margin-top: 10px;
+    width: 70px;
+    height: 35px;
+    font-size: 20px;
+    border-radius: 5px;
+}
+.operate-button{
+    border-radius: 5px;
+}

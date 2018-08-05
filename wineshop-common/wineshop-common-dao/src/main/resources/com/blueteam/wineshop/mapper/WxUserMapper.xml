@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.WxUserMapper">
+
+    <resultMap id="wxUserMap" type="com.blueteam.entity.po.WxUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="subscribe" jdbcType="INTEGER" property="subscribe"/>
+        <result column="openId" jdbcType="VARCHAR" property="openId"/>
+        <result column="nickname" jdbcType="NVARCHAR" property="nickname"/>
+        <result column="sex" jdbcType="NVARCHAR" property="sex"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="city" jdbcType="NVARCHAR" property="city"/>
+        <result column="province" jdbcType="NVARCHAR" property="province"/>
+        <result column="country" jdbcType="NVARCHAR" property="country"/>
+        <result column="headImgUrl" jdbcType="VARCHAR" property="headImgUrl"/>
+        <result column="subscribeTime" jdbcType="BIGINT" property="subscribeTime"/>
+        <result column="unionId" jdbcType="VARCHAR" property="unionId"/>
+        <result column="sexId" jdbcType="INTEGER" property="sexId"/>
+        <result column="groupId" jdbcType="INTEGER" property="groupId"/>
+        <result column="remark" jdbcType="NVARCHAR" property="remark"/>
+    </resultMap>
+
+
+    <!-- 新增数据 -->
+    <sql id="weixinId">
+                SET @ID:= (SELECT ID FROM WeixinUser WHERE openId = #{openId});
+
+    </sql>
+    <insert id="insert" parameterType="com.blueteam.entity.po.WxUser" useGeneratedKeys="true" keyProperty="id">
+      <include refid="weixinId"/>
+        <if test="unionId==null">
+            AND IFNULL(unionId,'') = ''
+        </if>
+        <if test="unionId!=null">
+            AND IFNULL(unionId,'') = #{unionId}
+        </if>
+      <if test="@ID ==0 ">
+          INSERT INTO WeixinUser
+          ([subscribe]
+          ,[openId]
+          ,[nickname]
+          ,[sex]
+          ,[language]
+          ,[city]
+          ,[province]
+          ,[country]
+          ,[headImgUrl]
+          ,[subscribeTime]
+          ,[unionId]
+          ,[sexId]
+          ,[groupId]
+          ,[remark])
+          VALUES
+          (#{subscribe}
+          ,#{openId}
+          ,#{nickname}
+          ,#{sex}
+          ,#{language}
+          ,#{city}
+          ,#{province}
+          ,#{country}
+          ,#{headImgUrl}
+          ,#{subscribeTime}
+          ,#{unionId}
+          ,#{sexId}
+          ,#{groupId}
+          ,#{remark})
+      </if>
+
+    </insert>
+
+    <update id="updateByPrimeryKey" parameterType="com.blueteam.entity.po.WxUser">
+        UPDATE WeixinUser
+        SET [subscribe] = #{subscribe}
+        ,[openId] = #{openId}
+        ,[nickname] = #{nickname}
+        ,[sex] = #{sex}
+        ,[language] = #{language}
+        ,[city] = #{city}
+        ,[province] = #{province}
+        ,[country] = #{country}
+        ,[headImgUrl] = #{headImgUrl}
+        ,[subscribeTime] = #{subscribeTime}
+        ,[unionId] = #{unionId}
+        ,[sexId] = #{sexId}
+        ,[groupId] = #{groupId}
+        ,[remark] = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getWxUserByOpendIdAndUnionId" resultMap="wxUserMap">
+        SELECT * FROM WeixinUser WHERE openId = #{openId}
+        <if test="unionId==null">
+            AND IFNULL(unionId,'') = ''
+        </if>
+
+        <if test="unionId!=null">
+            AND IFNULL(unionId,'') = #{unionId}
+        </if>
+    </select>
+</mapper>

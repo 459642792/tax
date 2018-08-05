@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderAdminMapper">
+    <!--AdminOrderBO结果映射-->
+    <resultMap id="AdminOrderBOResultMap" type="AdminOrderBO">
+        <result property="orderId" column="orderId"/>
+        <result property="orderNo" column="orderNo"/>
+        <result property="createTime" column="createTime"/>
+        <result property="shopName" column="shopName"/>
+        <result property="userId" column="userId"/>
+        <result property="payPrice" column="payPrice"/>
+        <result property="tradeArea" column="tradeArea"/>
+
+        <association property="orderStateBO" javaType="OrderStateBO">
+            <result property="completeState" column="completeState"/>
+            <result property="orderState" column="orderState"/>
+            <result property="refundState" column="refundState"/>
+            <result property="commentState" column="commentState"/>
+        </association>
+    </resultMap>
+
+    <!--AdminOrderDetailBO结果映射-->
+    <resultMap id="AdminOrderDetailBOResultMap" type="AdminOrderDetailBO">
+        <result property="orderId" column="orderId"/>
+        <result property="orderNo" column="orderNo"/>
+        <result property="tradeArea" column="tradeArea"/>
+        <result property="orderChannelName" column="orderChannelName"/>
+        <result property="payPrice" column="payPrice"/>
+        <result property="deliveryType" column="deliveryType"/>
+        <result property="deliveryTime" column="deliveryTime"/>
+        <result property="deliveryAddress" column="deliveryAddress"/>
+        <result property="userId" column="userId"/>
+        <result property="userPhone" column="userPhone"/>
+        <result property="userNickName" column="userNickName"/>
+        <result property="shopId" column="shopId"/>
+        <result property="shopName" column="shopName"/>
+        <result property="shopPhone" column="shopPhone"/>
+        <result property="originalPrice" column="originalPrice"/>
+        <result property="condition" column="condition"/>
+        <result property="costLimitMoney" column="costLimitMoney"/>
+        <result property="money" column="money"/>
+        <result property="createTime" column="createTime"/>
+        <result property="payTime" column="payTime"/>
+        <result property="promiseTime" column="promiseTime"/>
+        <result property="receiveTime" column="receiveTime"/>
+        <result property="commentTime" column="commentTime"/>
+        <result property="completeTime" column="completeTime"/>
+        <result property="remark" column="remark"/>
+
+        <association property="orderStateBO" javaType="OrderStateBO">
+            <result property="completeState" column="completeState"/>
+            <result property="orderState" column="orderState"/>
+            <result property="refundState" column="refundState"/>
+            <result property="commentState" column="commentState"/>
+        </association>
+    </resultMap>
+
+    <!--查询订单数量-->
+    <select id="countOrderList" parameterType="OrderListSearchDTO" resultType="Integer">
+        SELECT count(*)
+        FROM tf_b_order O, vendorinfo V
+        WHERE O.vendor_id = V.Id
+        <if test="completeState !=null">
+            AND O.complete_state=#{completeState}
+        </if>
+        <if test="orderState !=null">
+            AND O.order_state=#{orderState}
+        </if>
+        <if test="refundState !=null">
+            AND O.refund_state=#{refundState}
+        </if>
+        <if test="commentState !=null">
+            AND O.comment_state=#{commentState}
+        </if>
+
+        <if test="createFrom != null and createFrom!=''">
+            AND O.create_time >= str_to_date(#{createFrom},'%Y-%m-%d')
+        </if>
+        <if test="createTo != null and createTo!=''">
+            AND O.create_time &lt; date_add(str_to_date(#{createTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+
+        <if test="orderNo != null and orderNo!=''">
+            AND O.order_no LIKE "%"#{orderNo}"%"
+        </if>
+        <if test="keyword != null and keyword!=''">
+            AND (V.name LIKE "%"#{keyword}"%" OR O.user_id LIKE "%"#{keyword}"%")
+        </if>
+        <if test="tradeArea != null and tradeArea!=''">
+            AND V.TradingArea LIKE "%"#{tradeArea}"%"
+        </if>
+    </select>
+
+    <!--查询订单列表查询-->
+    <select id="listOrderInfo" parameterType="OrderListSearchDTO" resultMap="AdminOrderBOResultMap">
+        SELECT O.order_id AS orderId,
+        O.order_no AS orderNo,
+        O.create_time AS createTime,
+        V.name AS shopName,
+        O.user_id AS userId,
+        O.pay_price AS payPrice,
+        V.TradingArea AS tradeArea,
+        O.complete_state AS completeState,
+        O.order_state AS orderState,
+        O.refund_state AS refundState,
+        O.comment_state AS commentState
+        FROM tf_b_order O, vendorinfo V
+        WHERE O.vendor_id = V.Id
+        <if test="completeState !=null">
+            AND O.complete_state=#{completeState}
+        </if>
+        <if test="orderState !=null">
+            AND O.order_state=#{orderState}
+        </if>
+        <if test="refundState !=null">
+            AND O.refund_state=#{refundState}
+        </if>
+        <if test="commentState !=null">
+            AND O.comment_state=#{commentState}
+        </if>
+
+        <if test="createFrom != null and createFrom!=''">
+            AND O.create_time >= str_to_date(#{createFrom},'%Y-%m-%d')
+        </if>
+        <if test="createTo != null and createTo!=''">
+            AND O.create_time &lt; date_add(str_to_date(#{createTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+
+        <if test="orderNo != null and orderNo!=''">
+            AND O.order_no LIKE "%"#{orderNo}"%"
+        </if>
+        <if test="keyword != null and keyword!=''">
+            AND (V.name LIKE "%"#{keyword}"%" OR O.user_id LIKE "%"#{keyword}"%")
+        </if>
+        <if test="tradeArea != null and tradeArea!=''">
+            AND V.TradingArea LIKE "%"#{tradeArea}"%"
+        </if>
+        ORDER BY O.create_time DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询订单详情-->
+    <select id="getOrderDetail" parameterType="Long" resultMap="AdminOrderDetailBOResultMap">
+        SELECT
+        O.order_id AS orderId,
+        O.order_no AS orderNo,
+        O.complete_state AS completeState,
+        O.order_state AS orderState,
+        O.refund_state AS refundState,
+        O.comment_state AS commentState,
+        V.TradingArea AS tradeArea,
+        C.channel_name AS orderChannelName,
+        O.pay_price AS payPrice,
+        O.delivery_type AS deliveryType,
+        O.delivery_time AS deliveryTime,
+        O.delivery_address AS deliveryAddress,
+        U.Id AS userId,
+        U.Telephone AS userPhone,
+        U.NickName AS userNickName,
+        V.Id AS shopId,
+        V.Name AS shopName,
+        V.Telephone AS shopPhone,
+        O.original_price AS originalPrice,
+        O.create_time AS createTime,
+        O.pay_time AS payTime,
+        O.promise_time AS promiseTime,
+        O.receive_time AS receiveTime,
+        O.comment_time AS commentTime,
+        O.complete_time AS completeTime,
+        O.remark AS remark,
+        CI.condition ,
+        CI.costLimitMoney AS costLimitMoney,
+        CI.money AS money
+        FROM tf_b_order O
+        LEFT JOIN vendorinfo V
+        ON O.vendor_id = V.Id
+        LEFT JOIN userinfo U
+        ON O.user_id = U.Id
+        LEFT JOIN tf_m_channel C ON
+        O.order_channel = C.channel_id
+        LEFT JOIN couponrecord CR ON O.order_id = CR.OrderNo
+        LEFT JOIN couponinfo CI ON CR.CouponId = CI.Id
+        WHERE O.order_id =#{orderId}
+    </select>
+
+    <!--查询订单商品详情-->
+    <select id="getOrderGoodsDetail" parameterType="Long" resultType="AdminOrderGoodsBO">
+        SELECT
+        OG.goods_id AS goodsId,
+        OG.goods_num as goodsNum,
+        OG.original_price AS goodsPrice,
+        OG.goods_name AS goodsName,
+        OG.goods_photos AS goodsPhotos,
+        OA.attr_code AS attrCode,
+        OA.attr_value_show_name AS attrValueShowName
+        FROM tf_b_order_goods_item OG
+        RIGHT JOIN tf_b_order_attr OA
+        ON OG.goods_id = OA.goods_id
+        WHERE OG.order_id = #{orderId}
+        AND OA.order_id = #{orderId}
+        AND show_tag IN (1, 2)
+        ORDER BY show_order
+    </select>
+
+    <!--查询退款申请信息-->
+    <select id="listApplyRefundInfo" parameterType="Long" resultType="AdminOrderApplyRefundBO">
+        SELECT
+        AR.process_status AS processStatus,
+        AR.refund_reason_desc AS refundDesc,
+        AR.refund_remark AS refundRemark,
+        AR.create_time AS createTime,
+        AR.process_time AS processTime
+        FROM TF_M_APPLY_REFUND_RECORD AR
+        WHERE AR.order_id =#{orderId}
+        AND AR.process_status in(1,2)
+    </select>
+
+    <!--查询退款结果信息-->
+    <select id="listRefundResultInfo" parameterType="Long" resultType="AdminOrderRefundResultBO">
+        SELECT
+        R.result_state AS resultState,
+        R.refund_type AS refundType,
+        R.create_time AS refundTime,
+        R.refund_channel AS refundChannel,
+        R.receive_id   AS  receiveId,
+        R.refund_fee   AS  refundFee
+        FROM tf_m_refund_result R
+        WHERE R.order_id=#{orderId}
+        ORDER BY R.create_time DESC
+    </select>
+
+
+    <!--查询状态字典值信息-->
+    <select id="getStatePO" parameterType="HashMap" resultType="StatePO">
+        SELECT
+        state_id AS stateId ,
+        state_type AS  stateType,
+        state_name AS stateName,
+        state_business_type stateBusinessType,
+        state_order AS stateOrder
+        FROM tf_d_state S
+        where S.state_id=#{state}
+        AND  S.state_type=#{type}
+    </select>
+
+    <!--退款成功更新订单表-->
+    <update id="updateOrderInfo" parameterType="OrderPO">
+        UPDATE tf_b_order
+        SET complete_state=#{completeState},
+        refund_state=#{refundState}
+        WHERE order_id=#{orderId}
+    </update>
+
+    <!--保存退款结果-->
+    <insert id="saveManualRefundResult" parameterType="RefundResultPO">
+        INSERT INTO tf_m_refund_result (result_state, order_id, refund_type, refund_fee, refund_channel, receive_id,
+        create_time, staff_id)
+        VALUES (#{resultState},#{orderId},#{refundType},#{refundFee},#{refundChannel},#{receiveId},sysdate(),#{staffId})
+    </insert>
+
+
+</mapper>

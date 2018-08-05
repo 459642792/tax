@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.UserAddressMapper" >
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.UserAddressPO" >
+    <constructor >
+      <idArg column="user_address_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="contact_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="contact_phone" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="address_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="address_desc" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="input_address" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="formatted_address" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="longitude" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="latitude" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="city_code" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="ad_code" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="town_code" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="state_tag" jdbcType="TINYINT" javaType="java.lang.Integer" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <resultMap id="listUserAddress" type="com.blueteam.entity.vo.UserAddressVO" extends="BaseResultMap">
+
+  </resultMap>
+  <insert id="saveUserAddress" parameterType="com.blueteam.entity.po.UserAddressPO" useGeneratedKeys="true" keyProperty="userAddressId" >
+    REPLACE into tf_f_user_address
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="contactName != null" >
+        contact_name,
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone,
+      </if>
+      <if test="addressName != null" >
+        address_name,
+      </if>
+      <if test="addressDesc != null" >
+        address_desc,
+      </if>
+      <if test="inputAddress != null" >
+        input_address,
+      </if>
+      <if test="formattedAddress != null" >
+        formatted_address,
+      </if>
+      <if test="longitude != null" >
+        longitude,
+      </if>
+      <if test="latitude != null" >
+        latitude,
+      </if>
+      <if test="cityCode != null" >
+        city_code,
+      </if>
+      <if test="adCode != null" >
+        ad_code,
+      </if>
+      <if test="townCode != null" >
+        town_code,
+      </if>
+      <if test="stateTag != null" >
+        state_tag,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="contactName != null" >
+        #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="addressName != null" >
+        #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="addressDesc != null" >
+        #{addressDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="inputAddress != null" >
+        #{inputAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="formattedAddress != null" >
+        #{formattedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="longitude != null" >
+        #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adCode != null" >
+        #{adCode,jdbcType=VARCHAR},
+      </if>
+      <if test="townCode != null" >
+        #{townCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateTag != null" >
+        #{stateTag,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="modifyUserAddress" parameterType="UserAddressPO">
+    update tf_f_user_address
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="contactName != null">
+        contact_name = #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="addressName != null">
+        address_name = #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="addressDesc != null">
+        address_desc = #{addressDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="inputAddress != null">
+        input_address = #{inputAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="formattedAddress != null">
+        formatted_address = #{formattedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adCode != null">
+        ad_code = #{adCode,jdbcType=VARCHAR},
+      </if>
+      <if test="townCode != null">
+        town_code = #{townCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateTag != null">
+        state_tag = #{stateTag,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where user_address_id = #{userAddressId,jdbcType=INTEGER}
+  </update>
+  <select id="listUserAddress" resultMap="listUserAddress">
+    select * from tf_f_user_address
+    where user_id =   #{userId,jdbcType=INTEGER} and state_tag = #{stateTag,jdbcType=INTEGER}
+  </select>
+  <select id="getUserAddress" resultMap="BaseResultMap">
+    select * from tf_f_user_address
+    where user_id =   #{userId,jdbcType=INTEGER} and user_address_id = #{userAddressId,jdbcType=INTEGER}
+  </select>
+</mapper>

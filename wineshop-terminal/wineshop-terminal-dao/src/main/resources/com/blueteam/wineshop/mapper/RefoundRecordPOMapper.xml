@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.RefoundRecordPOMapper" >
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.RefoundRecordPO" >
+    <constructor >
+      <idArg column="refound_record_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="order_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="refound_reason" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="process_status" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="remark" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="process_by" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="process_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    refound_record_id, order_id, refound_reason, process_status, remark, process_by, 
+    process_time, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from refound_record
+    where refound_record_id = #{refoundRecordId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from refound_record
+    where refound_record_id = #{refoundRecordId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.blueteam.entity.po.RefoundRecordPO" >
+    insert into refound_record (refound_record_id, order_id, refound_reason, 
+      process_status, remark, process_by, 
+      process_time, create_time)
+    values (#{refoundRecordId,jdbcType=INTEGER}, #{orderId,jdbcType=BIGINT}, #{refoundReason,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{processBy,jdbcType=INTEGER}, 
+      #{processTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.blueteam.entity.po.RefoundRecordPO" >
+    insert into refound_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="refoundRecordId != null" >
+        refound_record_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="refoundReason != null" >
+        refound_reason,
+      </if>
+      <if test="processStatus != null" >
+        process_status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="processBy != null" >
+        process_by,
+      </if>
+      <if test="processTime != null" >
+        process_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="refoundRecordId != null" >
+        #{refoundRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="refoundReason != null" >
+        #{refoundReason,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="processBy != null" >
+        #{processBy,jdbcType=INTEGER},
+      </if>
+      <if test="processTime != null" >
+        #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.blueteam.entity.po.RefoundRecordPO" >
+    update refound_record
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="refoundReason != null" >
+        refound_reason = #{refoundReason,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        process_status = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="processBy != null" >
+        process_by = #{processBy,jdbcType=INTEGER},
+      </if>
+      <if test="processTime != null" >
+        process_time = #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where refound_record_id = #{refoundRecordId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.RefoundRecordPO" >
+    update refound_record
+    set order_id = #{orderId,jdbcType=BIGINT},
+      refound_reason = #{refoundReason,jdbcType=VARCHAR},
+      process_status = #{processStatus,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      process_by = #{processBy,jdbcType=INTEGER},
+      process_time = #{processTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where refound_record_id = #{refoundRecordId,jdbcType=INTEGER}
+  </update>
+</mapper>

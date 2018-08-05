@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.CityInfoMapper">
+    <resultMap id="listCityInfo" type="com.blueteam.entity.vo.UserCityVO">
+        <result column="initial" jdbcType="VARCHAR" property="initial"/>
+        <collection property="listCityInfo" ofType="com.blueteam.entity.po.CityInfo" resultMap="cityInfo">
+        </collection>
+    </resultMap>
+
+    <resultMap id="cityInfo" type="com.blueteam.entity.po.CityInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Name" jdbcType="VARCHAR" property="Name"/>
+        <result column="PinYin" jdbcType="VARCHAR" property="PinYin"/>
+        <result column="ParentCode" jdbcType="VARCHAR" property="ParentCode"/>
+        <result column="Code" jdbcType="VARCHAR" property="Code"/>
+        <result column="EnableFlag" jdbcType="VARCHAR" property="EnableFlag"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="IsExistVendor" jdbcType="VARCHAR" property="IsExistVendor"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+</resultMap>
+
+    <!-- 查询所有的市级 -->
+    <select id="CityInfoList" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and IsExistVendor='Y' and (length(Code)-length(REPLACE(Code,'_','')))=1
+        AND pinyin LIKE "%"#{PinYin}"%" ORDER BY pinyin
+    </select>
+
+<select id="listUserCity" resultMap="listCityInfo">
+        SELECT
+            a.*
+        FROM
+            (
+                SELECT
+                    UPPER(LEFT(s.pinyin, 1)) AS initial,
+                    s.*
+                FROM
+                    CityInfo s
+                WHERE
+                    EnableFlag = 'Y'
+                AND IsExistVendor = 'Y'
+                AND (
+                    length(CODE) - length(REPLACE(CODE, '_', ''))
+                ) = 1
+            ) a
+        ORDER BY
+            a.initial asc
+</select>
+    <!-- 查询城市 -->
+    <select id="queryCity" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and IsExistVendor='Y' AND (pinyin LIKE "%"#{PinYin}"%" or Name
+        like "%"#{PinYin}"%") ORDER BY pinyin
+    </select>
+
+    <!-- 查询市下面的区域 -->
+    <select id="queryCityList" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and IsExistVendor='Y' and (length(Code)-length(REPLACE(Code,'_','')))=2
+        AND (Code LIKE "%"#{Code}"%") ORDER BY pinyin
+    </select>
+    <select id="listCityList" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and (length(Code)-length(REPLACE(Code,'_','')))=2 AND (Code LIKE
+        "%"#{Code}"%") ORDER BY pinyin
+    </select>
+
+    <!-- 查询城市区域Code -->
+    <select id="selectCityCode" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT Code from CityInfo where Name=#{Name}
+    </select>
+
+    <!-- 查询城市名称 -->
+    <select id="selectCityName" resultMap="cityInfo" parameterType="java.lang.String">
+        SELECT Name from CityInfo where Code=#{Code} and EnableFlag = 'Y'
+    </select>
+
+    <select id="selectList" resultMap="cityInfo" parameterType="com.blueteam.entity.po.CityInfo">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and IsExistVendor='Y'
+        <if test="ParentCode!=null">
+            AND ParentCode = #{ParentCode}
+        </if>
+
+        <if test="Code!=null">
+            AND Code = ${Code}
+        </if>
+
+        <if test="Name!=null">
+            AND Name LIKE '%#{Code}%'
+        </if>
+    </select>
+
+
+    <select id="selectListForNotGYS" resultMap="cityInfo" parameterType="com.blueteam.entity.po.CityInfo">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y' and IsExistVendor='Y'
+        <if test="ParentCode!=null">
+            AND ParentCode = #{ParentCode}
+        </if>
+
+        <if test="Code!=null">
+            AND Code = ${Code}
+        </if>
+
+        <if test="Name!=null">
+            AND Name LIKE '%#{Code}%'
+        </if>
+    </select>
+    <select id="selectListForNotGYSS" resultMap="cityInfo" parameterType="com.blueteam.entity.po.CityInfo">
+        SELECT * FROM CityInfo WHERE EnableFlag = 'Y'
+        <if test="ParentCode!=null">
+            AND ParentCode = #{ParentCode}
+        </if>
+
+        <if test="Code!=null">
+            AND Code = ${Code}
+        </if>
+
+        <if test="Name!=null">
+            AND Name LIKE '%#{Code}%'
+        </if>
+    </select>
+    <select id="getCityInfo" resultMap="cityInfo">
+        <![CDATA[
+			SELECT * FROM CityInfo where Code = #{code}
+		]]>
+    </select>
+    <update id="updateCityInfo">
+        <![CDATA[
+			update CityInfo set IsExistVendor = #{isExistVendor} where Code = #{code}
+		]]>
+    </update>
+
+
+    <resultMap id="fullCityMap" type="com.blueteam.entity.dto.City">
+
+        <result column="provinceCode" jdbcType="NVARCHAR" property="provinceCode"/>
+        <result column="provinceName" jdbcType="NVARCHAR" property="provinceName"/>
+        <result column="oCityCode" jdbcType="NVARCHAR" property="cityCode"/>
+        <result column="cityName" jdbcType="NVARCHAR" property="cityName"/>
+        <result column="districtCode" jdbcType="NVARCHAR" property="districtCode"/>
+        <result column="districtName" jdbcType="NVARCHAR" property="districtName"/>
+        <result column="FullName" jdbcType="NVARCHAR" property="fullName"/>
+
+    </resultMap>
+    <sql id="common_citys">
+        WITH EnableCitys AS(
+        SELECT Code,ParentCode,Name AS cName FROM CityInfo WHERE EnableFlag='Y'
+        ),
+        provinceCitys AS(
+        SELECT *,code AS provinceCode,cName AS provinceName,'' AS ocityCode,'' AS cityName,'' AS districtCode,'' AS
+        districtName,cName AS FullName
+        FROM EnableCitys WHERE ParentCode='ROOT'
+        ),
+        ocitys AS (
+        SELECT EC.*,PC.CODE AS provinceCode,pc.cName AS provinceName,ec.Code AS ocityCode,ec.cName AS cityName,'' AS
+        districtCode,'' AS districtName, (pc.cName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN provinceCitys AS PC
+        ON EC.ParentCode = PC.Code
+        WHERE locate('_',EC.ParentCode)=0 AND EC.ParentCode != 'ROOT'
+        ),
+        disCitys AS(
+        SELECT EC.*,C.provinceCode,C.provinceName,C.ocityCode,C.cityName,EC.Code AS districtCode,EC.cName AS
+        districtName,(c.provinceName+c.cityName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN ocitys AS C
+        ON EC.ParentCode = C.Code
+        WHERE locate('_',EC.ParentCode) != 0
+        ),
+        citys AS(
+        SELECT * FROM provinceCitys
+        UNION ALL
+        SELECT * FROM ocitys
+        UNION ALL
+        SELECT * FROM disCitys
+        )
+    </sql>
+
+    <select id="selectCityByCode" resultMap="fullCityMap">
+        SELECT * FROM CityInfo WHERE Code = #{cityCode}
+
+    </select>
+</mapper>

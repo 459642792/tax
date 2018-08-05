@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.MessageMapper">
+    <resultMap id="messageInfoMap" type="com.blueteam.entity.po.Message">
+        <id column="Id" jdbcType="BIGINT" property="id"/>
+        <result column="TypeCode" jdbcType="VARCHAR" property="typeCode"/>
+        <result column="dataKey" jdbcType="VARCHAR" property="dataKey"/>
+        <result column="Title" jdbcType="NVARCHAR" property="title"/>
+        <result column="Content" jdbcType="NVARCHAR" property="content"/>
+        <result column="recipients" jdbcType="INTEGER" property="recipients"/>
+        <result column="vendorID" jdbcType="INTEGER" property="vendorID"/>
+        <result column="carriersID" jdbcType="INTEGER" property="carriersID"/>
+        <result column="receivingUserTypes" jdbcType="INTEGER" property="receivingUserTypes"/>
+        <result column="sendingTime" jdbcType="TIMESTAMP" property="sendingTime"/>
+        <result column="DataSource" jdbcType="VARCHAR" property="dataSource"/>
+        <result column="softApp" jdbcType="VARCHAR" property="softApp"/>
+        <result column="platform" jdbcType="VARCHAR" property="platform"/>
+        <result column="pushServerVersion" jdbcType="VARCHAR" property="pushServerVersion"/>
+
+
+        <result column="createBy" jdbcType="INTEGER" property="createBy"/>
+        <result column="createDate" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="lastUpdateBy" jdbcType="INTEGER" property="lastUpdateBy"/>
+        <result column="lastUpdateDate" jdbcType="TIMESTAMP" property="lastUpdateDate"/>
+
+
+        <result column="OrderID" jdbcType="INTEGER" property="orderID"/>
+        <result column="discoverId" jdbcType="INTEGER" property="discoverId"/>
+        <result column="OrderNo" property="orderNo"/>
+        <result column="settlementAmounts" property="settlementAmounts"/>
+
+
+        <result column="vendorImage" property="vendorImage"/>
+        <result column="productImg" property="productImg"/>
+    </resultMap>
+
+
+    <resultMap id="vendorMessageInfoMap" type="com.blueteam.entity.dto.VendorMessage">
+
+        <result column="TypeCode" jdbcType="VARCHAR" property="typeCode"/>
+        <result column="notReadCount" jdbcType="INTEGER" property="notReadCount"/>
+        <result column="lastMessage" jdbcType="NVARCHAR" property="lastMessage"/>
+        <result column="sendingTime" jdbcType="TIMESTAMP" property="sendingTime"/>
+    </resultMap>
+
+    <resultMap id="pageReultMap" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="messageInfoMap" javaType="List">
+            <id property="count" column="count"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertMsg" parameterType="com.blueteam.entity.po.Message" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO [dbo].[Message]
+        ([TypeCode]
+        ,[dataKey]
+        ,[Title]
+        ,[Content]
+        ,[Recipients]
+        ,[VendorID]
+        ,[CarriersID]
+        ,[receivingUserTypes]
+        ,[SendingTime]
+        ,[DataSource]
+        ,[SoftApp]
+        ,[Platform]
+        ,[PushServerVersion]
+        ,[CreateBy]
+        ,[CreateDate]
+        ,[LastUpdateBy]
+        ,[LastUpdateDate])
+        VALUES
+        (
+        #{typeCode,jdbcType=VARCHAR}
+        ,#{dataKey,jdbcType=VARCHAR}
+        ,#{title,jdbcType=NVARCHAR}
+        ,#{content,jdbcType=NVARCHAR}
+        ,#{recipients,jdbcType=INTEGER}
+        ,#{vendorID,jdbcType=INTEGER}
+        ,#{carriersID,jdbcType=INTEGER}
+        ,#{receivingUserTypes,jdbcType=INTEGER}
+        ,#{sendingTime,jdbcType=TIMESTAMP}
+        ,#{dataSource,jdbcType=VARCHAR}
+        ,#{softApp,jdbcType=VARCHAR}
+        ,#{platform,jdbcType=VARCHAR}
+        ,#{pushServerVersion,jdbcType=VARCHAR}
+        ,#{createBy,jdbcType=INTEGER}
+        ,#{createDate,jdbcType=TIMESTAMP}
+        ,#{lastUpdateBy,jdbcType=INTEGER}
+        ,#{lastUpdateDate,jdbcType=TIMESTAMP}
+        )
+
+    </insert>
+
+    <sql id="sqlSelectTypesNews">
+        WITH msgs AS( SELECT *,ROW_NUMBER() OVER(ORDER BY SendingTime DESC) AS OrderNum FROM (
+        SELECT M.*
+        ,P.Img AS ProductImg -- 产品图片
+        ,VI.Image AS VendorImage --商家图片
+        ,SI.OrderNo AS OrderNo --订单号
+        ,SRC.ForeignKey AS discoverId --发现ID
+
+        FROM Message AS M
+        LEFT JOIN ProductInfo AS P --商品表，兑换记录
+        ON M.DataKey = P.Id AND M.TypeCode='wine_exchange'
+        LEFT JOIN VendorInfo AS VI --商家表，商家图片
+        ON M.DataKey = VI.ID AND (M.TypeCode='wine_exchange' OR M.TypeCode='submit_vendor_authenticate' OR M.TypeCode =
+        'recommended_vendor' OR M.TypeCode='submit_vendor_enter')
+        LEFT JOIN ScoreInfo AS SI
+        ON M.DataKey = SI.ID AND M.TypeCode='comment_evaluate_order'
+        LEFT JOIN UpvoteRecord AS UR
+        ON M.DataKey = UR.ID AND M.TypeCode='discovered_comment_like'
+        LEFT JOIN SmallRoutineComment AS SRC
+        ON UR.ForeignKey = SRC.ID
+
+        <where>
+            <if test="recipients!=0">
+                Recipients=#{recipients}
+            </if>
+
+            <if test="vendorID!=0">
+                AND VendorId=#{vendorID}
+            </if>
+
+            <if test="carriersID!=0">
+                AND CarriersID = #{carriersID}
+            </if>
+
+            <if test="receivingUserTypes!=0">
+                AND receivingUserTypes = #{receivingUserTypes}
+            </if>
+
+            <if test="searchTypes!=null and searchTypes.size() > 0">
+                AND TypeCode IN
+                <foreach item="item" index="index" collection="searchTypes"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+
+            </if>
+        </where>
+
+        ) tt where discoverId IS NOT NULL AND TypeCode = 'discovered_comment_like'
+        )
+    </sql>
+<sql id="TOTALCOUNT">
+    <![CDATA[SET @TOTALCOUNT := (SELECT COUNT(id) FROM (
+    SELECT M.*
+    ,P.Img AS ProductImg
+    ,VI.Image AS VendorImage
+    ,SI.OrderNo AS OrderNo
+    ,SRC.ForeignKey AS discoverId
+    FROM Message AS M
+    LEFT JOIN ProductInfo AS P
+    ON M.DataKey = P.Id AND M.TypeCode='wine_exchange'
+    LEFT JOIN VendorInfo AS VI
+    ON M.DataKey = VI.ID AND (M.TypeCode='wine_exchange' OR M.TypeCode='submit_vendor_authenticate' OR M.TypeCode =
+    'recommended_vendor' OR M.TypeCode='submit_vendor_enter')
+    LEFT JOIN ScoreInfo AS SI
+    ON M.DataKey = SI.ID AND M.TypeCode='comment_evaluate_order'
+    LEFT JOIN UpvoteRecord AS UR
+    ON M.DataKey = UR.ID AND M.TypeCode='discovered_comment_like'
+    LEFT JOIN SmallRoutineComment AS SRC
+    ON UR.ForeignKey = SRC.ID
+    ]]>
+    <where>
+        <if test="recipients!=0">
+            Recipients=#{recipients}
+        </if>
+
+        <if test="vendorID!=0">
+            AND VendorId=#{vendorID}
+        </if>
+
+        <if test="carriersID!=0">
+            AND CarriersID = #{carriersID}
+        </if>
+
+        <if test="receivingUserTypes!=0">
+            AND receivingUserTypes = #{receivingUserTypes}
+        </if>
+
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+    </where>
+    ) tt)
+</sql>
+    <!--获取指定type的 我的消息-->
+    <select id="getMessagesByTypeCodes" resultMap="pageReultMap">
+        <include refid="TOTALCOUNT"/>;
+       <![CDATA[ SELECT @TOTALCOUNT AS  count,tt.* FROM (
+        SELECT M.*
+        ,P.Img AS ProductImg
+        ,VI.Image AS VendorImage
+        ,SI.OrderNo AS OrderNo
+        ,SRC.ForeignKey AS discoverId
+        FROM Message AS M
+        LEFT JOIN ProductInfo AS P
+        ON M.DataKey = P.Id AND M.TypeCode='wine_exchange'
+        LEFT JOIN VendorInfo AS VI
+        ON M.DataKey = VI.ID AND (M.TypeCode='wine_exchange' OR M.TypeCode='submit_vendor_authenticate' OR M.TypeCode =
+        'recommended_vendor' OR M.TypeCode='submit_vendor_enter')
+        LEFT JOIN ScoreInfo AS SI
+        ON M.DataKey = SI.ID AND M.TypeCode='comment_evaluate_order'
+        LEFT JOIN UpvoteRecord AS UR
+        ON M.DataKey = UR.ID AND M.TypeCode='discovered_comment_like'
+        LEFT JOIN SmallRoutineComment AS SRC
+        ON UR.ForeignKey = SRC.ID
+]]>
+        <where>
+            <if test="recipients!=0">
+                Recipients=#{recipients}
+            </if>
+
+            <if test="vendorID!=0">
+                AND VendorId=#{vendorID}
+            </if>
+
+            <if test="carriersID!=0">
+                AND CarriersID = #{carriersID}
+            </if>
+
+            <if test="receivingUserTypes!=0">
+                AND receivingUserTypes = #{receivingUserTypes}
+            </if>
+
+            <if test="searchTypes!=null and searchTypes.size() > 0">
+                AND TypeCode IN
+                <foreach item="item" index="index" collection="searchTypes"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+
+            </if>
+        </where>
+        ) tt where discoverId IS NOT NULL AND TypeCode = 'discovered_comment_like' ORDER BY SendingTime DESC  LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!--获取我的未读消息数量-->
+    <select id="getMeNotReadMessageCount" resultType="java.lang.Integer">
+        SELECT COUNT(M.ID) as resultCount FROM Message AS M
+        LEFT JOIN MessageReading AS MR
+        ON M.ID = MR.MessageID
+        WHERE IFNULL(MR.ReadingStatus,0) = 0
+
+        <if test="recipients!=0">
+            AND M.Recipients=#{recipients}
+        </if>
+
+        <if test="vendorID!=0">
+            AND M.VendorId=#{vendorID}
+        </if>
+
+        <if test="carriersID!=0">
+            AND M.CarriersID = #{carriersID}
+        </if>
+
+        <if test="receivingUserTypes!=0">
+            AND M.receivingUserTypes = #{receivingUserTypes}
+        </if>
+
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND M.TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+    </select>
+
+    <!--获取商家列表信息-->
+    <select id="getVendorMessageStatistics" resultMap="vendorMessageInfoMap">
+        SELECT * FROM(
+        SELECT IFNULL(g.NotReadCount,0) as notReadCount,M.TypeCode,M.Content AS lastMessage,M.SendingTime FROM (
+        SELECT COUNT(M.ID) AS NotReadCount,M.TypeCode FROM Message AS M
+        LEFT JOIN MessageReading AS MR
+        ON M.ID = MR.MessageID
+        WHERE IFNULL(MR.ReadingStatus,0) = 0 AND VendorId=#{vendorID}
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        GROUP BY M.TypeCode
+        ) AS G
+        RIGHT JOIN Message AS M
+        ON G.TypeCode = M.TypeCode
+        WHERE M.VendorId=#{vendorID}
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND M.TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        )ranked
+        <![CDATA[
+			GROUP BY TypeCode
+				ORDER BY
+					SendingTime DESC LIMIT 1
+ 		]]>
+    </select>
+
+
+    <!-- 商家消息搜索 -->
+    <sql id="vendorMessageSearch">
+
+       (
+        SELECT M.*
+        ,OI.DiscountAmount AS PayDiscountAmount,OI.PayTime,OI.PayWay,UI.NickName AS PayNickName
+        ,SR.Amounts AS settlementAmounts
+        ,P.image_url AS ProductImg
+        FROM Message AS M
+        LEFT JOIN SettlementRecords AS SR
+        ON M.DataKey = SR.Id AND M.TypeCode='settlement'
+        LEFT JOIN OrderInfo AS OI
+        ON M.DataKey = OI.Id AND M.TypeCode='transaction'
+        LEFT JOIN UserInfo AS UI
+        ON OI.UserId = UI.Id
+        LEFT JOIN goods_cash_record AS GCR
+        ON GCR.id = M.DataKey AND M.TypeCode='wine_exchange_send'
+        LEFT JOIN (
+        SELECT * FROM(
+        SELECT Tg.ID, TG.goods_name,TGI.image_url
+        FROM traded_goods AS TG
+        LEFT JOIN goods_table_image AS GTI
+        ON TG.id = GTI.traded_goods_id
+        LEFT JOIN traded_goods_image AS TGI
+        ON GTI.traded_goods_image_id = TGI.id
+        GROUP BY TG.id ORDER BY GTI.create_date DESC
+        ) T  LIMIT 1
+        ) AS P
+        ON GCR.traded_goods_id = P.Id
+        WHERE M.VendorId=#{vendorID}
+
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND M.TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+         ORDER BY M.SendingTime DESC
+        )
+
+    </sql>
+    <sql id="vendorMessageSearch_counts">
+                SET @TOTALCOUNT := (SELECT COUNT(id) FROM <include refid="vendorMessageSearch"/> as whereTable)
+
+    </sql>
+    <select id="getVendorMessagesByTypeCodes" resultMap="pageReultMap">
+        <include refid="vendorMessageSearch_counts"/>;
+        SELECT @TOTALCOUNT AS count,whereTable.* FROM  <include refid="vendorMessageSearch"/>  as whereTable
+        <![CDATA[
+		ORDER BY whereTable.SendingTime DESC 	LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		 ]]>
+    </select>
+
+    <!--获取管理员消息列表-->
+    <select id="getAdminMessages" resultMap="messageInfoMap">
+        WITH msgs AS(
+        SELECT M.*
+        ,P.Img AS ProductImg -- 产品图片
+        ,VI.Image AS VendorImage --商家图片
+        FROM Message AS M
+        LEFT JOIN ProductInfo AS P --商品表，兑换记录
+        ON M.DataKey = P.Id AND M.TypeCode='wine_exchange'
+        LEFT JOIN VendorInfo AS VI --商家表，商家图片
+        ON M.DataKey = VI.ID AND (M.TypeCode='submit_vendor_authenticate' OR M.TypeCode = 'submit_vendor_enter' OR
+        M.TypeCode = 'wine_exchange')
+        LEFT JOIN MessageReading AS MR
+        ON M.ID = MR.MessageID
+        WHERE M.receivingUserTypes = 8
+        AND IFNULL(MR.ReadingStatus,0) = 0
+
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND M.TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        )
+        SELECT * FROM msgs ORDER BY SendingTime DESC
+    </select>
+
+
+    <insert id="readMessageByID" parameterType="com.blueteam.entity.dto.MessageSearch">
+        --这里没有判断我是否有权限读取这条消息
+        DECLARE @ID INT
+        SET @ID = 0
+        SELECT @ID = id FROM MessageReading WHERE MessageID = #{id}
+        IF @ID = 0
+        BEGIN
+        INSERT INTO MessageReading
+        (
+        MessageID ,
+        Recipients ,
+        ReadingStatus ,
+        ReadingTime ,
+        CreateBy ,
+        CreateDate ,
+        LastUpdateBy ,
+        LastUpdateDate
+        )
+        VALUES (#{id} , -- MessageID - int
+        #{createBy} , -- Recipients - int
+        1 , -- ReadingStatus - int
+        now() , -- ReadingTime - datetime
+        #{createBy} , -- CreateBy - int
+        now() , -- CreateDate - datetime
+        #{createBy} , -- LastUpdateBy - int
+        now() -- LastUpdateDate - datetime
+        )
+        END
+    </insert>
+
+
+    <insert id="readMessageByTypeCodes" parameterType="com.blueteam.entity.dto.MessageSearch">
+        INSERT INTO MessageReading
+        (
+        MessageID ,
+        Recipients ,
+        ReadingStatus ,
+        ReadingTime ,
+        CreateBy ,
+        CreateDate ,
+        LastUpdateBy ,
+        LastUpdateDate
+        )
+        SELECT
+        M.ID,
+        #{createBy},
+        1,
+        now(),
+        #{createBy},
+        now(),
+        #{createBy},
+        now()
+        FROM MessageReading AS MR
+        RIGHT JOIN Message AS M
+        ON MR.MessageID = M.ID
+        WHERE IFNULL(MR.ReadingStatus,0) = 0
+        AND(
+        (
+        m.receivingUserTypes = 0
+        <if test="vendorID!=0">
+            AND M.VendorID = #{vendorID}
+        </if>
+
+        <if test="carriersID!=0">
+            AND M.CarriersID = #{carriersID}
+        </if>
+        AND M.Recipients = #{createBy})
+        )
+
+
+        <if test="searchTypes!=null and searchTypes.size() > 0">
+            AND m.TypeCode IN
+            <foreach item="item" index="index" collection="searchTypes"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </insert>
+</mapper>

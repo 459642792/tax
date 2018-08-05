@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.CurrencyRecordMapper">
+    <resultMap id="currencyRecord" type="com.blueteam.entity.po.CurrencyRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="number_id" jdbcType="INTEGER" property="numberId"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="vendorinfo_id" jdbcType="INTEGER" property="vendorinfoId"/>
+        <result column="userinfo_id" jdbcType="INTEGER" property="userinfoId"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="DATE" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="DATE" property="updateDate"/>
+    </resultMap>
+    <!-- 查询当天该用户为商家新增多少个酒币 -->
+    <select id="countUserInfoCurrencyRecord" resultType="java.lang.Integer">
+        <![CDATA[
+SELECT
+	SUM(amount) AS counts
+FROM
+	currency_record
+WHERE
+	status = #{status}
+AND userinfo_id = #{userInfoId}
+AND vendorinfo_id = #{vendorInfoId}
+AND date_format(create_date,'%Y-%m-%d') = CURDATE()
+	]]>
+    </select>
+    <insert id="saveCurrencyRecord" parameterType="com.blueteam.entity.po.CurrencyRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+	    	insert into currency_record
+				(number_id,amount,vendorinfo_id,status,create_by,create_date,update_by,update_date,userinfo_id) 
+				values(#{numberId},#{amount},#{vendorinfoId},#{status},#{createBy},#{createDate},#{updateBy},#{updateDate},#{userinfoId})
+	    ]]>
+    </insert>
+    <!--查询商家剩余酒币 -->
+    <select id="countVendorInfoCurrencyRecord" resultType="java.lang.Integer">
+        <![CDATA[
+		SELECT
+			 IFNULL(a.amounts,0) -  IFNULL(b.amounts,0) AS amounts
+		FROM
+			(
+				SELECT
+					vendorinfo_id,
+					SUM(amount) AS amounts
+				FROM
+					currency_record
+				WHERE
+					status = 1
+				AND vendorinfo_id = #{vendorInfoId}
+				GROUP BY
+					vendorinfo_id
+			) AS a
+		LEFT JOIN (
+			SELECT
+				vendorinfo_id,
+				SUM(amount) AS amounts
+			FROM
+				currency_record
+			WHERE
+				status = 0
+			AND vendorinfo_id = #{vendorInfoId}
+			GROUP BY
+				vendorinfo_id
+		) b ON a.vendorinfo_id = b.vendorinfo_id
+		]]>
+    </select>
+    <select id="listCurrencyRecord" resultType="java.util.HashMap">
+        <![CDATA[
+		 select *
+			FROM
+				(
+					SELECT
+				gcr.goods_name AS name,
+				date_format(crd.create_date,'%Y-%m-%d %H:%i') AS createDate,
+				INSERT('--', 2, 1, crd.amount) AS amount,
+				crd.status AS status
+			FROM
+				currency_record crd
+			LEFT JOIN goods_cash_record gcr ON crd.number_id = gcr.id
+			WHERE
+				crd.status = 0 and crd.vendorinfo_id = #{vendorInfoId}
+			UNION
+				SELECT
+					'成功交易' AS name,
+				  date_format(create_date,'%Y-%m-%d %H:%i') AS createDate,
+					INSERT('++', 2, 1, amount) AS amount,
+					status AS status
+				FROM
+					currency_record
+				WHERE
+					status = 1 and vendorinfo_id = #{vendorInfoId}
+					 ) as tt ORDER BY
+						tt.createDate DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+					]]>
+    </select>
+
+    <select id="listCountCurrencyRecord" resultType="int">
+        <![CDATA[
+		SELECT COUNT(*)
+FROM ( SELECT
+				gcr.goods_name AS name,
+				date_format(crd.create_date,'%Y-%m-%d %H:%i') AS createDate,
+				INSERT('--', 2, 1, crd.amount) AS amount,
+				crd.status AS status
+			FROM
+				currency_record crd
+			LEFT JOIN goods_cash_record gcr ON crd.number_id = gcr.id
+			WHERE
+				crd.status = 0 and crd.vendorinfo_id = #{vendorInfoId}
+			UNION
+				SELECT
+					'成功交易' AS name,
+					date_format(create_date,'%Y-%m-%d %H:%i') AS createDate,
+					INSERT('++', 2, 1, amount) AS amount,
+					status AS status
+				FROM
+					currency_record
+				WHERE
+					status = 1 and vendorinfo_id = #{vendorInfoId}
+					 ) as tt
+	]]>
+    </select>
+
+</mapper>

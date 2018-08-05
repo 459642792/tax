@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.VendorBankMapper">
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.VendorBankPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="bank" jdbcType="VARCHAR" property="bank" />
+    <result column="bank_branch" jdbcType="VARCHAR" property="bankBranch" />
+    <result column="province_code" jdbcType="VARCHAR" property="provinceCode" />
+    <result column="province_name" jdbcType="VARCHAR" property="provinceName" />
+    <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="district_code" jdbcType="VARCHAR" property="districtCode" />
+    <result column="district_name" jdbcType="VARCHAR" property="districtName" />
+    <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <result column="bank_shortname" jdbcType="VARCHAR" property="bankShortname" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, created_time, modify_time, vendor_id, account, bank, bank_branch, province_code, 
+    province_name, city_code, city_name, district_code, district_name,delete_flag,bank_shortname
+  </sql>
+
+  <select id="selectByVendorId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tf_m_vendor_bank
+    where vendor_id = #{vendorId} and delete_flag=0
+  </select>
+
+  <insert id="insert" parameterType="com.blueteam.entity.po.VendorBankPO">
+    insert into tf_m_vendor_bank (id, created_time, modify_time, 
+      vendor_id, account, bank, 
+      bank_branch, province_code, province_name, 
+      city_code, city_name, district_code, 
+      district_name,bank_shortname)
+    values (#{id,jdbcType=INTEGER}, now(), now(),
+      #{vendorId,jdbcType=INTEGER}, #{account,jdbcType=VARCHAR}, #{bank,jdbcType=VARCHAR}, 
+      #{bankBranch,jdbcType=VARCHAR}, #{provinceCode,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR}, 
+      #{cityCode,jdbcType=VARCHAR}, #{cityName,jdbcType=VARCHAR}, #{districtCode,jdbcType=VARCHAR}, 
+      #{districtName,jdbcType=VARCHAR},#{bankShortname})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.VendorBankPO">
+    update tf_m_vendor_bank
+    set created_time = #{createdTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      vendor_id = #{vendorId,jdbcType=INTEGER},
+      account = #{account,jdbcType=VARCHAR},
+      bank = #{bank,jdbcType=VARCHAR},
+      bank_branch = #{bankBranch,jdbcType=VARCHAR},
+      province_code = #{provinceCode,jdbcType=VARCHAR},
+      province_name = #{provinceName,jdbcType=VARCHAR},
+      city_code = #{cityCode,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      district_code = #{districtCode,jdbcType=VARCHAR},
+      district_name = #{districtName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateById" parameterType="com.blueteam.entity.po.VendorBankPO">
+    update tf_m_vendor_bank
+    <set>
+        modify_time = now(),
+      <if test="account != null">
+        account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="bank != null">
+        bank = #{bank,jdbcType=VARCHAR},
+      </if>
+      <if test="bankBranch != null">
+        bank_branch = #{bankBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceCode != null">
+        province_code = #{provinceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null">
+        province_name = #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null">
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtCode != null">
+        district_code = #{districtCode,jdbcType=VARCHAR},
+      </if>
+      <if test="districtName != null">
+        district_name = #{districtName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankShortname != null">
+        bank_shortname = #{bankShortname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id} AND vendor_id = #{vendorId}
+  </update>
+
+  <update id="delById" parameterType="com.blueteam.entity.po.VendorBankPO">
+    update tf_m_vendor_bank
+    SET modify_time = now(),delete_flag = 1
+    where id = #{id} AND vendor_id = #{vendorId}
+  </update>
+
+</mapper>

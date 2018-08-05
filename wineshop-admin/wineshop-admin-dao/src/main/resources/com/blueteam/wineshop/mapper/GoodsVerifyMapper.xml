@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.GoodsVerifyMapper" >
+
+    <select id="countVerifyInfo" parameterType="GoodsVerifySearchDTO" resultType="Integer">
+        SELECT count(VC.VERIFY_BAR_CODE)
+        FROM (SELECT V.VERIFY_BAR_CODE
+        FROM TF_B_GOODS_VERIFY V
+        WHERE V.VERIFY_STATE = 0
+        GROUP BY V.VERIFY_BAR_CODE)  VC
+    </select>
+
+    <select id="listVerifyInfo" parameterType="GoodsVerifySearchDTO"
+            resultType="AdminVerifyVO">
+        SELECT
+        V.VERIFY_BAR_CODE verifyBarCode,
+        COUNT(V.VERIFY_ID) verifyCount,
+        MIN(V.UPDATE_TIME) latestUpdateTime,
+        V.VERIFY_GOODS_NAME verifyGoodsName
+        FROM TF_B_GOODS_VERIFY V
+        WHERE V.VERIFY_STATE = 0
+        GROUP BY V.VERIFY_BAR_CODE
+        <trim prefix="ORDER BY" suffixOverrides=",">
+            <if test="timeOrderTag ==null or timeOrderTag==0">
+                latestUpdateTime DESC,
+            </if>
+            <if test="timeOrderTag !=null and timeOrderTag==1">
+                latestUpdateTime,
+            </if>
+            <if test="submitOrderTag ==null or submitOrderTag==0">
+                verifyCount DESC,
+            </if>
+            <if test="submitOrderTag !=null and submitOrderTag==1">
+                verifyCount,
+            </if>
+        </trim>
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="countVendorVerifyInfo" parameterType="VendorVerifySearchDTO"
+            resultType="Integer">
+        SELECT count(V.VERIFY_ID)
+        FROM   TF_B_GOODS_VERIFY V
+        WHERE  V.VERIFY_BAR_CODE = #{verifyBarCode}
+        AND    V.VERIFY_STATE =0
+    </select>
+
+    <select id="listVendorInfo" parameterType="VendorVerifySearchDTO"
+            resultType="AdminVendorVerifyVO">
+        SELECT V.VERIFY_BAR_CODE    verifyBarCode,
+               VI.NAME              vendorName,
+               V.VERIFY_GOODS_NAME  verifyGoodsName,
+               V.CREATE_TIME        submitTime,
+               V.VERIFY_SALE_PRICE  verifySalePrice,
+               V.VERIFY_GOODS_STATE verifyGoodsState,
+               V.VERIFY_GOODS_PHOTO verifyGoodsPhoto
+        FROM   TF_B_GOODS_VERIFY V, VENDORINFO VI
+        WHERE  V.VERIFY_BAR_CODE = #{verifyBarCode}
+        AND    V.VENDOR_ID = VI.Id
+        AND    V.VERIFY_STATE =0
+        ORDER BY V.CREATE_TIME DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <update id="updateVerifyInfo" parameterType="GoodsVerifyInfoPO">
+        UPDATE TF_B_GOODS_VERIFY V
+        <set>
+            <if test="verifyRefuseCode != null ">V.VERIFY_REFUSE_CODE = #{verifyRefuseCode},</if>
+            <if test="verifyRefuseReason != null ">V.VERIFY_REFUSE_REASON = #{verifyRefuseReason},</if>
+            V.VERIFY_STATE = #{verifyState},
+            V.UPDATE_TIME = SYSDATE()
+        </set>
+        WHERE  V.VERIFY_BAR_CODE =#{verifyBarCode}
+    </update>
+
+</mapper>

@@ -1,0 +1,207 @@
+.ui-datepicker .ui-datepicker-title select.ui-datepicker-year {
+    margin-top: 5px;
+}
+
+.ui-datepicker .ui-datepicker-title select.ui-datepicker-month {
+    margin-top: 5px;
+}
+
+.orderInfoCon {
+    text-align: center;
+    flex: 1;
+    margin-left: 10px;
+    font-size: 12px;
+}
+
+.orderInfoCon:first-child {
+    margin-left: 0;
+}
+
+.orderInfoList {
+    display: flex;
+}
+
+/*订单列表订单详情*/
+.orderAdmin_orderDetail {
+    font-size: 13px;
+}
+
+.orderAdmin_detail_titile {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.orderAdmin_detail_headerTitle {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 0 10px 0;
+}
+
+.orderAdmin_detail_orderinfo {
+    border-bottom: 1px solid #e4e4e4;
+    padding: 5px 0;
+}
+
+.orderAdmin_detail_orderinfo_list {
+    display: flex;
+    line-height: 25px;
+
+}
+
+.orderAdmin_detail_orderinfo_listL {
+    flex: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.orderAdmin_detail_orderinfo_listR {
+    width: 40%;
+}
+
+/*商品信息*/
+.orderAdmin_goodsInfoList {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.orderAdmin_goodsInfoList_img {
+    width: 100px;
+    margin-right: 10px;
+}
+
+.orderAdmin_goodsInfoList_img img {
+    width: 90px;
+    height: 60px;
+    padding: 5px;
+    border: 1px solid #e4e4e4;
+}
+
+.orderAdmin_goodsInfoList_property {
+    flex: 1;
+}
+
+.orderAdmin_goodsInfoList_price {
+    margin-left: 10px;
+    width: 100px;
+    text-align: right;
+}
+
+.orderAdmin_goodsInfoList_title {
+    margin-bottom: 10px;
+}
+
+.orderGoodsInfoAttribute span {
+    display: inline-block;
+    color: #878787;
+    font-size: 12px;
+    border-right: 1px solid #878787;
+    padding: 0 5px 0px 5px;
+    height: 15px;
+    line-height: 15px;
+}
+
+.orderGoodsInfoAttribute span:first-child {
+    padding-left: 0;
+}
+
+.orderGoodsInfoAttribute span:last-child {
+    border-right: none;
+}
+
+.orderAdmin_goodsInfoList_price span {
+    padding-right: 15px
+}
+
+.orderAdmin_detail_orderinfo_sum {
+    text-align: right;
+    line-height: 25px;
+    padding-right: 10px;
+}
+
+/*举报列表*/
+.reportAdmin_listText {
+    padding: 0 15px;
+
+}
+
+.reportAdmin_listIAmge {
+    padding: 0 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.reportAdmin_listIAmge a {
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.reportAdmin_listIAmge img {
+    width: 90px;
+    height: 90px;
+    padding: 5px;
+    border: 1px solid #e4e4e4;
+}
+
+#kfhf_textarea, #cljg_textarea {
+    width: 90%;
+    height: 50px;
+    margin: 0 auto;
+    padding: 5px;
+    display: block;
+}
+
+#reportAdmin_button {
+    margin-top: 20px;
+    padding: 10px 50px;
+    margin-left: 200px;
+}
+
+.redColor {
+    color: red;
+    padding-left: 5%;
+    font-size: 12px;
+}
+
+/*手动退款*/
+#refundAuto {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 0;
+    z-index: 9999;
+}
+.refundAutoCont {
+    width: 300px;
+    height: 200px;
+    background: #fff;
+    padding: 10px;
+}
+.refundAutoCont-title{
+    text-align: center;
+    font-weight: bold;
+
+}
+.refundAutoCont-list{
+    margin-top: 10px;
+}
+.refundAutoCont-list span{
+    padding-right: 10px;
+}
+.refundAutoCont-list input,.refundAutoCont-list select{
+    height: 30px;
+    width: 200px;
+    padding: 0 5px;
+
+}
+#orderInfo_list td{
+    font-size: 12px;
+}
+.errorRefundAuto{
+    padding-left: 67px;
+    display: none;
+}

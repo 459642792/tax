@@ -1,0 +1,18 @@
+#dt_count tbody td {
+    text-align: center;
+}
+
+#dt_basic thead th {
+    text-align: center;
+}
+
+#dt_basic tbody td {
+    text-align: center;
+}
+
+.icon_img {
+    height: 18px;
+    width: 18px;
+    vertical-align: -2px;
+    margin-right: 5px;
+}

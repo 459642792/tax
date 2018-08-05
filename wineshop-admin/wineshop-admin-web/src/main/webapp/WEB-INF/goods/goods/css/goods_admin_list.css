@@ -1,0 +1,67 @@
+.goodsBtn{
+    margin-right:5px;
+}
+#goods_admin_list .tableBtn{
+    width:50px;
+}
+#goods_admin_list .tableBtn img{
+    width:20px;
+    height:20px;
+}
+.brandType,
+.searchPrice,
+.searchPrice .input,
+.alcoholAttrCode,
+.alcoholAttrCode .input,
+.inputSearch,
+.inputSearch .input{
+    display: flex;
+    display: -webkit-flex;
+}
+.searchPrice .input input,
+.alcoholAttrCode .input input,
+.inputSearch .input{
+    margin-right: 20px;
+}
+.brandType .title,
+.searchPrice .title,
+.alcoholAttrCode .title,
+.inputSearch .title{
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 0px;
+}
+.brandType #adminType label,
+.brandType #packageAttrCode label{
+    height:30px;
+    line-height:30px;
+    display: inline-block;
+    margin-right:10px;
+    position: relative;
+    padding-left:15px;
+    width:40px;
+}
+.brandType #adminType label input[type=checkbox],
+.brandType #packageAttrCode label input[type=checkbox]{
+    position: absolute;
+    top:5px;
+    left:0px;
+}
+#goods_admin_list .clickSort{
+    background: url('./../../../Content/Home/image/table_sort.png') no-repeat center right;
+}
+
+#goods_admin_list .hasSortAsc{
+    background: #EEEEEE;
+    background: url('./../../../Content/Home/image/sort_up.png') no-repeat center right #EEEEEE;
+}
+#goods_admin_list .hasSortDesc{
+    background: #EEEEEE;
+    background: url('./../../../Content/Home/image/sort_down.png') no-repeat center right #EEEEEE;
+}
+#dt_basic_wrapper .dt-toolbar{
+    padding:0;
+    border-bottom:0;
+}

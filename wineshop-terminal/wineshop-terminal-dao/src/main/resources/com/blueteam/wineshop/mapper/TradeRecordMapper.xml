@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.TradeRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.TradeRecordPO" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="order_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="refund_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="result_code" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="trade_type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="trade_start_record" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="trade_end_record" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="trade_start_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="trade_end_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <select id="getTradeRecord" resultType="java.lang.Integer"  >
+select id
+    from tf_m_trade_record
+    where order_id = #{orderId,jdbcType=INTEGER} AND trade_end_record is  null
+  </select>
+  <insert id="saveTradeRecord" parameterType="com.blueteam.entity.po.TradeRecordPO" >
+    insert into tf_m_trade_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="refundId != null" >
+        refund_id,
+      </if>
+      <if test="resultCode != null" >
+        result_code,
+      </if>
+      <if test="tradeType != null" >
+        trade_type,
+      </if>
+      <if test="tradeStartRecord != null" >
+        trade_start_record,
+      </if>
+      <if test="tradeEndRecord != null" >
+        trade_end_record,
+      </if>
+      <if test="tradeStartTime != null" >
+        trade_start_time,
+      </if>
+      <if test="tradeEndTime != null" >
+        trade_end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="refundId != null" >
+        #{refundId,jdbcType=BIGINT},
+      </if>
+      <if test="resultCode != null" >
+        #{resultCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeType != null" >
+        #{tradeType,jdbcType=INTEGER},
+      </if>
+      <if test="tradeStartRecord != null" >
+        #{tradeStartRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeEndRecord != null" >
+        #{tradeEndRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStartTime != null" >
+        #{tradeStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tradeEndTime != null" >
+        #{tradeEndTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateTradeRecord" parameterType="com.blueteam.entity.po.TradeRecordPO" >
+    update tf_m_trade_record
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="refundId != null" >
+        refund_id = #{refundId,jdbcType=BIGINT},
+      </if>
+      <if test="resultCode != null" >
+        result_code = #{resultCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeType != null" >
+        trade_type = #{tradeType,jdbcType=INTEGER},
+      </if>
+      <if test="tradeStartRecord != null" >
+        trade_start_record = #{tradeStartRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeEndRecord != null" >
+        trade_end_record = #{tradeEndRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStartTime != null" >
+        trade_start_time = #{tradeStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tradeEndTime != null" >
+        trade_end_time = #{tradeEndTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

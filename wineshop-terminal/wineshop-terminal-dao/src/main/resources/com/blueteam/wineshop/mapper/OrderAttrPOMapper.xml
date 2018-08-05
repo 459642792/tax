@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderAttrPOMapper" >
+  <insert id="saveOrderAttr" parameterType="com.blueteam.entity.po.OrderAttrPO" >
+    insert into tf_b_order_attr
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="attrCode != null" >
+        attr_code,
+      </if>
+      <if test="parentAttrCode != null" >
+        parent_attr_code,
+      </if>
+      <if test="attrName != null" >
+        attr_name,
+      </if>
+      <if test="attrType != null" >
+        attr_type,
+      </if>
+      <if test="attrGoodsType != null" >
+        attr_goods_type,
+      </if>
+      <if test="necessaryTag != null" >
+        necessary_tag,
+      </if>
+      <if test="attrValueCode != null" >
+        attr_value_code,
+      </if>
+      <if test="attrValueName != null" >
+        attr_value_name,
+      </if>
+      <if test="attrValueShowName != null" >
+        attr_value_show_name,
+      </if>
+      <if test="showTag != null" >
+        show_tag,
+      </if>
+      <if test="showOrder != null" >
+        show_order,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="attrCode != null" >
+        #{attrCode,jdbcType=CHAR},
+      </if>
+      <if test="parentAttrCode != null" >
+        #{parentAttrCode,jdbcType=CHAR},
+      </if>
+      <if test="attrName != null" >
+        #{attrName,jdbcType=VARCHAR},
+      </if>
+      <if test="attrType != null" >
+        #{attrType,jdbcType=TINYINT},
+      </if>
+      <if test="attrGoodsType != null" >
+        #{attrGoodsType,jdbcType=INTEGER},
+      </if>
+      <if test="necessaryTag != null" >
+        #{necessaryTag,jdbcType=TINYINT},
+      </if>
+      <if test="attrValueCode != null" >
+        #{attrValueCode,jdbcType=CHAR},
+      </if>
+      <if test="attrValueName != null" >
+        #{attrValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="attrValueShowName != null" >
+        #{attrValueShowName,jdbcType=VARCHAR},
+      </if>
+      <if test="showTag != null" >
+        #{showTag,jdbcType=TINYINT},
+      </if>
+      <if test="showOrder != null" >
+        #{showOrder,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+</mapper>

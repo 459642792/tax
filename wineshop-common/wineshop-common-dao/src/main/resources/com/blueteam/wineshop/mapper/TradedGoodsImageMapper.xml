@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.TradedGoodsImageMapper">
+    <resultMap id="tradedGoodsImage" type="com.blueteam.entity.po.TradedGoodsImage">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="DATE" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="DATE" property="updateDate"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from traded_goods_image
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="saveTradedGoodsImage" parameterType="com.blueteam.entity.po.TradedGoodsImage"
+            useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+		INSERT INTO traded_goods_image (
+	image_url,
+	type,
+	create_by,
+	create_date,
+	update_by,
+	update_date
+)
+VALUES
+	(
+		#{imageUrl},
+		#{type},
+		#{createBy},
+		#{createDate},
+		#{updateBy},
+		#{updateDate}
+	)
+		]]>
+    </insert>
+    <update id="updateTradedGoodsImage" parameterType="com.blueteam.entity.po.TradedGoodsImage">
+        <![CDATA[
+			UPDATE traded_goods_image SET 
+	image_url = #{imageUrl},
+	update_by = #{updateBy},
+	update_date = #{updateDate}
+ where id = #{id}
+		]]>
+    </update>
+</mapper>

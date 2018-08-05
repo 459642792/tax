@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.TradeAdminMapper">
+
+    <!--AdminTradeBO结果映射-->
+    <resultMap id="AdminTradeBOResultMap" type="AdminTradeBO">
+        <result property="orderNo" column="orderNo"/>
+        <result property="tradeTime" column="tradeTime"/>
+        <result property="shopName" column="shopName"/>
+        <result property="tradeArea" column="tradeArea"/>
+        <result property="userId" column="userId"/>
+        <result property="orderSource" column="orderSource"/>
+        <result property="originalPrice" column="originalPrice"/>
+        <result property="payPrice" column="payPrice"/>
+        <result property="refundFee" column="refundFee"/>
+        <result property="couponType" column="couponType"/>
+        <result property="couponFee" column="couponFee"/>
+
+        <association property="orderStateBO" javaType="OrderStateBO">
+            <result property="completeState" column="completeState"/>
+            <result property="orderState" column="orderState"/>
+            <result property="refundState" column="refundState"/>
+            <result property="commentState" column="commentState"/>
+        </association>
+    </resultMap>
+
+    <!--查询交易信息-->
+    <select id="getTradeInfo" parameterType="TradeListSearchDTO" resultMap="AdminTradeBOResultMap">
+        SELECT
+        O.ORDER_NO AS orderNo,
+        O.CREATE_TIME AS tradeTime,
+        VI.Name AS shopName,
+        VI.TradingArea AS tradeArea,
+        O.USER_ID AS userId,
+        o.order_source AS orderSource,
+        o.ORIGINAL_PRICE AS originalPrice,
+        o.PAY_PRICE AS payPrice,
+        R.refund_fee AS refundFee,
+        CI.Type AS couponType,
+        c.Money AS couponFee,
+        O.complete_state AS completeState,
+        O.order_state AS orderState,
+        O.refund_state AS refundState,
+        O.comment_state AS commentState
+        FROM TF_B_ORDER O
+        LEFT JOIN vendorinfo VI ON O.VENDOR_ID = VI.Id
+        LEFT JOIN tf_m_refund_result R ON O.ORDER_ID = R.order_id
+        LEFT JOIN couponrecord C ON O.ORDER_ID = C.orderNo
+        LEFT JOIN couponinfo CI ON C.CouponId = CI.Id
+        <where>
+            <include refid="com.blueteam.wineshop.mapper.BaseMapper.judgeOrderState">
+                <property name="orderTable" value="O"/>
+            </include>
+
+            <if test="tradeArea != null and tradeArea!=''">
+                AND VI.TradingArea LIKE "%"#{tradeArea}"%"
+            </if>
+
+            <if test="tradeTimeFrom != null and tradeTimeFrom!=''">
+                AND O.create_time >= str_to_date(#{tradeTimeFrom},'%Y-%m-%d')
+            </if>
+
+            <if test="tradeTimeTo != null and tradeTimeTo!=''">
+                AND O.create_time &lt; date_add(str_to_date(#{tradeTimeTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+
+            <if test="shopName != null and shopName!=''">
+                AND VI.Name LIKE "%"#{shopName}"%"
+            </if>
+
+            <if test="tradeSource != null">
+                AND o.order_source=#{tradeSource}
+            </if>
+        </where>
+    </select>
+
+    <!--分页查询交易信息-->
+    <select id="getTradeListInfo" parameterType="TradeListSearchDTO" resultMap="AdminTradeBOResultMap">
+        SELECT
+        O.ORDER_NO AS orderNo,
+        O.CREATE_TIME AS tradeTime,
+        VI.Name AS shopName,
+        VI.TradingArea AS tradeArea,
+        O.USER_ID AS userId,
+        o.order_source AS orderSource,
+        o.ORIGINAL_PRICE AS originalPrice,
+        o.PAY_PRICE AS payPrice,
+        O.complete_state AS completeState,
+        O.order_state AS orderState,
+        O.refund_state AS refundState,
+        O.comment_state AS commentState,
+        R.refund_fee AS refundFee,
+        CI.Type AS couponType,
+        c.Money AS couponFee
+        FROM TF_B_ORDER O
+        LEFT JOIN vendorinfo VI ON O.VENDOR_ID = VI.Id
+        LEFT JOIN tf_m_refund_result R ON O.ORDER_ID = R.order_id
+        LEFT JOIN couponrecord C ON O.ORDER_ID = C.orderNo
+        LEFT JOIN couponinfo CI ON C.CouponId = CI.Id
+        <where>
+            <include refid="com.blueteam.wineshop.mapper.BaseMapper.judgeOrderState">
+                <property name="orderTable" value="O"/>
+            </include>
+
+            <if test="tradeArea != null and tradeArea!=''">
+                AND VI.TradingArea LIKE "%"#{tradeArea}"%"
+            </if>
+
+            <if test="tradeTimeFrom != null and tradeTimeFrom!=''">
+                AND O.create_time >= str_to_date(#{tradeTimeFrom},'%Y-%m-%d')
+            </if>
+
+            <if test="tradeTimeTo != null and tradeTimeTo!=''">
+                AND O.create_time &lt; date_add(str_to_date(#{tradeTimeTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+
+            <if test="shopName != null and shopName!=''">
+                AND VI.Name LIKE "%"#{shopName}"%"
+            </if>
+
+            <if test="tradeSource != null">
+                AND o.order_source=#{tradeSource}
+            </if>
+        </where>
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+
+</mapper>

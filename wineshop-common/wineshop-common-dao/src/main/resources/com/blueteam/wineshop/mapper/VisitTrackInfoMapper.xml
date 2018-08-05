@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.VisitTrackInfoMapper" >
+  <resultMap id="visit" type="com.blueteam.entity.po.VisitTrackInfoPO">
+    <constructor>
+      <idArg column="Id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="ForeignId" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="VisitType" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="VisitTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="ClientAddress" javaType="java.lang.String" jdbcType="VARCHAR" />
+    </constructor>
+  </resultMap>
+  <insert id="insertVisitTrackInfo" parameterType="com.blueteam.entity.po.VisitTrackInfoPO">
+    insert into visittrackinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        Id,
+      </if>
+      <if test="foreignid != null">
+        ForeignId,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="visittype != null">
+        VisitType,
+      </if>
+      <if test="visittime != null">
+        VisitTime,
+      </if>
+      <if test="clientaddress != null">
+        ClientAddress,
+      </if>
+      <if test="useragent != null">
+        UserAgent,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="foreignid != null">
+        #{foreignid,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="visittype != null">
+        #{visittype,jdbcType=INTEGER},
+      </if>
+      <if test="visittime != null">
+        #{visittime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clientaddress != null">
+        #{clientaddress,jdbcType=VARCHAR},
+      </if>
+      <if test="useragent != null">
+        #{useragent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="getVisitTrackToVendorId" resultType="Integer" >
+      SELECT count(id) from visittrackinfo where ForeignId = #{vendorId,jdbcType=INTEGER} AND
+      user_id = #{userId,jdbcType=INTEGER}
+  </select>
+</mapper>

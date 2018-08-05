@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.VendorByGoodsMapper" >
+    <!--<cache eviction="LRU"    flushInterval="3000" size="1024" readOnly="false"  type="com.blueteam.base.cache.redis.help.RedisCache"/> &lt;!&ndash; *映射语句 &ndash;&gt;-->
+    <resultMap id="BaseResultMap" type="com.blueteam.entity.po.GoodsVerifyInfoPO">
+        <constructor >
+            <idArg column="VERIFY_ID" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="VERIFY_BAR_CODE" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="VERIFY_GOODS_NAME" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="VERIFY_GOODS_STATE" jdbcType="BIT" javaType="java.lang.Boolean" />
+            <arg column="VERIFY_GOODS_PHOTO" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="VENDOR_ID" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="VERIFY_SALE_PRICE" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="VERIFY_STATE" jdbcType="TINYINT" javaType="java.lang.Byte" />
+            <arg column="VERIFY_REFUSE_REASON" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="CREATE_TIME" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="UPDATE_TIME" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+        </constructor>
+    </resultMap>
+
+
+    <resultMap id="brandGoodsMap" type="com.blueteam.entity.vo.GoodsVO">
+        <result column="goodsId" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goodsName" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="goodsImage" jdbcType="VARCHAR" property="goodsImage"/>
+        <result column="goodsPrice" jdbcType="VARCHAR" property="goodsPrice"/>
+        <result column="goodsMonthlySales" jdbcType="INTEGER" property="goodsMonthlySales"/>
+        <result column="goodsStatus" jdbcType="INTEGER" property="goodsStatus"/>
+        <result column="goodsBarcode" jdbcType="VARCHAR" property="goodsBarcode"/>
+        <collection property="goodsAttr" ofType="com.blueteam.entity.vo.GoodsAttrVO">
+            <result column="attrName" jdbcType="VARCHAR" property="attrName"/>
+            <result column="valueName" jdbcType="VARCHAR" property="valueName"/>
+            <result column="valueCode" jdbcType="VARCHAR" property="valueCode"/>
+        </collection>
+    </resultMap>
+    <!--品牌商品列表映射-->
+    <resultMap id="pageReultMap" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="brandGoodsMap"
+                    javaType="List">
+        </collection>
+    </resultMap>
+    <!--商品详情映射-->
+    <resultMap id="GoodsDtailsMap" type="com.blueteam.entity.vo.GoodsDetailVO" extends="brandGoodsMap">
+        <result column="vendorName" jdbcType="VARCHAR" property="vendorName"/>
+        <result column="vendorId" jdbcType="INTEGER" property="vendorId"/>
+        <result column="telephone" jdbcType="VARCHAR"  property="telephone"/>
+        <result column="phone" jdbcType="VARCHAR"  property="phone"/>
+        <result column="brandName" jdbcType="VARCHAR" property="brandName"/>
+        <result column="brandId" jdbcType="INTEGER" property="brandId"/>
+        <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+        <result column="goodsYearSales" jdbcType="INTEGER" property="goodsYearSales"/>
+        <result column="goodsDetail" jdbcType="VARCHAR" property="goodsDetail"/>
+        <result column="goodsVendorStatus" jdbcType="INTEGER" property="goodsVendorStatus"/>
+        <collection property="goodsImages" ofType="com.blueteam.entity.vo.GoodsPhotoVO">
+            <result column="imageUrl" jdbcType="VARCHAR" property="imageUrl"/>
+            <result column="imageTone" jdbcType="VARCHAR" property="imageTone"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertGoodsVerifyInfo" parameterType="com.blueteam.entity.po.GoodsVerifyInfoPO" flushCache="true" useGeneratedKeys="true" keyProperty="verfifyId">
+        insert ignore into tf_b_goods_verify
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="verifyBarCode != null" >
+                VERIFY_BAR_CODE,
+            </if>
+            <if test="verifyGoodsName != null" >
+                VERIFY_GOODS_NAME,
+            </if>
+            <if test="verifyGoodsState != null" >
+                VERIFY_GOODS_STATE,
+            </if>
+            <if test="verifyGoodsPhoto != null" >
+                VERIFY_GOODS_PHOTO,
+            </if>
+            <if test="vendorId != null" >
+                VENDOR_ID,
+            </if>
+            <if test="verifySalePrice != null" >
+                VERIFY_SALE_PRICE,
+            </if>
+            <if test="verifyState != null" >
+                VERIFY_STATE,
+            </if>
+            <if test="verifyRefuseReason != null" >
+                VERIFY_REFUSE_REASON,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="verifyBarCode != null" >
+                #{verifyBarCode,jdbcType=VARCHAR},
+            </if>
+            <if test="verifyGoodsName != null" >
+                #{verifyGoodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="verifyGoodsState != null" >
+                #{verifyGoodsState,jdbcType=BIT},
+            </if>
+            <if test="verifyGoodsPhoto != null" >
+                #{verifyGoodsPhoto,jdbcType=VARCHAR},
+            </if>
+            <if test="vendorId != null" >
+                #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="verifySalePrice != null" >
+                #{verifySalePrice,jdbcType=INTEGER},
+            </if>
+            <if test="verifyState != null" >
+                #{verifyState,jdbcType=TINYINT},
+            </if>
+            <if test="verifyRefuseReason != null" >
+                #{verifyRefuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <sql id="countGoodsByType">
+        SET @totalcount =
+        (SELECT count(gv.goods_id) FROM (select goods_id from tf_g_goods_vendor where vendor_id = #{vendorId}  and vendor_Goods_STATE = #{vendorGoodsState}
+        ) gv JOIN (select goods_id from tf_g_goods where  goods_type = #{brandGoodsType}
+        <if test="vendorGoodsState != 0">
+            and   GOODS_STATE = #{vendorGoodsState}
+        </if>
+        ) g ON gv.goods_id = g.goods_id
+        );
+    </sql>
+    <!--获取商家商品列表-->
+    <select id="listGoodsByType" resultMap="pageReultMap">
+        <include refid="countGoodsByType"></include>
+        SELECT   @totalcount as `count`,a.* FROM  (SELECT g.goods_id AS  goodsId,
+        g.goodsName,gp.goodsImage,g.goodsPrice,g.goodsStatus,ga.attrName,ga.valueName,ga.valueCode
+        FROM
+        (SELECT * FROM  (SELECT gv.goods_id,ROUND(gv.SALE_PRICE / 100, 2) AS goodsPrice,g.goods_name as goodsName,g.GOODS_STATE AS  goodsStatus,gv.UPDATE_TIME AS  updateTime FROM
+        (select goods_id,SALE_PRICE,UPDATE_TIME from tf_g_goods_vendor where vendor_id = #{vendorId}  and vendor_Goods_STATE = #{vendorGoodsState}
+        ) gv JOIN (select goods_name,goods_id,GOODS_STATE from tf_g_goods where goods_type = #{brandGoodsType}
+        <if test="vendorGoodsState != 0">
+            and   GOODS_STATE = #{vendorGoodsState}
+        </if>
+        ) g ON gv.goods_id = g.goods_id ) g
+        ORDER  BY
+        <if test="order != null and orderType != null and order != '' and orderType != ''">
+            ${order} ${orderType},
+        </if>
+        convert(g.goodsName USING gbk) COLLATE gbk_chinese_ci asc
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ) g
+        JOIN (
+        SELECT
+        GOODS_ID,GOODS_PHOTO AS goodsImage
+        FROM
+        tf_g_goods_photo
+        GROUP BY
+        GOODS_ID
+        ) gp ON g.goods_id = gp.GOODS_ID
+        JOIN (
+        SELECT
+        ga.GOODS_ID,
+        ga.ATTR_VALUE_SHOW_NAME AS valueName,
+        ga.ATTR_CODE as  valueCode,
+        a.ATTR_NAME as attrName
+        <if test="source == 1">
+            ,a.FIRST_SHOW_ORDER
+        </if>
+        <if test="source == 2">
+            ,a.SECOND_SHOW_ORDER
+        </if>
+        <if test="source == 3">
+            , a.THIRD_SHOW_ORDER
+        </if>
+        FROM
+        tf_g_goods_attr ga
+        JOIN (select * from td_g_attr where 1=1
+        <if test="source == 1">
+            AND  FIRST_SHOW_TAG =1
+        </if>
+        <if test="source == 2">
+            AND  SECOND_SHOW_TAG =1
+        </if>
+        <if test="source == 3">
+            AND   THIRD_SHOW_TAG = 1
+        </if>
+        ) a ON ga.ATTR_CODE = a.ATTR_CODE
+        ) ga ON g.goods_id = ga.GOODS_ID
+        ) a
+    </select>
+    <!--商家审核列表-->
+    <select id="listGoodsByVerify" resultMap="brandGoodsMap">
+        SELECT
+            SUBSTRING_INDEX(VERIFY_GOODS_PHOTO,'^',1) AS goodsImage,
+            VERIFY_GOODS_NAME AS goodsName,
+            ROUND(VERIFY_SALE_PRICE / 100, 2) AS goodsPrice
+        FROM
+            tf_b_goods_verify gv
+        WHERE
+            gv.VERIFY_STATE = 0
+        AND gv.VENDOR_ID = #{vendorId}
+        ORDER BY
+            UPDATE_TIME DESC
+    </select>
+
+    <!--商品详情-->
+    <select id="getVendorByGoodsDetails" resultMap="GoodsDtailsMap">
+        select gb.goods_id AS goodsId,gb.goodsName,ROUND(gv.SALE_PRICE / 100, 2) AS goodsPrice,gb.goodsStatus,gb.barCode AS goodsBarcode, ga.attrName,ga.valueName,ga.valueCode,
+        gb.brandName,gb.brandId,gb.GOODS_TYPE AS  typeId,gd.GOODS_DESC AS goodsDetail,gv.VENDOR_GOODS_STATE AS  goodsVendorStatus,ggp.GOODS_PHOTO AS imageUrl,ggp.PHOTO_TONE as imageTone
+        from (select GOODS_ID,SALE_PRICE,VENDOR_ID,VENDOR_GOODS_STATE from tf_g_goods_vendor where VENDOR_ID =  #{vendorId} and GOODS_ID =  #{goodsId}) gv
+        RIGHT JOIN (SELECT
+        g.goods_id,g.GOODS_NAME AS goodsName,g.GOODS_STATE as goodsStatus,g.BAR_CODE AS  barCode,g.GOODS_TYPE,bn.brand_id AS brandId,bn.brand_name AS brandName
+        FROM
+        (SELECT * FROM tf_g_goods WHERE GOODS_ID =  #{goodsId}) g
+        JOIN
+        (SELECT brand_id,brand_name FROM td_g_brand_sub ) bn
+        ON g.BRAND_ID = bn.brand_id ) gb on gv.goods_id  = gb.goods_id
+        JOIN (
+        SELECT
+        ga.GOODS_ID,
+        ga.ATTR_VALUE_SHOW_NAME AS valueName,
+        ga.ATTR_CODE as  valueCode,
+        a.ATTR_NAME as attrName
+        <if test="source == 1">
+            ,a.FIRST_SHOW_ORDER
+        </if>
+        <if test="source == 2">
+            ,a.SECOND_SHOW_ORDER
+        </if>
+        <if test="source == 3">
+            , a.THIRD_SHOW_ORDER
+        </if>
+        FROM
+        tf_g_goods_attr ga
+        JOIN (select * from td_g_attr
+        <if test="source == 1">
+            where      FIRST_SHOW_TAG =1  OR FIRST_SHOW_TAG =3
+        </if>
+        <if test="source == 2">
+            where  SECOND_SHOW_TAG =1 OR FIRST_SHOW_TAG =3
+        </if>
+        <if test="source == 3">
+            where   THIRD_SHOW_TAG = 1 OR FIRST_SHOW_TAG =3
+        </if>
+        ) a ON ga.ATTR_CODE = a.ATTR_CODE
+        ) ga ON  gb.goods_id = ga.GOODS_ID
+        join tf_g_goods_photo ggp ON  gb.goods_id = ggp.GOODS_ID
+        join tf_g_goods_detail gd ON  gb.goods_id = gd.GOODS_ID ORDER BY
+        <if test="source == 1">
+            ga.FIRST_SHOW_ORDER ASC
+        </if>
+        <if test="source == 2">
+            ga.SECOND_SHOW_ORDER ASC
+        </if>
+        <if test="source == 3">
+            ga.THIRD_SHOW_ORDER ASC
+        </if>
+    </select>
+
+
+
+    <sql id="countMatchingGoods">
+        SET @totalcount =
+        (SELECT count(goods_id) FROM tf_g_goods WHERE GOODS_STATE=1
+          AND (goods_name like  "%"#{matchingValue}"%"  OR BAR_CODE  like "%"#{matchingValue}"%")
+        );
+    </sql>
+    <!--用户模糊匹配商家商品列表-->
+    <select id="listMatchingGoodsByNameAndBarcode" resultMap="pageReultMap">
+        <include refid="countMatchingGoods"></include>
+        SELECT   @totalcount as `count`,a.* FROM  (SELECT g.goods_id AS  goodsId,
+        g.goodsName,gp.goodsImage,g.goodsPrice,g.goodsBarcode,ga.attrName,ga.valueName,ga.valueCode
+        FROM
+        (SELECT
+        goods_name as goodsName,
+        goods_id,
+        ROUND(SUGGEST_PRICE / 100, 2) AS goodsPrice,UPDATE_TIME,BAR_CODE as goodsBarcode  from tf_g_goods where GOODS_STATE=1 AND (goods_name like "%"#{matchingValue}"%"  OR BAR_CODE  like "%"#{matchingValue}"%")
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}) g
+        JOIN (
+        SELECT
+        GOODS_ID,GOODS_PHOTO AS goodsImage
+        FROM
+        tf_g_goods_photo
+        GROUP BY
+        GOODS_ID
+        ) gp ON g.goods_id = gp.GOODS_ID
+        JOIN (
+        SELECT
+        ga.GOODS_ID,
+        ga.ATTR_VALUE_SHOW_NAME AS valueName,
+        ga.ATTR_CODE as  valueCode,
+        a.ATTR_NAME as attrName
+        <if test="source == 1">
+            ,a.FIRST_SHOW_ORDER
+        </if>
+        <if test="source == 2">
+            ,a.SECOND_SHOW_ORDER
+        </if>
+        <if test="source == 3">
+            , a.THIRD_SHOW_ORDER
+        </if>
+        FROM
+        tf_g_goods_attr ga
+        JOIN (select * from td_g_attr where 1=1
+        <if test="source == 1">
+            AND  FIRST_SHOW_TAG =1
+        </if>
+        <if test="source == 2">
+            AND  SECOND_SHOW_TAG =1
+        </if>
+        <if test="source == 3">
+            AND   THIRD_SHOW_TAG = 1
+        </if>
+        ) a ON ga.ATTR_CODE = a.ATTR_CODE
+        ) ga ON g.goods_id = ga.GOODS_ID ORDER  BY g.goodsPrice DESC ,g.UPDATE_TIME DESC
+        <if test="source == 1">
+            , ga.FIRST_SHOW_ORDER ASC
+        </if>
+        <if test="source == 2">
+            ,ga.SECOND_SHOW_ORDER ASC
+        </if>
+        <if test="source == 3">
+            ,ga.THIRD_SHOW_ORDER ASC
+        </if>
+        ) a
+    </select>
+    <!--插入商家商品-->
+    <insert id="saveGoodsVendorInfo" parameterType="com.blueteam.entity.po.GoodsVendorInfoPO" flushCache="true" >
+        insert into tf_g_goods_vendor
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="goodsId != null" >
+                GOODS_ID,
+            </if>
+            <if test="vendorId != null" >
+                VENDOR_ID,
+            </if>
+            <if test="salePrice != null" >
+                SALE_PRICE,
+            </if>
+            <if test="vendorGoodsState != null" >
+                VENDOR_GOODS_STATE,
+            </if>
+            <if test="createStaffId != null" >
+                CREATE_STAFF_ID,
+            </if>
+            <if test="updateStaffId != null" >
+                UPDATE_STAFF_ID,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="goodsId != null" >
+                #{goodsId,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null" >
+                #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="salePrice != null" >
+                #{salePrice,jdbcType=INTEGER},
+            </if>
+            <if test="vendorGoodsState != null" >
+                #{vendorGoodsState,jdbcType=BIT},
+            </if>
+            <if test="createStaffId != null" >
+                #{createStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="updateStaffId != null" >
+                #{updateStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+        ON DUPLICATE KEY UPDATE SALE_PRICE =  #{salePrice,jdbcType=INTEGER},
+        VENDOR_GOODS_STATE= #{vendorGoodsState,jdbcType=BIT},UPDATE_STAFF_ID= #{vendorId,jdbcType=INTEGER},UPDATE_TIME = sysdate()
+    </insert>
+    <insert id="saveVndorBrandInfo" parameterType="com.blueteam.entity.po.VendorBrandInfoPO" flushCache="true">
+        insert into tf_g_vendor_brand
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="vendorId != null" >
+                VENDOR_ID,
+            </if>
+            <if test="brandId != null" >
+                BRAND_ID,
+            </if>
+            <if test="brandGoodsAmount != null" >
+                BRAND_GOODS_AMOUNT,
+            </if>
+            <if test="authorityTag != null" >
+                AUTHORITY_TAG,
+            </if>
+            <if test="createStaffId != null" >
+                CREATE_STAFF_ID,
+            </if>
+            <if test="updateStaffId != null" >
+                UPDATE_STAFF_ID,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+            <if test="isMajor != null" >
+                IS_MAJOR,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="vendorId != null" >
+                #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="brandId != null" >
+                #{brandId,jdbcType=INTEGER},
+            </if>
+            <if test="brandGoodsAmount != null" >
+                #{brandGoodsAmount,jdbcType=INTEGER},
+            </if>
+            <if test="authorityTag != null" >
+                #{authorityTag,jdbcType=INTEGER},
+            </if>
+            <if test="createStaffId != null" >
+                #{createStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="updateStaffId != null" >
+                #{updateStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isMajor != null" >
+                #{isMajor},
+            </if>
+        </trim>
+        <!--<choose>
+            <when test="goodsVendorStatus == 1">-->
+                ON DUPLICATE KEY UPDATE BRAND_GOODS_AMOUNT = BRAND_GOODS_AMOUNT + #{brandGoodsAmount},
+                UPDATE_STAFF_ID=#{updateStaffId},UPDATE_TIME = sysdate(),
+                IS_MAJOR=#{isMajor}
+            <!--</when>
+            <otherwise>
+                ON DUPLICATE KEY UPDATE BRAND_GOODS_AMOUNT = BRAND_GOODS_AMOUNT - 1,
+                UPDATE_STAFF_ID=#{updateStaffId},UPDATE_TIME = sysdate(),
+                IS_MAJOR=#{isMajor}
+            </otherwise>
+        </choose>-->
+
+    </insert>
+    <select id="getGoodsByStatusAndBrandId" parameterType="Long" resultType="HashMap">
+       select  GOODS_STATE AS  goodsStatus ,BRAND_ID AS  brandId from tf_g_goods where GOODS_ID = #{goodsId}
+    </select>
+
+    <select id="getVendorGoodsByStatus" resultType="HashMap">
+        select VENDOR_GOODS_STATE as vendorGoodsStatus ,SALE_PRICE AS price from tf_g_goods_vendor where GOODS_ID = #{goodsId} AND  VENDOR_ID = #{vendorId}
+    </select>
+    <update id="updateVendorGoodsByStatus"  flushCache="true">
+        update  tf_g_goods_vendor SET vendor_goods_state =  #{vendorGoodsStatus}  where vendor_id = #{vendorId}  and goods_id = #{goodsId}
+    </update>
+    <select id="getGoodsByBrandId" resultType="HashMap">
+        SELECT
+            tg.goods_id AS goodsId,
+            tv.vendor_id AS vendorId
+        FROM
+            tf_g_goods tg
+        LEFT JOIN (
+            SELECT
+                *
+            FROM
+                tf_g_goods_vendor
+            WHERE
+                vendor_id =#{vendorId}
+        ) tv ON tg.goods_id = tv.goods_id
+        WHERE
+            tg.BAR_CODE = #{barCode}
+    </select>
+    <update id="updateGoodsVerifyByBarCode"  parameterType="com.blueteam.entity.po.GoodsVerifyInfoPO">
+        update tf_b_goods_verify
+        <set >
+            <if test="verifyBarCode != null" >
+                VERIFY_BAR_CODE = #{verifyBarCode,jdbcType=VARCHAR},
+            </if>
+            <if test="verifyGoodsName != null" >
+                VERIFY_GOODS_NAME = #{verifyGoodsName},
+            </if>
+            <if test="verifyGoodsState != null" >
+                VERIFY_GOODS_STATE = #{verifyGoodsState},
+            </if>
+            <if test="verifyGoodsPhoto != null" >
+                VERIFY_GOODS_PHOTO = #{verifyGoodsPhoto},
+            </if>
+            <if test="vendorId != null" >
+                VENDOR_ID = #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="verifySalePrice != null" >
+                VERIFY_SALE_PRICE = #{verifySalePrice,jdbcType=INTEGER},
+            </if>
+            <if test="verifyState != null" >
+                VERIFY_STATE = #{verifyState},
+            </if>
+            <if test="verifyRefuseReason != null" >
+                VERIFY_REFUSE_REASON = #{verifyRefuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME = #{createTime},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime},
+            </if>
+        </set>
+        where VERIFY_BAR_CODE =#{verifyBarCode} and VENDOR_ID =  #{vendorId} and VERIFY_STATE = 1
+    </update>
+
+    <select id="getIsMajor" parameterType="int" resultType="int">
+        SELECT IS_MAJOR FROM tf_g_vendor_brand
+        WHERE BRAND_ID=#{brandId} and VENDOR_ID=#{vendorId}
+    </select>
+</mapper>

@@ -1,0 +1,28 @@
+﻿.impowerBox .title {
+    display: none;
+}
+
+.impowerBox .qrcode {
+    border: none;
+    width: 240px;
+    margin-top: 0;
+}
+
+.impowerBox .status {
+    padding: 7px 18px;
+}
+
+.impowerBox .status p,
+.impowerBox .status h4 {
+    font-family: "Helvetica Neue", Helvetica, Arial;
+    font-size: 14px;
+}
+
+.impowerBox .status_succ,
+.impowerBox .info {
+    margin-top: -20px;
+}
+
+.impowerBox .status_browser p:last-child {
+    display: none;
+}

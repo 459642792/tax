@@ -1,0 +1,210 @@
+/*尾部*/
+.col_agent {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 150px;
+
+}
+
+.dllc {
+    width: 100%;
+    margin: 0;
+    min-width: 1200px;
+}
+
+.dllc h2 {
+    color: #cc0000;
+    height: 50px;
+    line-height: 50px;
+}
+
+.dllc ul, .dllc h2 {
+    margin-left: 30px;
+}
+
+.dllc ul li {
+    float: left;
+}
+
+.dllc ul .dllc_p {
+    width: 180px;
+}
+
+.dllc ul .dllc_p div {
+    width: 130px;
+}
+
+.dllc ul .dllc_p div h4 {
+    margin: 0;
+}
+
+.dllc ul .dllc_img {
+    width: 50px;
+    margin-left: 5px;
+    margin-right: 10px
+}
+
+.dllc ul .dllc_img img {
+    margin-top: 20px;
+}
+
+.dllc ul .dllc_p img {
+    margin-right: 5px;
+}
+
+.dllc ul .dllc_p p {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #333333
+}
+
+.foot_t {
+    background-color: #ededed;
+    min-width: 1200px;
+    width: 100%;
+    height: 95px;
+    clear: both;
+}
+
+.foot_min {
+    margin: 0 auto;
+    width: 1200px;
+    position: relative;
+
+}
+
+.foot_min li {
+    float: left;
+    font-weight: bolder;
+    padding-top: 7px;
+    margin-top: 8px;
+}
+
+.foot_mar {
+    margin-right: 95px;
+    margin-left: 90px;
+}
+
+.foot_mal {
+    margin-left: 90px;
+}
+
+.foot_min span {
+    margin-left: 15px;
+    position: relative;
+    bottom: 20px;
+}
+
+.foot_width {
+    width: 100%;
+    background-color: #ffffff;
+    clear: both;
+    min-width: 1200px;
+
+}
+
+.col_foot {
+    width: 1200px;
+
+}
+
+.col_foot ul {
+    float: left;
+    margin-top: 15px;
+    margin-left: 40px;
+    margin-right: 120px;
+}
+
+.col_foot h3 {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.col_foot h3 a {
+    color: #333333;
+    text-decoration: none;
+}
+
+.col_foot li {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.col_foot li a {
+    color: #888888;
+    text-decoration: none;
+}
+
+.col_hr {
+    border-bottom: 1px solid #cccccc;
+    width: 1100px;
+    margin-left: 35px;
+    clear: both;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+.foot_b li a {
+    color: #888888;
+    text-decoration: none;
+}
+
+.foot_b {
+    padding-bottom: 10px;
+    clear: both;
+}
+
+.foot_b ul {
+    margin-top: 7px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.foot_b li {
+    margin-left: 5px;
+    display: inline;
+    font-size: 12px;
+
+}
+
+.foot_b p {
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 5px;
+
+}
+
+.foot_talk {
+    text-align: center;
+
+}
+
+/*登录尾部*/
+.foot_b1 li a {
+    color: #666;
+    text-decoration: none;
+}
+
+.foot_b1 {
+    clear: both;
+}
+
+.foot_b1 ul {
+    margin-top: 7px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.foot_b1 li {
+    margin-left: 5px;
+    display: inline;
+    font-size: 12px;
+
+}
+
+.foot_b1 p {
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 5px;
+
+}

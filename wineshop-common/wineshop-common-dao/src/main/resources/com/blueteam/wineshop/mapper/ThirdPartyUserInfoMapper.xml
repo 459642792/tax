@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.ThirdPartyUserInfoMapper">
+    <resultMap id="BaseResultMap" type="com.blueteam.entity.po.ThirdPartyUserInfo">
+        <constructor>
+            <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="third_party_id" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="third_party_nick_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="third_party_head_image" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="third_party_city" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="user_type" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="third_party_type" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="third_party_status" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="create_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="create_date" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+            <arg column="update_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="update_date" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, third_party_id, third_party_nick_name, third_party_head_image, third_party_city,
+        user_type, third_party_type, third_party_status, create_by, create_date, update_by,
+        update_date
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from third_party_user_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from third_party_user_info
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.blueteam.entity.po.ThirdPartyUserInfo" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into third_party_user_info ( third_party_id, third_party_nick_name,
+        third_party_head_image, third_party_city, user_type,
+        third_party_type, third_party_status, create_by,
+        create_date, update_by, update_date
+        )
+        values (#{thirdPartyId,jdbcType=VARCHAR}, #{thirdPartyNickName,jdbcType=VARCHAR},
+        #{thirdPartyHeadImage,jdbcType=VARCHAR}, #{thirdPartyCity,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER},
+        #{thirdPartyType,jdbcType=INTEGER}, #{thirdPartyStatus,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR},
+        #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
+        )
+
+
+    </insert>
+    <insert id="insertSelective" parameterType="com.blueteam.entity.po.ThirdPartyUserInfo" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into third_party_user_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="thirdPartyId != null">
+                third_party_id,
+            </if>
+            <if test="thirdPartyNickName != null">
+                third_party_nick_name,
+            </if>
+            <if test="thirdPartyHeadImage != null">
+                third_party_head_image,
+            </if>
+            <if test="thirdPartyCity != null">
+                third_party_city,
+            </if>
+            <if test="userType != null">
+                user_type,
+            </if>
+            <if test="thirdPartyType != null">
+                third_party_type,
+            </if>
+            <if test="thirdPartyStatus != null">
+                third_party_status,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="thirdPartyId != null">
+                #{thirdPartyId,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyNickName != null">
+                #{thirdPartyNickName,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyHeadImage != null">
+                #{thirdPartyHeadImage,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyCity != null">
+                #{thirdPartyCity,jdbcType=VARCHAR},
+            </if>
+            <if test="userType != null">
+                #{userType,jdbcType=INTEGER},
+            </if>
+            <if test="thirdPartyType != null">
+                #{thirdPartyType,jdbcType=INTEGER},
+            </if>
+            <if test="thirdPartyStatus != null">
+                #{thirdPartyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+
+
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.blueteam.entity.po.ThirdPartyUserInfo">
+        update third_party_user_info
+        <set>
+            <if test="thirdPartyId != null">
+                third_party_id = #{thirdPartyId,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyNickName != null">
+                third_party_nick_name = #{thirdPartyNickName,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyHeadImage != null">
+                third_party_head_image = #{thirdPartyHeadImage,jdbcType=VARCHAR},
+            </if>
+            <if test="thirdPartyCity != null">
+                third_party_city = #{thirdPartyCity,jdbcType=VARCHAR},
+            </if>
+            <if test="userType != null">
+                user_type = #{userType,jdbcType=INTEGER},
+            </if>
+            <if test="thirdPartyType != null">
+                third_party_type = #{thirdPartyType,jdbcType=INTEGER},
+            </if>
+            <if test="thirdPartyStatus != null">
+                third_party_status = #{thirdPartyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.ThirdPartyUserInfo">
+        update third_party_user_info
+        set third_party_id = #{thirdPartyId,jdbcType=VARCHAR},
+        third_party_nick_name = #{thirdPartyNickName,jdbcType=VARCHAR},
+        third_party_head_image = #{thirdPartyHeadImage,jdbcType=VARCHAR},
+        third_party_city = #{thirdPartyCity,jdbcType=VARCHAR},
+        user_type = #{userType,jdbcType=INTEGER},
+        third_party_type = #{thirdPartyType,jdbcType=INTEGER},
+        third_party_status = #{thirdPartyStatus,jdbcType=INTEGER},
+        create_by = #{createBy,jdbcType=VARCHAR},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        update_by = #{updateBy,jdbcType=VARCHAR},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="listThirdPartyUserInfo" resultMap="BaseResultMap">
+        <![CDATA[
+ SELECT tpui.* from   (
+    SELECT * from third_party_user_info where  1 = 1
+]]>
+        <if test="bindStatus != null">
+            AND third_party_status = #{bindStatus}
+        </if>
+        <if test="thirdStatus != null">
+            AND third_party_type = #{thirdStatus}
+        </if>
+        <if test="status != null">
+            AND user_type = #{status}
+        </if>
+        <![CDATA[ )  tpui LEFT JOIN
+     (select * from user_middle_third_party where middle_status = 1) umtp    ON umtp.third_party_id = tpui.id LEFT JOIN
+UserInfo ui ON ui.Id = umtp.user_info_id
+
+where   umtp.user_info_id =  #{userInfoId} ]]>
+
+    </select>
+</mapper>

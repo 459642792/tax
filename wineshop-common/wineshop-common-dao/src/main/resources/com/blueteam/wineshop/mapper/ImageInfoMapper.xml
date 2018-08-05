@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.ImageInfoMapper">
+    <resultMap id="imageInfo" type="com.blueteam.entity.po.ImageInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Image" jdbcType="VARCHAR" property="Image"/>
+        <result column="Url" jdbcType="VARCHAR" property="Url"/>
+        <result column="Title" jdbcType="VARCHAR" property="Title"/>
+        <result column="Status" jdbcType="INTEGER" property="Status"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="ForeignKey" jdbcType="VARCHAR" property="ForeignKey"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="SortNumber" jdbcType="INTEGER" property="SortNumber"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="ExtendId" jdbcType="INTEGER" property="ExtendId"/>
+    </resultMap>
+
+    <select id="ImageInfoList" resultMap="imageInfo">
+        SELECT * FROM ImageInfo WHERE Type = #{Type} and ExtendId = #{ForeignKey}
+    </select>
+
+    <select id="getImagesByType" resultMap="imageInfo">
+        select * from ImageInfo where ForeignKey = #{vendorId}
+        and Type = #{vendorType} order by SortNumber
+    </select>
+
+    <select id="findMaxSortNumber" resultType="com.blueteam.entity.po.ImageInfo">
+        select  SortNumber from ImageInfo
+        where type = #{imageType} and ForeignKey = #{vendorId} order by SortNumber desc LIMIT 0,1
+    </select>
+
+    <select id="getImagesByIdAndType" resultMap="imageInfo">
+        select * from ImageInfo where Type=#{type} and ForeignKey =
+        (select ForeignKey from ImageInfo where Id=#{id})
+        order by SortNumber
+    </select>
+
+    <insert id="insertImage" parameterType="com.blueteam.entity.po.ImageInfo">
+        insert into ImageInfo
+        (Image,Url,Title,Status,Detail,ForeignKey,Type,SortNumber,CreateBy,CreateDate,UpdateDate,UpdateBy,ExtendId)
+        values(#{Image},#{Url},#{Title},#{Status},#{Detail},#{ForeignKey},#{Type},#{SortNumber},#{CreateBy},#{CreateDate},#{UpdateDate},#{UpdateBy},#{ExtendId})
+    </insert>
+
+    <!-- 顶部头图前置 -->
+    <update id="swapSortNumber" parameterType="map">
+        update ImageInfo set SortNumber =
+        case Id
+        when #{firstId} then #{secondSortNumber}
+        when #{secondId} then #{firstSortNumber}
+        else SortNumber end
+        where Id = #{firstId} or Id = #{secondId}
+    </update>
+
+    <delete id="removeHeadImage" parameterType="int">
+        delete ImageInfo where Id = #{id}
+    </delete>
+
+    <!-- 删除图片的相关信息 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.util.List">
+        delete from ImageInfo where ExtendId = #{ExtendId} and Type=#{Type}
+    </delete>
+
+</mapper>

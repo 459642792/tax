@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.ReportAdminMapper">
+
+    <!--查询举报数量-->
+    <select id="countReportList" parameterType="ReportListSearchDTO" resultType="Integer">
+        SELECT COUNT(*)
+        FROM tf_b_order_complain OC
+        JOIN vendorinfo V ON OC.vendor_id = V.ID
+        <if test="reportState != null">
+            AND OC.state=#{reportState}
+        </if>
+
+        <if test="reportFrom != null and reportFrom!=''">
+            AND OC.created_time >= str_to_date(#{reportFrom},'%Y-%m-%d')
+        </if>
+
+        <if test="reportTo != null and reportTo!=''">
+            AND OC.created_time &lt; date_add(str_to_date(#{reportTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+
+        <if test="keyword != null and keyword!=''">
+            AND (V.name LIKE "%"#{keyword}"%" OR OC.ID LIKE "%"#{keyword}"%")
+        </if>
+
+        <if test="reportContext != null and reportContext!=''">
+            AND OC.complain_reason LIKE "%"#{reportContext}"%"
+        </if>
+    </select>
+
+    <!--分页查询举报列表-->
+    <select id="listReportInfo" parameterType="ReportListSearchDTO" resultType="AdminReportListVO">
+        SELECT
+        OC.id AS reportId,
+        OC.created_time AS reportTime,
+        OC.order_no AS orderNo,
+        V.NAME AS shopName,
+        OC.ID AS userId,
+        OC.complain_reason AS reportContext,
+        OC.state AS reportState
+        FROM tf_b_order_complain OC
+        JOIN vendorinfo V ON OC.vendor_id = V.ID
+        <if test="reportState != null">
+            AND OC.state=#{reportState}
+        </if>
+
+        <if test="reportFrom != null and reportFrom!=''">
+            AND OC.created_time >= str_to_date(#{reportFrom},'%Y-%m-%d')
+        </if>
+
+        <if test="reportTo != null and reportTo!=''">
+            AND OC.created_time &lt; date_add(str_to_date(#{reportTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+
+        <if test="keyword != null and keyword!=''">
+            AND (V.name LIKE "%"#{keyword}"%" OR OC.ID LIKE "%"#{keyword}"%")
+        </if>
+
+        <if test="reportContext != null and reportContext!=''">
+            AND OC.complain_reason LIKE "%"#{reportContext}"%"
+        </if>
+        order by OC.state , oc.created_time desc
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询举报详情-->
+    <select id="getReportDetailInfo" parameterType="String" resultType="AdminReportDetailVO">
+        SELECT
+        OC.state AS reportState,
+        OC.order_no AS orderNo,
+        V.NAME AS shopName,
+        OC.ID AS userId,
+        OC.complain_reason AS reportContext,
+        OC.complain_picture AS reportPhotoString,
+        OC.reply AS reply,
+        OC.dispose_result AS result,
+        OC.pay_price AS  payPrice
+        FROM tf_b_order_complain OC
+        JOIN vendorinfo V ON OC.vendor_id = V.ID
+        WHERE OC.id=#{reportId}
+    </select>
+
+    <!--更新举报信息-->
+    <update id="updateReportInfo" parameterType="ReportSubmitDTO">
+        UPDATE tf_b_order_complain OC
+        <set>
+            <if test="reply != null and reply!=''">
+                OC.reply=#{reply},
+                OC.state = 1
+            </if>
+
+            <if test="result != null and result!=''">
+                OC.dispose_result=#{result},
+                OC.state = 2
+            </if>
+        </set>
+        WHERE OC.id=#{reportId}
+    </update>
+
+
+</mapper>

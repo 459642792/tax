@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderOtherMapper" >
+
+    <!--商品详情相关-->
+    <resultMap id="GoodsDetailsMap" type="com.blueteam.entity.bo.wechatapplet.OrderGoodsItemBO">
+        <result column="goodsId" jdbcType="BIGINT" property="goodsId"/>
+        <association  property="orderGoodsItemPO"  javaType="com.blueteam.entity.po.OrderGoodsItemPO">
+            <result column="goodsName" jdbcType="NVARCHAR" property="goodsName"/>
+            <result column="barCode" jdbcType="NVARCHAR" property="barCode"/>
+            <result column="goodsTypeName" jdbcType="NVARCHAR" property="goodsTypeName"/>
+            <result column="mainBrandName" jdbcType="NVARCHAR" property="mainBrandName"/>
+            <result column="brandName" jdbcType="NVARCHAR" property="brandName"/>
+            <result column="originalPrice" jdbcType="INTEGER" property="originalPrice"/>
+        </association>
+        <collection property="orderAttrPO" ofType="com.blueteam.entity.po.OrderAttrPO">
+            <result column="attrCode" jdbcType="CHAR" property="attrCode"/>
+            <result column="parentAttrCode" jdbcType="CHAR" property="parentAttrCode"/>
+            <result column="attrName" jdbcType="VARCHAR" property="attrName"/>
+            <result column="attrType" jdbcType="INTEGER" property="attrType"/>
+            <result column="attrGoodsType" jdbcType="INTEGER" property="attrGoodsType"/>
+            <result column="necessaryTag" jdbcType="INTEGER" property="necessaryTag"/>
+            <result column="attrValueCode" jdbcType="CHAR" property="attrValueCode"/>
+            <result column="attrValueName" jdbcType="VARCHAR" property="attrValueName"/>
+            <result column="attrValueShowName" jdbcType="VARCHAR" property="attrValueShowName"/>
+            <result column="showTag" jdbcType="INTEGER" property="showTag"/>
+            <result column="showOrder" jdbcType="INTEGER" property="showOrder"/>
+        </collection>
+        <collection property="goodsImageBOS" ofType="com.blueteam.entity.bo.wechatapplet.GoodsImageBO">
+            <result column="goodsImage" jdbcType="VARCHAR" property="goodsImage"/>
+        </collection>
+    </resultMap>
+
+
+    <!--商品详情相关-->
+    <select id="getOrderGoodsItem" resultMap="GoodsDetailsMap">
+        SELECT gv.goodsId,
+        g.goods_name AS goodsName,
+        g.BAR_CODE AS barCode,
+        gt.GOODS_TYPE_NAME AS goodsTypeName,
+        bm.MAIN_BRAND_NAME AS mainBrandName,
+        bs.BRAND_NAME AS brandName,
+        gv.originalPrice,
+        ga.attr_code AS attrCode,
+        a.PARENT_ATTR_CODE AS parentAttrCode,
+        a.ATTR_NAME AS attrName,
+        a.ATTR_TYPE AS attrType,
+        a.ATTR_GOODS_TYPE AS attrGoodsType,
+        a.NECESSARY_TAG AS necessaryTag,
+        ga.attr_value_code AS attrValueCode,
+        ga.attr_value_name AS attrValueName,
+        ga.attr_value_show_name AS attrValueShowName,
+        a.FIRST_SHOW_TAG AS showTag,
+        a.FIRST_SHOW_ORDER AS showOrder,
+        gp.GOODS_PHOTO AS goodsImage
+        FROM
+        (
+        SELECT
+        GOODS_ID AS goodsId,
+        SALE_PRICE AS originalPrice
+        FROM
+        tf_g_goods_vendor
+        WHERE
+        VENDOR_ID = #{vendorId} AND VENDOR_GOODS_STATE = 1
+        AND GOODS_ID  IN
+        <foreach collection="goodsList" index="index" item="goodsId" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+        ) gv JOIN tf_g_goods g ON gv.goodsId = g.goods_id
+        JOIN td_g_goods_type gt ON g.GOODS_TYPE = gt.GOODS_TYPE_ID
+        JOIN td_g_brand_main bm ON g.MAIN_BRAND_ID = bm.MAIN_BRAND_ID
+        JOIN td_g_brand_sub bs ON g.BRAND_ID = bs.BRAND_ID
+        JOIN tf_g_goods_photo gp ON g.GOODS_ID = gp.GOODS_ID
+        JOIN (
+        SELECT
+        goods_id,attr_code,attr_value_code,attr_value_name,attr_value_show_name
+        FROM
+        tf_g_goods_attr
+        WHERE
+        GOODS_ID IN
+        <foreach collection="goodsList" index="index" item="goodsId" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+        ) ga ON g.GOODS_ID = ga.goods_id
+        JOIN td_g_attr a ON ga.attr_code = a.attr_code
+    </select>
+
+    <!--支付类型 如 在线支付 货到付款-->
+    <select id="listVendorPayType"  resultType="com.blueteam.entity.vo.VendorPayTypeVO">
+        SELECT
+            cpt.channel_pay_type_id AS payTypeId,
+            pt.pay_type_name AS payTypeName,
+            cpt.show_order AS showOrder
+        FROM
+            tf_f_vendor_pay_type vpt
+        JOIN tf_m_channel_pay_type cpt ON vpt.channel_pay_type_id = cpt.channel_pay_type_id
+        JOIN tf_m_pay_type pt ON cpt.pay_type_id = pt.pay_type_id
+        WHERE
+            vpt.vendor_id = #{vendorId} AND cpt.channel_id = #{channelId}
+    </select>
+    <!--支付方式 如：微信 支付宝 等-->
+    <select id="listVendorPayWay"  resultType="com.blueteam.entity.vo.VendorPayWayVO">
+        SELECT
+            cpw.channel_pay_way_id AS payWayId,
+            pw.pay_way_name AS payWayName,
+            cpw.show_order AS showOrder
+        FROM
+            tf_f_vendor_pay_way vpw
+        JOIN tf_m_channel_pay_way cpw ON vpw.channel_pay_way_id = cpw.channel_pay_way_id
+        JOIN tf_m_pay_way pw ON cpw.pay_way_id = pw.pay_way_id
+        WHERE
+            vpw.vendor_id =  #{vendorId}
+             AND cpw.channel_pay_type_id = #{payTypeId}
+             AND cpw.state_tag = 1
+    </select>
+
+
+    <!--商家订单配送信息-->
+    <select id="getVendorDispatch" resultType="java.util.Map">
+        select d.dispatch_name AS dispatchName,d.dispatch_type AS dispatchType,d.dispatch_provider AS provider,d.dispatch_detail AS detail  from tf_f_vendor_dispatch vd JOIN
+            tf_m_dispatch d ON vd.dispatch_id = d.dispatch_id
+            where vd.vendor_id = #{vendorId} AND vd.dispatch_id = 1 AND vd.state_tag = 1
+    </select>
+
+    <!--用户在该商家优惠券信息-->
+    <select id="listCouponByVendorAndUser" resultType="com.blueteam.entity.bo.wechatapplet.CouponBO">
+        SELECT
+            c.Id AS couponId,
+            c.Money AS money,
+            c.Title AS couponName,
+            c.`Condition` AS `condition`,
+            c.CostLimitMoney AS costLimitMoney,
+            c.BeginTime AS startDate,
+            c.EndTime AS endDate
+        FROM
+            CouponInfo c
+        WHERE
+            Type = 'DISCOUNT_COUPON_CODE'
+        AND (ForeignKey = #{vendorId} OR ForeignKey = 0)
+        AND UserId = #{userId}
+        AND CostStatus = 'N'
+        AND date_format(endTime, '%Y-%m-%d') >= CURDATE()
+        ORDER BY
+            BeginTime asc,
+            `Condition` DESC,
+            Money DESC
+    </select>
+    <!--获取订单使用的优惠id-->
+    <select id="getByCouponId" resultType="java.lang.Integer">
+        select CouponId from couponrecord where OrderNo = #{orderNo}
+    </select>
+</mapper>

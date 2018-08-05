@@ -1,0 +1,1025 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.VendorInfoMapper">
+    <resultMap id="vendorInfo" type="com.blueteam.entity.po.VendorInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Name" jdbcType="VARCHAR" property="Name"/>
+        <result column="CityCode" jdbcType="VARCHAR" property="CityCode"/>
+        <result column="Addr" jdbcType="VARCHAR" property="Addr"/>
+        <result column="Opentime" jdbcType="VARCHAR" property="Opentime"/>
+        <result column="Telephone" jdbcType="VARCHAR" property="Telephone"/>
+        <result column="Phone" jdbcType="VARCHAR" property="Phone"/>
+        <result column="VisitCount" jdbcType="INTEGER" property="VisitCount"/>
+        <result column="Status" jdbcType="INTEGER" property="Status"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="RecommendProduct" jdbcType="VARCHAR" property="RecommendProduct"/>
+        <result column="AuditStatus" jdbcType="VARCHAR" property="AuditStatus"/>
+        <result column="ContactPerson" jdbcType="VARCHAR" property="ContactPerson"/>
+        <result column="Rate" jdbcType="DOUBLE" property="Rate"/>
+        <result column="Image" jdbcType="VARCHAR" property="Image"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+        <result column="Label" jdbcType="VARCHAR" property="Label"/>
+        <result column="Longitude" jdbcType="VARCHAR" property="Longitude"/>
+        <result column="Latitude" jdbcType="VARCHAR" property="Latitude"/>
+        <result column="PinpaiIds" jdbcType="VARCHAR" property="PinpaiIds"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="Advantage" jdbcType="VARCHAR" property="Advantage"/>
+
+        <result column="legalPerson" jdbcType="NVARCHAR" property="legalPerson"/>
+        <result column="legalPersonIdCard" jdbcType="VARCHAR" property="legalPersonIdCard"/>
+        <result column="idInHandImage" jdbcType="VARCHAR" property="idInHandImage"/>
+        <result column="businessLicenseImg" jdbcType="VARCHAR" property="businessLicenseImg"/>
+        <result column="licenseFileImg" jdbcType="VARCHAR" property="licenseFileImg"/>
+        <result column="authenticationAuditor" jdbcType="INTEGER" property="authenticationAuditor"/>
+        <result column="authenticatioDate" jdbcType="TIMESTAMP" property="authenticatioDate"/>
+        <result column="authenticationStatus" jdbcType="INTEGER" property="authenticationStatus"
+                typeHandler="com.blueteam.base.help.mybatis.EnumTypeHandler"/>
+        <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+        <result column="credit_code" jdbcType="VARCHAR" property="creditCode"/>
+        <result column="province_code" jdbcType="VARCHAR" property="provinceCode"/>
+        <result column="province_name" jdbcType="VARCHAR" property="provinceName"/>
+        <result column="city_code" jdbcType="VARCHAR" property="cityCodes"/>
+        <result column="city_name" jdbcType="VARCHAR" property="cityName"/>
+        <result column="district_code" jdbcType="VARCHAR" property="districtCode"/>
+        <result column="district_name" jdbcType="VARCHAR" property="districtName"/>
+        <result column="is_open" property="isOpen" jdbcType="INTEGER"/>
+
+        <result column="volume" property="volume" jdbcType="INTEGER"/>
+        <result column="page_views" property="pageViews" jdbcType="INTEGER"/>
+        <result column="sales_amount" property="salesAmount" jdbcType="INTEGER"/>
+        <result column="send_qr_code_status" property="sendQrCodeStatus" jdbcType="INTEGER"/>
+
+
+        <result column="score" jdbcType="DOUBLE" property="score"/>
+        <result column="sales" jdbcType="INTEGER" property="sales"/>
+        <result column="authenticationReason" jdbcType="NVARCHAR" property="authenticationReason"/>
+        <result column="authenticationStatus" jdbcType="INTEGER" property="authenticationStatusInt"/>
+
+
+        <result column="carriersID" jdbcType="INTEGER" property="carriersID"/>
+        <result column="carriersName" jdbcType="NVARCHAR" property="carriersName"/>
+        <result column="pinpais" jdbcType="NVARCHAR" property="pinpaiStr"/>
+        <result column="orderCount" jdbcType="INTEGER" property="orderCount"/>
+        <result column="orderAmount" jdbcType="DOUBLE" property="orderAmount"/>
+        <result column="pinpais" jdbcType="DOUBLE" property="pinpais"/>
+
+        <result column="Modify" property="Modify"/>
+        <result column="TradingArea" property="tradingArea"/>
+        <result column="userName" property="userName"/>
+        <result column="score" property="zonghe"/>
+        <collection property="PpList" column="Id" javaType="List" select="listVendorMajorBrand"></collection>
+    </resultMap>
+
+    <resultMap id="VendorCityMap" type="com.blueteam.entity.po.VendorInfo" extends="vendorInfo">
+
+        <association property="city" javaType="com.blueteam.entity.dto.City">
+            <result column="provinceCode" jdbcType="NVARCHAR" property="provinceCode"/>
+            <result column="provinceName" jdbcType="NVARCHAR" property="provinceName"/>
+            <result column="cityCode" jdbcType="NVARCHAR" property="cityCode"/>
+            <result column="cityName" jdbcType="NVARCHAR" property="cityName"/>
+            <result column="districtCode" jdbcType="NVARCHAR" property="districtCode"/>
+            <result column="districtName" jdbcType="NVARCHAR" property="districtName"/>
+            <result column="FullName" jdbcType="NVARCHAR" property="fullName"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="VendorCityMap_new" type="com.blueteam.entity.po.VendorInfo" extends="vendorInfo">
+
+        <association property="city" javaType="com.blueteam.entity.dto.City">
+            <result column="provinceCode" jdbcType="NVARCHAR" property="provinceCode"/>
+            <result column="provinceName" jdbcType="NVARCHAR" property="provinceName"/>
+            <result column="oCityCode" jdbcType="NVARCHAR" property="cityCode"/>
+            <result column="cityName" jdbcType="NVARCHAR" property="cityName"/>
+            <result column="districtCode" jdbcType="NVARCHAR" property="districtCode"/>
+            <result column="districtName" jdbcType="NVARCHAR" property="districtName"/>
+            <result column="FullName" jdbcType="NVARCHAR" property="fullName"/>
+        </association>
+
+    </resultMap>
+
+    <resultMap id="pageReultMap" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="VendorCityMap" javaType="List">
+            <id property="count" column="count"/>
+        </collection>
+    </resultMap>
+    <resultMap id="new_pageReultMaps" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="VendorCityMap" javaType="List">
+            <id property="count" column="count"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="pageReultMap_new" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="VendorCityMap_new" javaType="List">
+            <id property="count" column="count"/>
+        </collection>
+    </resultMap>
+
+<sql id="cityNames_EnableCitys">
+     SET EnableCitys :=
+        (
+        SELECT Name,Code,ParentCode FROM CityInfo WHERE EnableFlag='Y'
+        );
+</sql>
+    <sql id="cityNames_CitysOne">
+        SET CitysOne :=
+        (
+        SELECT prov.Code AS provinceCode,prov.Name AS provinceName,city.Code AS cityCode,city.Name AS cityName
+        FROM EnableCitys AS prov
+        LEFT JOIN EnableCitys AS city
+        ON prov.Code = city.ParentCode
+        WHERE PROV.ParentCode = 'ROOT'
+        );
+    </sql>
+    <sql id="cityNames_Citys">
+          SET Citys :=
+        (
+        SELECT co.*
+        ,dis.Code AS districtCode,dis.Name AS districtName
+        FROM CitysOne AS CO
+        LEFT JOIN EnableCitys AS dis
+        ON dis.ParentCode = CO.cityCode
+        );
+    </sql>
+    <sql id="cityNames">
+      <include refid="cityNames_EnableCitys"/>
+        <include refid="cityNames_CitysOne"/>
+        <include refid="cityNames_Citys"/>
+    </sql>
+    <sql id="carriersVendorList_cityNames">
+         (
+        SELECT co.*
+        ,dis.Code AS districtCode,dis.Name AS districtName
+        FROM (
+        SELECT prov.Code AS provinceCode,prov.Name AS provinceName,city.Code AS cityCode,city.Name AS cityName
+        FROM (
+        SELECT Name,Code,ParentCode FROM CityInfo WHERE EnableFlag='Y'
+        ) AS prov
+        LEFT JOIN (
+        SELECT Name,Code,ParentCode FROM CityInfo WHERE EnableFlag='Y'
+        ) AS city
+        ON prov.Code = city.ParentCode
+        WHERE PROV.ParentCode = 'ROOT'
+        ) AS CO
+        LEFT JOIN (
+        SELECT Name,Code,ParentCode FROM CityInfo WHERE EnableFlag='Y'
+        ) AS dis
+        ON dis.ParentCode = CO.cityCode
+        )
+    </sql>
+<sql id="carriersVendorList_AREAS">
+            SET @AREAS :=(select ManagementArea FROM CarriersInfo WHERE ID=#{carriersId}) ;
+</sql>
+    <sql id="carriersVendorList_COUNT">
+        SET @COUNT := (select COUNT(ID) FROM VendorInfo WHERE locate(CityCode,@AREAS) !=0
+        <if test="status!=null">
+            AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>) ;
+    </sql>
+
+    <sql id="carriersVendorList_VendorScore">
+      (
+        SELECT VendorId,CAST(ROUND(SUM(Score)/COUNT(*),2) AS DECIMAL(10,2)) AS Score FROM ScoreInfo AS S
+        RIGHT JOIN (
+        SELECT * FROM VendorInfo WHERE locate(CityCode,@AREAS) !=0
+        <if test="status!=null">
+            AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>
+        ) AS PT
+        ON PT.ID = S.VendorId
+        GROUP BY VendorId
+        )
+    </sql>
+    <sql id="carriersVendorList_Orders">
+         SET  Orders := (
+        SELECT ID,VendorId FROM OrderInfo WHERE OrderStatus=30
+        );
+    </sql>
+    <sql id="carriersVendorList_VendorSales">
+      (
+        SELECT COUNT(OI.ID) AS Sales,OI.VendorId FROM (
+        SELECT ID,VendorId FROM OrderInfo WHERE OrderStatus=30
+        ) AS OI
+        RIGHT JOIN (
+        SELECT * FROM VendorInfo WHERE locate(CityCode,@AREAS) !=0
+        <if test="status!=null">
+            AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>
+        ) AS PT
+        ON PT.ID = OI.VendorId
+        GROUP BY OI.VendorId
+        )
+    </sql>
+    <sql id="carriersVendorList_PageResult">
+       (
+        SELECT VL.*,vs.Score,sal.Sales,@COUNT AS count
+        FROM (
+        SELECT * FROM VendorInfo WHERE locate(CityCode,@AREAS) !=0
+        <if test="status!=null">
+            AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>
+        ) VL
+        LEFT JOIN <include refid="carriersVendorList_VendorScore"/> vs
+        ON vl.Id = vs.VendorId
+        LEFT JOIN <include refid="carriersVendorList_VendorSales"/> AS sal
+        ON vl.Id = sal.VendorId
+        )
+    </sql>
+    <select id="carriersVendorList" resultMap="pageReultMap">
+        <include refid="carriersVendorList_AREAS"/>
+        <include refid="carriersVendorList_COUNT"/>
+      select @COUNT AS count,pr.* from (  select VDS.*, salesList.Sales AS Sales ,scorei.Score AS Score,ci.fullname AS fullname from (SELECT
+        *
+        FROM
+        VendorInfo
+        WHERE
+        locate(CityCode ,@AREAS) != 0
+        <if test="status!=null">
+            AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>
+        ) AS VDS LEFT JOIN
+        (SELECT COUNT(id) AS Sales,vendorid FROM orderinfo where OrderStatus=30 GROUP BY VendorId) as salesList  ON VDS.id = salesList.vendorid LEFT JOIN
+        (SELECT VendorId,CAST(ROUND(SUM(Score)/COUNT(*),2) AS DECIMAL(10,2)) AS Score FROM ScoreInfo AS S GROUP BY VendorId ) as scorei ON VDS.id = scorei.vendorid
+        LEFT JOIN cityinfo ci ON VDS.citycode =  ci.`code`
+        ) AS  pr
+        ORDER BY
+        <if test="order == 'SCORE'">
+            pr.Score
+        </if>
+        <if test="order == 'SALES'">
+            pr.Sales
+        </if>
+        <if test="order == 'DATE'">
+            pr.CreateDate
+        </if>
+        <if test="orderby == 'DESC'">
+            desc
+        </if>
+
+        <if test="orderby == 'ASC'">
+            asc
+        </if>
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+<sql id="getCarriersVendor_AREAS">
+            SET @AREAS := (SELECT  ManagementArea FROM CarriersInfo WHERE ID=#{carrisId});
+</sql>
+    <!-- 获取运营商下面的商家  -->
+    <select id="getCarriersVendor" resultMap="VendorCityMap">
+        <include refid="getCarriersVendor_AREAS"/>
+        <!--<include refid="cityNames"/>-->
+        SELECT * FROM VendorInfo
+        WHERE ID=#{vendorId} AND locate(CityCode,@AREAS) !=0
+    </select>
+
+    <!-- 获取运营商下面的商家  -->
+    <select id="getCarriersVendorByUserID" resultMap="VendorCityMap">
+        <include refid="AREASS"/>;
+    <!--<include refid="cityNames"/>-->
+        SELECT * FROM VendorInfo
+        WHERE ID=#{vendorId} AND locate(CityCode,@AREAS) !=0
+    </select>
+
+    <insert id="insert" parameterType="com.blueteam.entity.po.VendorInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into VendorInfo (Name, CityCode, Addr,
+        Opentime, Telephone, Phone,
+        VisitCount, Status, Detail,
+        RecommendProduct, AuditStatus, ContactPerson,
+        Rate, Image,IMAGE_TONE, UserId,
+        Label, Longitude, Latitude,
+        PinpaiIds, CreateDate, CreateBy,
+        UpdateDate, UpdateBy, Advantage,
+        legalPerson,legalPersonIdCard,idInHandImage,businessLicenseImg,licenseFileImg,authenticationAuditor,authenticatioDate,authenticationStatus,Modify,authenticationReason,TradingArea)
+        values (#{Name,jdbcType=NVARCHAR}, #{CityCode,jdbcType=VARCHAR}, #{Addr,jdbcType=NVARCHAR},
+        #{Opentime,jdbcType=NVARCHAR}, #{Telephone,jdbcType=VARCHAR}, #{Phone,jdbcType=VARCHAR},
+        #{VisitCount,jdbcType=INTEGER}, #{Status,jdbcType=INTEGER}, #{Detail,jdbcType=NVARCHAR},
+        #{RecommendProduct,jdbcType=VARCHAR}, #{AuditStatus,jdbcType=CHAR}, #{ContactPerson,jdbcType=NVARCHAR},
+        #{Rate,jdbcType=DECIMAL}, #{Image,jdbcType=NVARCHAR}, #{imageTone,jdbcType=NVARCHAR},#{UserId,jdbcType=INTEGER},
+        #{Label,jdbcType=NVARCHAR}, #{Longitude,jdbcType=NVARCHAR}, #{Latitude,jdbcType=NVARCHAR},
+        #{PinpaiIds,jdbcType=NVARCHAR}, #{CreateDate,jdbcType=TIMESTAMP}, #{CreateBy,jdbcType=NVARCHAR},
+        #{UpdateDate,jdbcType=TIMESTAMP}, #{UpdateBy,jdbcType=NVARCHAR}, #{Advantage,jdbcType=NVARCHAR},
+        #{legalPerson},#{legalPersonIdCard},#{idInHandImage},#{businessLicenseImg},#{licenseFileImg},#{authenticationAuditor},#{authenticatioDate},#{authenticationStatus,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler},#{Modify}
+        ,#{authenticationReason},#{tradingArea}
+        )
+
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.VendorInfo">
+        update VendorInfo
+        set Name = #{Name,jdbcType=NVARCHAR},
+        CityCode = #{CityCode,jdbcType=VARCHAR},
+        Addr = #{Addr,jdbcType=NVARCHAR},
+        Opentime = #{Opentime,jdbcType=NVARCHAR},
+        Telephone = #{Telephone,jdbcType=VARCHAR},
+        Phone = #{Phone,jdbcType=VARCHAR},
+        VisitCount = #{VisitCount,jdbcType=INTEGER},
+        Status = #{Status,jdbcType=INTEGER},
+        Detail = #{Detail,jdbcType=NVARCHAR},
+        RecommendProduct = #{RecommendProduct,jdbcType=VARCHAR},
+        AuditStatus = #{AuditStatus,jdbcType=CHAR},
+        ContactPerson = #{ContactPerson,jdbcType=NVARCHAR},
+        Rate = #{Rate,jdbcType=DECIMAL},
+        Image = #{Image,jdbcType=NVARCHAR},
+        IMAGE_TONE= #{imageTone,jdbcType=NVARCHAR},
+        UserId = #{UserId,jdbcType=INTEGER},
+        Label = #{Label,jdbcType=NVARCHAR},
+        Longitude = #{Longitude,jdbcType=NVARCHAR},
+        Latitude = #{Latitude,jdbcType=NVARCHAR},
+        PinpaiIds = #{PinpaiIds,jdbcType=NVARCHAR},
+        CreateDate = #{CreateDate,jdbcType=TIMESTAMP},
+        CreateBy = #{CreateBy,jdbcType=NVARCHAR},
+        UpdateDate = #{UpdateDate,jdbcType=TIMESTAMP},
+        UpdateBy = #{UpdateBy,jdbcType=NVARCHAR},
+        Advantage = #{Advantage,jdbcType=NVARCHAR},
+        TradingArea= #{tradingArea,jdbcType=NVARCHAR},
+        legalPerson = #{legalPerson},
+        legalPersonIdCard = #{legalPersonIdCard},
+        idInHandImage = #{idInHandImage},
+        businessLicenseImg = #{businessLicenseImg},
+        licenseFileImg = #{licenseFileImg},
+        authenticationAuditor = #{authenticationAuditor},
+        authenticatioDate = #{authenticatioDate},
+        authenticationStatus = #{authenticationStatus,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler},
+        Modify = #{Modify},
+        authenticationReason=#{authenticationReason}
+        where Id = #{Id,jdbcType=INTEGER}
+    </update>
+
+    <sql id="AREASS">
+        SET @AREAS:=(SELECT ManagementArea FROM CarriersInfo  WHERE UserID=#{userId})
+    </sql>
+<sql id="TOTALCOUNTS">
+    SET @TOTALCOUNT := (SELECT COUNT(id) FROM VendorInfo
+    WHERE locate(CityCode,@AREAS) !=0
+    <if test="authenticationStatus!=null">
+        AND AuthenticationStatus=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+    </if>
+
+    <if test="auditStatus!=null">
+        AND AuditStatus=#{auditStatus}
+    </if>
+    )
+</sql>
+    <select id="carriersVendors" resultMap="pageReultMap">
+        <include refid="AREASS"/>;
+        <include refid="TOTALCOUNTS"/>;
+        SELECT @TOTALCOUNT AS count, VI.* FROM  VendorInfo  VI, CityInfo CI
+        WHERE locate(VI.CityCode,@AREAS) !=0
+        AND  VI.CityCode = CI.districtCode
+        AND  CI.EnableFlag='Y'
+        AND  locate('_', CI.ParentCode)!=0
+        AND  CI.ParentCode != 'ROOT'
+        <if test="authenticationStatus!=null">
+            AND AuthenticationStatus=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+        </if>
+        <if test="auditStatus!=null">
+            AND AuditStatus=#{auditStatus}
+        </if>
+        ORDER BY VI.CreateDate DESC
+--         LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+
+    </select>
+<sql id="TOTALCOUNTss">
+    SET @TOTALCOUNT := (SELECT  COUNT(id) FROM VendorInfo
+    WHERE  locate(CityCode,@AREAS) !=0	AND LegalPerson IS NOT NULL   AND AuditStatus = 'N' AND IFNULL(authenticationStatus,1) != 20 AND IFNULL(authenticationStatus,1) != 30
+    <if test="status!=null">
+        AND Status=#{status,typeHandler=com.blueteam.base.help.mybatis.EnumTypeHandler}
+    </if>
+    )
+</sql>
+    <!-- 获取提交资料待认证的商家 -->
+    <select id="carriersPreAuthVendors" resultMap="pageReultMap">
+        <include refid="AREASS"/>;
+        <include refid="TOTALCOUNTss"/>;
+        <!--<include refid="cityNames"/>-->
+        SELECT @TOTALCOUNT AS COUNT, VI.*, CI.* FROM VendorInfo VI, CityInfo CI
+        WHERE  locate(VI.CityCode, @AREAS) !=0
+        AND LegalPerson IS NOT NULL
+        AND AuditStatus = 'N'
+        AND IFNULL(authenticationStatus, 1) != 20
+        AND IFNULL(authenticationStatus, 1) != 30
+        AND VI.CityCode = CI.districtCode
+        AND CI.EnableFlag='Y'
+        AND locate('_', CI.ParentCode)!=0
+        AND CI.ParentCode != 'ROOT'
+        ORDER BY VI.CreateDate DESC
+        LIMIT ${(pageIndex-1)*pageSize}, ${pageSize}
+    </select>
+
+
+    <select id="VendorInfoList" resultMap="vendorInfo">
+        SELECT * FROM VendorInfo WHERE CityCode = #{CityCode} AND Id NOT IN (SELECT vendorId FROM ReVendor WHERE
+        AreaAddr= #{CityCode})
+    </select>
+    <select id="VendorInfoLists" resultMap="vendorInfo">
+        <!--
+               SELECT * FROM VendorInfo WHERE CityCode = #{CityCode} AND Id NOT IN (SELECT  vendorId  FROM ReVendor WHERE AreaAddr= #{CityCode})-->
+        <![CDATA[
+         SELECT
+	b.*, c.score
+FROM
+	(
+		SELECT
+			*
+		FROM
+			VendorInfo
+		WHERE
+			CityCode = #{CityCode}
+		AND Id NOT IN (
+			SELECT
+				vendorId
+			FROM
+				ReVendor
+			WHERE
+				AreaAddr = #{CityCode}
+		)
+	) AS b
+LEFT JOIN (
+	SELECT
+		vendorid,
+		ROUND(SUM(score)/COUNT(*), 2) AS score
+	FROM
+		ScoreInfo
+	GROUP BY
+		vendorid
+) c ON b.id = c.vendorid
+
+         ]]>
+    </select>
+    <select id="vendorDetail" resultMap="vendorInfo">
+        SELECT * FROM VendorInfo WHERE Id = #{Id}
+    </select>
+
+    <select id="quyuList" resultMap="vendorInfo">
+        SELECT * FROM VendorInfo WHERE Name like "%"#{Name}"%" and CityCode = #{CityCode}
+    </select>
+
+    <update id="updateVisit">
+        UPDATE VendorInfo set VisitCount=#{VisitCount} where Id = #{Id}
+    </update>
+
+    <select id="vendorInfoQuey" resultMap="vendorInfo">
+        SELECT V.* FROM VendorInfo AS V
+        <if test='"null" != Name and  "" != Name'>
+            right JOIN (
+            SELECT (','+id+',') AS idcode FROM PinpaiInfo WHERE Name LIKE "%"#{Name}"%") T
+            ON locate(T.idcode,V.PinpaiIds) !=0 WHERE v.ID IS NOT NULL UNION
+            SELECT V.* FROM (select * from VendorInfo where Latitude is not null and Longitude is not null and Latitude
+            != '0' and Latitude != ''
+            and Longitude != '0' and Longitude != ''
+            ) AS V WHERE V.Name like "%"#{Name}"%"
+        </if>
+    </select>
+    <select id="findByUserId" parameterType="int" resultMap="vendorInfo">
+        select * from VendorInfo where UserId = #{userId}
+    </select>
+
+
+    <sql id="sql_selectVendorListByWhere">
+        <include refid="cityNames"></include>
+        , users AS(
+        SELECT VI.* FROM UserInfo AS UI
+        LEFT JOIN VendorInfo VI
+        ON UI.Id = VI.UserId
+        WHERE UserTypes | 2 = UserTypes
+        ),
+        statics AS(
+        SELECT Count(OI.Id) AS OrderCount,SUM(OI.DiscountAmount) AS OrderAmount,U.ID FROM OrderInfo AS OI
+        RIGHT JOIN users AS U
+        ON OI.VendorId = U.Id
+        WHERE OI.OrderStatus = 30
+        GROUP BY U.id
+        ),
+        vendors AS(
+        SELECT U.*,
+        IFNULL(C.provinceCode,co.provinceCode) AS provinceCode,IFNULL(C.provinceName,CO.provinceName) AS provinceName,
+        IFNULL(C.cityName,CO.cityName) AS cityName,IFNULL(C.cityCode,co.cityCode) AS oCityCode,
+        (IFNULL(C.provinceName,CO.provinceName) + IFNULL(C.cityName,CO.cityName) + C.districtName) as FullCityName
+        ,C.districtName,C.districtCode,OrderAmount,OrderCount
+        FROM users AS U
+        LEFT JOIN Citys AS C
+        ON U.CityCode = C.districtCode
+        LEFT JOIN CitysOne AS CO
+        ON U.CityCode = CO.cityCode
+        LEFT JOIN statics AS US
+        ON U.ID = us.ID
+        ),
+        WhereVendors AS(
+        SELECT * FROM vendors
+        <where>
+            <if test="name != null and name != ''">
+                NAME LIKE "%"#{name}"%"
+            </if>
+            <if test="cityName!=null and cityName !=''">
+                AND FullCityName LIKE "%"#{cityName}"%"
+            </if>
+            <if test="rz_begin!=null and rz_begin!=''">
+                AND CreateDate>=#{rz_begin}
+            </if>
+            <if test="rz_end != null and rz_end!=''">
+                <![CDATA[
+		  AND CreateDate <  DATEADD(DAY,1,#{rz_end})
+		    ]]>
+            </if>
+
+            <if test="authenticationStatus != null and authenticationStatus != 0 and authenticationStatus != 100">
+                AND authenticationStatus = #{authenticationStatus}
+            </if>
+
+            <if test="authenticationStatus == null or authenticationStatus == 100">
+                AND results.authenticationStatus is null
+            </if>
+
+        </where>
+        ),
+
+        pinpai AS(
+        SELECT VI.*,T.idcode,t.Name AS pname FROM WhereVendors AS VI
+        LEFT JOIN (
+        SELECT (','+CONVERT(varchar(30),id,101)+',') AS idcode,Name FROM PinpaiInfo
+        <where>
+            <if test="pinpai!=null and pinpai != ''">
+                name like "%"#{pinpai}"%"
+            </if>
+        </where>
+        ) T
+        ON locate(T.idcode,VI.PinpaiIds) !=0
+        WHERE vI.ID IS NOT NULL
+        <if test="pinpai!=null and pinpai != ''">
+            AND t.Name IS NOT NULL
+        </if>
+        ),
+        pinpaijoin AS(
+        SELECT DISTINCT [Id]
+        ,[Name]
+        ,[CityCode]
+        ,[Addr]
+        ,[Opentime]
+        ,[Telephone]
+        ,[Phone]
+        ,[VisitCount]
+        ,[Status]
+        ,[Detail]
+        ,[RecommendProduct]
+        ,[AuditStatus]
+        ,[ContactPerson]
+        ,[Rate]
+        ,[Image]
+        ,[UserId]
+        ,[Label]
+        ,[Longitude]
+        ,[Latitude]
+        ,[PinpaiIds]
+        ,[CreateDate]
+        ,[CreateBy]
+        ,[UpdateDate]
+        ,[UpdateBy]
+        ,[Advantage]
+        ,[LegalPerson]
+        ,[LegalPersonIdCard]
+        ,[BusinessLicenseImg]
+        ,[LicenseFileImg]
+        ,[IdInHandImage]
+        ,[AuthenticationAuditor]
+        ,[AuthenticationStatus]
+        ,[AuthenticatioDate]
+        ,[Modify],
+        provinceCode,
+        provinceName,
+        cityName,
+        districtName,
+        districtCode,
+        oCityCode,
+        OrderCount,
+        OrderAmount
+        ,[AuthenticationReason],pinpais = (
+        SELECT b.name + ','
+        FROM PinpaiInfo AS b
+        WHERE locate(','+ CAST(b.id AS VARCHAR(10))+',',a.PinpaiIds)!=0
+        FOR XML PATH('') )
+        FROM pinpai AS a
+        )
+
+    </sql>
+    <!--<select id="selectVendorListByWhere" resultMap="pageReultMap">-->
+        <!--DECLARE @totalcount INT-->
+        <!--<include refid="sql_selectVendorListByWhere"></include>-->
+        <!--SELECT @totalcount=COUNT(*) FROM pinpaijoin-->
+        <!--;-->
+        <!--<include refid="sql_selectVendorListByWhere"></include>-->
+        <!--,pageNoList AS(-->
+        <!--SELECT ID-->
+        <!--<choose>-->
+            <!--<when test="order != null and orderType != null and order != '' and orderType != ''">-->
+                <!--,row_number()-->
+                <!--OVER (ORDER BY ${order} ${orderType}) AS OrderNo-->
+            <!--</when>-->
+            <!--<otherwise>-->
+                <!--,row_number()-->
+                <!--OVER (ORDER BY CreateDate DESC)AS OrderNo-->
+            <!--</otherwise>-->
+        <!--</choose>-->
+        <!--FROM pinpaijoin-->
+        <!--),pageList AS(-->
+        <!--SELECT ID,OrderNo FROM pageNoList WHERE-->
+        <!--<![CDATA[-->
+            <!--OrderNo > (#{pageIndex}-1)*#{pageSize} AND OrderNo<= #{pageIndex}*#{pageSize}-->
+         <!--]]>-->
+        <!--),-->
+        <!--pageJoinList as (-->
+        <!--SELECT PL.*,PN.OrderNo,CI.Name as CarriersName,CI.ID AS CarriersID FROM pageList AS PN-->
+        <!--LEFT JOIN pinpaijoin AS PL-->
+        <!--ON PN.ID = PL.ID-->
+        <!--LEFT JOIN CarriersInfo AS CI-->
+        <!--ON locate(PL.CityCode,CI.ManagementArea) !=0-->
+        <!--)-->
+        <!--SELECT @totalcount as count,* FROM pageJoinList ORDER BY OrderNo ASC-->
+    <!--</select>-->
+<sql id="resultss">
+    <![CDATA[   SET  @COUNT := (  select count(*) from (select DISTINCT vii.Id as id,vii.`Name` as name ,cii.fullname AS fullname , CI.`Name` AS carriersName,vii.CreateDate AS createDate,aa.pinpais AS pinpais
+    ,orde.count as orderCount,orde.sums AS orderAmount,vii.AuthenticationStatus as authenticationStatus from vendorinfo vii left JOIN
+    cityinfo cii ON vii.CityCode = cii.`Code`
+    LEFT JOIN CarriersInfo AS CI ON locate(vii.CityCode ,CI.ManagementArea) !=0
+    LEFT JOIN (select DISTINCT id,(
+    select group_concat(name) from  (select vii.id as id,pii.name AS name from vendorinfo vii LEFT JOIN (
+    select CONCAT(',',CONCAT(id,''),',') AS idcode,Name FROM PinpaiInfo ) pii
+    on LOCATE(pii.idcode,vii.PinpaiIds) WHERE vii.ID IS NOT NULL
+    ) AS B where B.id=A.id
+    ) as pinpais from  (select id from vendorinfo
+    ) AS A
+    ) as aa ON aa.id = vii.id
+    LEFT JOIN (
+    select vendorId,COUNT(vendorId) AS count,SUM(settlement_money) AS sums from orderinfo GROUP BY vendorId
+    ) as orde ON orde.vendorId = vii.id
+    ) AS  results
+    where 1=1]]>
+    <if test="name != null and name != ''">
+        and  results.name LIKE "%"#{name}"%"
+    </if>
+    <if test="cityName!=null and cityName !=''">
+        AND results.fullname LIKE "%"#{cityName}"%"
+    </if>
+    <if test="rz_begin!=null and rz_begin!=''">
+        AND results.CreateDate>=#{rz_begin}
+    </if>
+    <if test="rz_end != null and rz_end!=''">
+        <![CDATA[
+		  AND results.CreateDate < date_add(#{rz_end}, INTERVAL 1 DAY)
+		    ]]>
+    </if>
+    <if test="pinpai!=null and pinpai != ''">
+        AND  results.pinpais like "%"#{pinpai}"%"
+    </if>
+    <if test="authenticationStatus != null and authenticationStatus != 0 and authenticationStatus != 100">
+        AND results.authenticationStatus = #{authenticationStatus}
+    </if>
+    <if test="authenticationStatus == null or authenticationStatus == 100">
+        AND results.authenticationStatus is null
+    </if>
+    <![CDATA[  )]]>
+</sql>
+<select id="selectVendorListByWhere" resultMap="pageReultMap">
+    <include refid="resultss"/>;
+       <![CDATA[
+  select @COUNT as count,results.* from (select DISTINCT vii.Id as id,vii.`Name` as name ,cii.fullname AS fullname , CI.`Name` AS carriersName,vii.CreateDate AS createDate,aa.pinpais AS pinpais
+    ,orde.count as orderCount,orde.sums AS orderAmount,vii.AuthenticationStatus as authenticationStatus from vendorinfo vii left JOIN
+    cityinfo cii ON vii.CityCode = cii.`Code`
+    LEFT JOIN CarriersInfo AS CI ON locate(vii.CityCode ,CI.ManagementArea) !=0
+    LEFT JOIN (select DISTINCT id,(
+    select group_concat(name) from  (select vii.id as id,pii.name AS name from vendorinfo vii LEFT JOIN (
+    select CONCAT(',',CONCAT(id,''),',') AS idcode,Name FROM PinpaiInfo ) pii
+    on LOCATE(pii.idcode,vii.PinpaiIds) WHERE vii.ID IS NOT NULL
+    ) AS B where B.id=A.id
+    ) as pinpais from  (select id from vendorinfo
+    ) AS A
+    ) as aa ON aa.id = vii.id
+    LEFT JOIN (
+    select vendorId,COUNT(vendorId) AS count,SUM(settlement_money) AS sums from orderinfo GROUP BY vendorId
+    ) as orde ON orde.vendorId = vii.id
+    ) AS  results
+where 1=1   ]]>
+    <if test="name != null and name != ''">
+      and  results.name LIKE "%"#{name}"%"
+    </if>
+    <if test="cityName!=null and cityName !=''">
+        AND results.fullname LIKE "%"#{cityName}"%"
+    </if>
+    <if test="rz_begin!=null and rz_begin!=''">
+        AND results.CreateDate>=#{rz_begin}
+    </if>
+    <if test="rz_end != null and rz_end!=''">
+        <![CDATA[
+		  AND results.CreateDate < date_add(#{rz_end}, INTERVAL 1 DAY)
+		    ]]>
+    </if>
+    <if test="pinpai!=null and pinpai != ''">
+        AND  results.pinpais like "%"#{pinpai}"%"
+    </if>
+    <if test="authenticationStatus != null and authenticationStatus != 0 and authenticationStatus != 100">
+        AND results.authenticationStatus = #{authenticationStatus}
+    </if>
+    <if test="authenticationStatus  == null or authenticationStatus == 100">
+        AND results.authenticationStatus is null
+    </if>
+    <![CDATA[ ORDER BY results.CreateDate DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize};  ]]>
+</select>
+    <sql id="common_citys">
+        WITH EnableCitys AS(
+        SELECT Code,ParentCode,Name AS cName FROM CityInfo WHERE EnableFlag='Y'
+        ),
+        provinceCitys AS(
+        SELECT *,code AS provinceCode,cName AS provinceName,'' AS ocityCode,'' AS cityName,'' AS districtCode,'' AS
+        districtName,cName AS FullName
+        FROM EnableCitys WHERE ParentCode='ROOT'
+        ),
+        ocitys AS (
+        SELECT EC.*,PC.CODE AS provinceCode,pc.cName AS provinceName,ec.Code AS ocityCode,ec.cName AS cityName,'' AS
+        districtCode,'' AS districtName, (pc.cName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN provinceCitys AS PC
+        ON EC.ParentCode = PC.Code
+        WHERE locate('_',EC.ParentCode)=0 AND EC.ParentCode != 'ROOT'
+        ),
+        disCitys AS(
+        SELECT EC.*,C.provinceCode,C.provinceName,C.ocityCode,C.cityName,EC.Code AS districtCode,EC.cName AS
+        districtName,(c.provinceName+c.cityName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN ocitys AS C
+        ON EC.ParentCode = C.Code
+        WHERE locate('_',EC.ParentCode) != 0
+        ),
+        citys AS(
+        SELECT * FROM provinceCitys
+        UNION ALL
+        SELECT * FROM ocitys
+        UNION ALL
+        SELECT * FROM disCitys
+        )
+    </sql>
+
+    <!--<select id="getVendorById" resultMap="VendorCityMap_new">-->
+        <!--<include refid="common_citys"></include>-->
+        <!--,OneVendor AS (-->
+        <!--SELECT * FROM VendorInfo WHERE ID = #{id}-->
+        <!--),-->
+        <!--pinpaijoin AS (-->
+        <!--SELECT VI.*,T.idcode,t.Name AS pname,citys.* FROM OneVendor AS VI-->
+        <!--LEFT JOIN(-->
+        <!--SELECT (','+CONVERT(varchar(30),id,101)+',') AS idcode,Name FROM PinpaiInfo-->
+        <!--)T-->
+        <!--ON locate(T.idcode,VI.PinpaiIds) !=0-->
+        <!--LEFT JOIN citys-->
+        <!--ON citys.code = VI.cityCode-->
+        <!--WHERE vI.ID IS NOT NULL-->
+        <!--)-->
+        <!--SELECT TOP 1 *,-->
+        <!--score = (SELECT SUM(Score) / COUNT(1) FROM ScoreInfo WHERE VendorId = #{id})-->
+        <!--,pinpais = (-->
+        <!--SELECT b.pname + ','-->
+        <!--FROM pinpaijoin AS b-->
+        <!--WHERE b.id = a.id FOR XML PATH('') )-->
+        <!--FROM pinpaijoin AS a-->
+
+    <!--</select>-->
+    <sql id="scorea">
+        SET  @score := (SELECT SUM(Score) / COUNT(1) FROM ScoreInfo WHERE VendorId = #{id})
+    </sql>
+    <select id="getVendorById" resultMap="VendorCityMap_new">
+        <include refid="scorea"/>;
+  select results.* from (select DISTINCT vii.*,cii.fullname AS fullname , CI.`Name` AS carriersName,aa.pinpais AS pinpais
+    ,orde.count as orderCount,orde.sums AS orderAmount,@score AS score from vendorinfo vii left JOIN
+    cityinfo cii ON vii.CityCode = cii.`Code`
+    LEFT JOIN CarriersInfo AS CI ON locate(vii.CityCode ,CI.ManagementArea) !=0
+    LEFT JOIN (select DISTINCT id,(
+    select group_concat(name) from  (select vii.id as id,pii.name AS name from vendorinfo vii LEFT JOIN (
+    select CONCAT(',',CONCAT(id,''),',') AS idcode,Name FROM PinpaiInfo ) pii
+    on LOCATE(pii.idcode,vii.PinpaiIds) WHERE vii.ID IS NOT NULL
+    ) AS B where B.id=A.id
+    ) as pinpais from  (select id from vendorinfo
+    ) AS A
+    ) as aa ON aa.id = vii.id
+    LEFT JOIN (
+    select vendorId,COUNT(vendorId) AS count,SUM(settlement_money) AS sums from orderinfo GROUP BY vendorId
+    ) as orde ON orde.vendorId = vii.id
+    ) AS  results WHERE results.id = #{id}
+    </select>
+    <select id="selectVendorByAreas" resultMap="vendorInfo">
+        SELECT * FROM VendorInfo AS VI
+        <where>
+            <if test="cityCode != null">
+                VI.CityCode like #{cityCode} OR locate(#{cityCode}+'_',VI.CityCode) !=0
+            </if>
+        </where>
+    </select>
+
+    <!-- 发现商家列表 -->
+    <select id="DiscoverVendorList" resultMap="vendorInfo">
+        SELECT Id,Name,TradingArea FROM VendorInfo
+        <where>
+            <if test="CityCode!=null and CityCode!=''">
+                <![CDATA[	CityCode like "%"#{CityCode}"%" ]]>  and name not in (select VendorName from ReVendor)
+            </if>
+            <if test="CityCode==null and CityCode==''">
+                name not in (select VendorName from ReVendor)
+            </if>
+        </where>
+    </select>
+
+    <!-- 推荐商家列表 -->
+    <select id="VendorRecommendList" resultMap="vendorInfo">
+        SELECT * FROM VendorInfo v
+        RIGHT JOIN ReVendor r
+        ON v.id=r.vendorId
+        WHERE r.AreaAddr=#{CityCode} ORDER BY OrderField asc
+    </select>
+
+    <select id="getVendorAndCityById" resultMap="VendorCityMap_new">
+        <include refid="common_citys"></include>
+        SELECT VI.*,citys.* FROM VendorInfo AS VI
+        LEFT JOIN citys
+        ON citys.code = VI.cityCode
+        WHERE VI.Id=#{id}
+    </select>
+
+    <select id="getVenderAndUserName" resultMap="vendorInfo">
+        SELECT VI.Name,UI.NickName AS userName FROM VendorInfo AS VI
+        LEFT JOIN UserInfo AS UI
+        ON VI.UserId=UI.Id
+        WHERE VI.Id=#{id}
+    </select>
+
+    <select id="getVendorByDetails" parameterType="Integer" resultType="HashMap">
+        select CityCode,Image AS image,IMAGE_TONE AS imageTone,`Name` AS name,Advantage AS advantage,Addr AS address,Telephone AS telephone ,
+         phone,VisitCount AS visitCount,Longitude AS longitude,Latitude AS latitude ,Opentime AS opentime from vendorinfo where Id = #{vendorId}
+    </select>
+
+
+    <insert id="saveAuthentication" parameterType="com.blueteam.entity.po.VendorInfo"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into VendorInfo (CreateDate, CreateBy,UpdateDate, UpdateBy,UserId,
+        legalPerson,legalPersonIdCard,idInHandImage,businessLicenseImg,
+        authenticationStatus,company_name,credit_code,Image,
+        AuditStatus,Telephone,Status)
+        values (now(),#{userId},now(),#{userId},#{userId},
+        #{legalPerson},#{legalPersonIdCard},#{idInHandImage},#{businessLicenseImg},
+        10,#{companyName},#{creditCode},#{image},
+        #{auditStatus},#{telephone},#{status})
+    </insert>
+
+    <select id="getByUserId" parameterType="int" resultMap="vendorInfo">
+        SELECT * from VendorInfo WHERE UserId=#{userId}
+    </select>
+
+    <select id="getNewVendorById" parameterType="int" resultMap="vendorInfo">
+        SELECT * from VendorInfo WHERE id=#{id}
+    </select>
+
+    <update id="updateAuthentication" parameterType="com.blueteam.entity.po.VendorInfo">
+        UPDATE VendorInfo
+        <set>
+            UpdateDate=now(),
+            <if test="legalPerson != null">
+                legalPerson = #{legalPerson},
+            </if>
+            <if test="legalPersonIdCard != null">
+                legalPersonIdCard = #{legalPersonIdCard},
+            </if>
+            <if test="idInHandImage != null">
+                idInHandImage = #{idInHandImage},
+            </if>
+            <if test="businessLicenseImg != null">
+                businessLicenseImg = #{businessLicenseImg},
+            </if>
+            <!--<if test="authenticationStatus != null">-->
+                authenticationStatus = 10,
+            <!--</if>-->
+            <if test="companyName != null">
+                company_name = #{companyName},
+            </if>
+            <if test="creditCode != null">
+                credit_code = #{creditCode},
+            </if>
+            <if test="image != null">
+                Image = #{image},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+
+    <update id="updateVendor" parameterType="com.blueteam.entity.po.VendorInfo">
+        UPDATE VendorInfo
+        <set>
+            UpdateDate=now(),
+            is_open=1,
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="cityCode != null">
+                CityCode = #{cityCode},
+            </if>
+            <if test="addr != null">
+                Addr = #{addr},
+            </if>
+            <if test="opentime != null">
+                Opentime = #{opentime},
+            </if>
+            <if test="phone != null">
+                Phone = #{phone},
+            </if>
+            <if test="label != null">
+                Label = #{label},
+            </if>
+            <if test="longitude != null">
+                Longitude = #{longitude},
+            </if>
+            <if test="latitude != null">
+                Latitude = #{latitude},
+            </if>
+            <if test="tradingArea != null">
+                TradingArea = #{tradingArea},
+            </if>
+            <if test="image != null">
+                Image = #{image},
+            </if>
+            <if test="advantage != null">
+                Advantage = #{advantage},
+            </if>
+            <if test="provinceCode != null">
+                province_code = #{provinceCode},
+            </if>
+            <if test="provinceName != null">
+                province_name = #{provinceName},
+            </if>
+            <if test="cityCodes != null">
+                city_code = #{cityCodes},
+            </if>
+            <if test="cityName != null">
+                city_name = #{cityName},
+            </if>
+            <if test="districtCode != null">
+                district_code = #{districtCode},
+            </if>
+            <if test="districtName != null">
+                district_name = #{districtName},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+    <!--查询商户主营品牌-->
+    <select id="listVendorMajorBrand" resultType="string">
+        select bs.BRAND_NAME from td_g_brand_sub bs
+        left join tf_g_vendor_brand vb on vb.BRAND_ID=bs.BRAND_ID
+        where vb.VENDOR_ID=#{vendorId} and vb.IS_MAJOR=1 and vb.BRAND_GOODS_AMOUNT > 0
+    </select>
+
+    <update id="increaseOrderStatistics">
+        UPDATE VendorInfo
+        <set>
+            UpdateDate=now(),
+            <if test="volume != null">
+                volume =volume+#{volume},
+            </if>
+            <if test="pageViews != null">
+                page_views =page_views+#{pageViews},
+            </if>
+            <if test="salesAmount != null">
+                sales_amount =sales_amount+#{salesAmount},
+            </if>
+        </set>
+        WHERE id=#{vendorId}
+    </update>
+    <update id="sendQRCode" parameterType="int">
+        UPDATE VendorInfo
+        SET UpdateDate=now(),send_qr_code_status=1
+        WHERE id=#{vendorId}
+    </update>
+
+    <insert id="bindPayInfo" parameterType="int">
+        insert INTO tf_f_vendor_pay_type VALUES (#{vendorId},1);
+        insert INTO tf_f_vendor_pay_type VALUES (#{vendorId},2);
+        insert INTO tf_f_vendor_pay_way VALUES (#{vendorId},1);
+        insert INTO tf_f_vendor_dispatch VALUES (#{vendorId},1,1,5);
+    </insert>
+</mapper>

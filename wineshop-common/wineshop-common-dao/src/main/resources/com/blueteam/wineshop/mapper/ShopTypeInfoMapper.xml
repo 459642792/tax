@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.ShopTypeInfoMapper">
+    <resultMap id="BaseResultMap" type="com.blueteam.entity.po.ShopTypeInfo">
+        <constructor>
+            <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="shop_type_parent_id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="shop_type_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="shop_type_sort" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="create_date" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+            <arg column="create_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="update_date" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+            <arg column="update_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="status" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, shop_type_parent_id, shop_type_name, shop_type_sort, create_date, create_by,
+        update_date, update_by,status
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from shop_type_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from shop_type_info
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.blueteam.entity.po.ShopTypeInfo">
+        insert into shop_type_info (id, shop_type_parent_id, shop_type_name,
+        shop_type_sort, create_date, create_by,
+        update_date, update_by)
+        values (#{id,jdbcType=INTEGER}, #{shopTypeParentId,jdbcType=INTEGER}, #{shopTypeName,jdbcType=VARCHAR},
+        #{shopTypeSort,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR},
+        #{updateDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.blueteam.entity.po.ShopTypeInfo">
+        insert into shop_type_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="shopTypeParentId != null">
+                shop_type_parent_id,
+            </if>
+            <if test="shopTypeName != null">
+                shop_type_name,
+            </if>
+            <if test="shopTypeSort != null">
+                shop_type_sort,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="shopTypeParentId != null">
+                #{shopTypeParentId,jdbcType=INTEGER},
+            </if>
+            <if test="shopTypeName != null">
+                #{shopTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="shopTypeSort != null">
+                #{shopTypeSort,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.blueteam.entity.po.ShopTypeInfo">
+        update shop_type_info
+        <set>
+            <if test="shopTypeParentId != null">
+                shop_type_parent_id = #{shopTypeParentId,jdbcType=INTEGER},
+            </if>
+            <if test="shopTypeName != null">
+                shop_type_name = #{shopTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="shopTypeSort != null">
+                shop_type_sort = #{shopTypeSort,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.ShopTypeInfo">
+        update shop_type_info
+        set shop_type_parent_id = #{shopTypeParentId,jdbcType=INTEGER},
+        shop_type_name = #{shopTypeName,jdbcType=VARCHAR},
+        shop_type_sort = #{shopTypeSort,jdbcType=INTEGER},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        create_by = #{createBy,jdbcType=VARCHAR},
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+        update_by = #{updateBy,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="listShopTypeInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT * FROM shop_type_info
+        <if test="_parameter != null ">
+            where shop_type_parent_id = #{parentId,jdbcType=INTEGER}
+        </if>
+        order by shop_type_sort ASC
+    </select>
+</mapper>

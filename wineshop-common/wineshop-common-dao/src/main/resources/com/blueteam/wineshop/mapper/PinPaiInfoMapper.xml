@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.PinPaiInfoMapper">
+    <resultMap id="pinPaiInfo" type="com.blueteam.entity.po.PinPaiInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Name" jdbcType="VARCHAR" property="Name"/>
+        <result column="Desc" jdbcType="VARCHAR" property="Desc"/>
+        <result column="Status" jdbcType="VARCHAR" property="Status"/>
+        <result column="Image" jdbcType="VARCHAR" property="Image"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="sortNumber" jdbcType="INTEGER" property="sortNumber"/>
+    </resultMap>
+
+    <select id="PinPaiInfoList" resultMap="pinPaiInfo">
+        SELECT * FROM
+        PinpaiInfo WHERE Status = #{Status} order by sortNumber asc LIMIT 0,20
+    </select>
+    <select id="listPinPaiInfo" resultMap="pinPaiInfo"
+            parameterType="java.util.List">
+        <![CDATA[
+			SELECT DISTINCT `name`,a.*  FROM PinpaiInfo a WHERE a.`Status` in
+		]]>
+        <foreach item="Status" index="index" collection="list" open="("
+                 separator="," close=")">
+            #{Status}
+        </foreach>
+        <![CDATA[ order by a.`Status` desc]]>
+    </select>
+
+
+    <select id="PinPaiName" resultMap="pinPaiInfo">
+        SELECT * FROM PinpaiInfo WHERE
+        Id =#{Id}
+    </select>
+
+    <!-- 查询管理后台的品牌数据 -->
+    <select id="adminPinpaiList" resultMap="pinPaiInfo">
+        select p.* from PinpaiInfo p
+        <if test="Name != null and Name!=''">
+            where p.Name like "%"#{Name}"%"
+        </if>
+        ORDER BY  UpdateDate DESC
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 对品牌库的数据进行条件统计分析 -->
+    <select id="adminPinpaiCount" resultMap="pinPaiInfo">
+        select * from PinpaiInfo p
+        <if test="Name != null and  Name!='' ">
+            <![CDATA[ where  p.Name like "%"#{Name}"%" ]]>
+        </if>
+    </select>
+
+    <!-- 对品牌库的数据进行新增操作 -->
+    <insert id="insertpinpai" parameterType="com.blueteam.entity.po.PinPaiInfo">
+        <![CDATA[
+		insert into PinpaiInfo
+		(Name,`Desc`,Status,Image,CreateDate,CreateBy,UpdateDate,UpdateBy,sortNumber)
+		values(#{Name},#{Desc},#{Status},#{Image},#{CreateDate},#{CreateBy},#{UpdateDate},#{UpdateBy},#{sortNumber})
+		]]>
+    </insert>
+
+    <!-- 对品牌库的数据进行修改操作 -->
+    <update id="updatepinpai" parameterType="com.blueteam.entity.po.PinPaiInfo">
+        update PinpaiInfo set Name = #{Name} where Id = #{Id}
+    </update>
+    <select id="listPinpai" resultType="java.util.Map">
+        SELECT ID AS id,Name AS name FROM
+        PinpaiInfo order by sortNumber asc
+    </select>
+</mapper>

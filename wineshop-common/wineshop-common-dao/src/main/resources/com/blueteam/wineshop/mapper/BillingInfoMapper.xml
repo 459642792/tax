@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.BillingInfoMapper">
+    <resultMap id="billingInfoMap" type="com.blueteam.entity.po.BillingInfo">
+        <id column="Id" jdbcType="INTEGER" property="id"/>
+        <result column="BillingInfoType" jdbcType="VARCHAR" property="billingInfoType"/>
+        <result column="VendorInfoId" jdbcType="INTEGER" property="vendorInfoId"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="IdentityCard " jdbcType="VARCHAR" property="identityCard "/>
+        <result column="AlipayCardBank" jdbcType="VARCHAR" property="alipayCardBank"/>
+        <result column="BankName" jdbcType="VARCHAR" property="bankName"/>
+        <result column="AccountOpeningCity" jdbcType="VARCHAR" property="accountOpeningCity"/>
+        <result column="AccountOpeningBranch" jdbcType="VARCHAR" property="accountOpeningBranch"/>
+        <result column="CreateDate" jdbcType="DATE" property="createDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="createBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="UpdateDate" jdbcType="DATE" property="updateDate"/>
+    </resultMap>
+
+    <insert id="saveBillingInfo" parameterType="com.blueteam.entity.po.BillingInfo" useGeneratedKeys="true"
+            keyProperty="Id">
+        <![CDATA[
+	    	insert into BillingInfo
+				(BillingInfoType,VendorInfoId,Name,IdentityCard,AlipayCardBank,BankName,AccountOpeningCity,AccountOpeningBranch,
+				CreateDate,CreateBy,UpdateBy,UpdateDate) 
+				values(#{billingInfoType},#{vendorInfoId},#{name},#{identityCard},#{alipayCardBank},#{bankName},#{accountOpeningCity},#{accountOpeningBranch},#{createDate},#{createBy},#{updateBy},#{updateDate})
+	    ]]>
+    </insert>
+
+    <update id="updateBillingInfo" parameterType="com.blueteam.entity.po.BillingInfo">
+        <![CDATA[
+  			UPDATE BillingInfo set 
+  				BillingInfoType = #{billingInfoType},
+  				Name = #{name},
+  				IdentityCard = #{identityCard},
+  				AlipayCardBank = #{alipayCardBank},
+  				BankName = #{bankName},
+  				AccountOpeningCity = #{accountOpeningCity},
+  				AccountOpeningBranch = #{accountOpeningBranch},
+				CreateDate = #{createDate},
+				CreateBy = #{createBy},
+				UpdateBy = #{updateBy},
+				UpdateDate =#{updateDate}
+				WHERE VendorInfoId = #{vendorInfoId}
+  		]]>
+    </update>
+
+    <select id="getBillingInfo" resultMap="billingInfoMap">
+        <![CDATA[
+  			SELECT * FROM BillingInfo WHERE VendorInfoId = #{vendorInfoId}
+  		]]>
+    </select>
+</mapper>

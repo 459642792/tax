@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.GoodsAttrMapper">
+
+    <select id="listAttrType" resultType="HashMap">
+        SELECT T.GOODS_TYPE_ID AS  attrTypeId,
+        IF(T.GOODS_TYPE_NAME = '酒水类', '通用', T.GOODS_TYPE_NAME) attrTypeName
+        FROM TD_G_GOODS_TYPE T
+        ORDER BY SHWO_ORDER
+    </select>
+
+
+    <select id="listAttrCode" parameterType="Integer" resultType="HashMap">
+        SELECT A.ATTR_CODE AS attrCode,
+               A.ATTR_NAME AS attrName,
+               A.ATTR_TYPE AS attrType,
+               A.OPERATE_TAG AS operateTag
+        FROM   TD_G_ATTR A
+        WHERE  A.ATTR_GOODS_TYPE =#{attrTypeId}
+        AND    A.ADMIN_SHOW_TAG =1
+        AND    A.PARENT_ATTR_CODE IS NULL
+        ORDER BY A.ADMIN_SHOW_ORDER
+    </select>
+
+
+    <select id="countAttrValue" parameterType="AttrValueSearchDTO" resultType="Integer">
+        SELECT COUNT(*)
+        FROM TD_G_ATTR A
+        LEFT JOIN TD_G_ATTR_VAL V
+        ON     A.ATTR_CODE = V.ATTR_CODE
+        WHERE  A.ATTR_CODE =#{attrCode}
+        ORDER BY A.ADMIN_SHOW_ORDER, V.ATTR_VALUE_SHOW_ORDER
+    </select>
+
+    <select id="listAttrValue" parameterType="AttrValueSearchDTO" resultType="HashMap">
+        SELECT A.ATTR_CODE AS  attrCode,
+               A.ATTR_NAME AS  attrName,
+               A.ATTR_TYPE AS  attrType,
+               V.ATTR_VALUE_CODE AS attrValueCode,
+               V.ATTR_VALUE_NAME AS attrValueName,
+               V.OPERATE_TAG  AS operateTag
+        FROM TD_G_ATTR A
+        LEFT JOIN TD_G_ATTR_VAL V
+        ON     A.ATTR_CODE = V.ATTR_CODE
+        WHERE  A.ATTR_CODE =#{attrCode}
+        ORDER BY V.ATTR_VALUE_SHOW_ORDER
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="getAttrInfo" parameterType="String" resultType="HashMap">
+        SELECT A.ATTR_CODE AS  attrCode,
+               A.ATTR_NAME AS  attrName,
+               A.ATTR_TYPE AS  attrType,
+               A.OPERATE_TAG AS  operateTag
+        FROM TD_G_ATTR A
+        WHERE  A.ATTR_CODE =#{attrCode}
+    </select>
+
+
+    <select id="countAttrValueName" parameterType="String" resultType="Integer">
+        SELECT COUNT(*)
+        FROM  TD_G_ATTR A
+        INNER JOIN TD_G_ATTR_VAL V
+        ON     A.ATTR_CODE = V.ATTR_CODE
+        WHERE  A.ATTR_CODE =#{attrCode}
+        AND    V.ATTR_VALUE_NAME=#{attrValueName}
+    </select>
+
+    <select id="getExistentMaxValue" parameterType="String" resultType="HashMap">
+        SELECT MAX(V.VALUE_INDEX) AS maxValueIndex,
+               MAX(V.ATTR_VALUE_SHOW_ORDER) AS maxShowOrder
+        FROM TD_G_ATTR_VAL V
+        WHERE V.ATTR_CODE =#{attrCode}
+        AND   V.VALUE_INDEX!=999
+    </select>
+
+    <insert id="saveAttrValue" parameterType="AttrValInfoPO">
+        INSERT INTO TD_G_ATTR_VAL (ATTR_CODE, ATTR_VALUE_CODE, VALUE_INDEX, ATTR_VALUE_NAME, OPERATE_TAG, ATTR_VALUE_SHOW_ORDER, CREATE_STAFF_ID, UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        VALUES (#{attrCode}, #{attrValueCode}, #{valueIndex}, #{attrValueName}, #{operateTag}, #{attrValueShowOrder}, #{createStaffId}, #{updateStaffId}, sysdate(), sysdate());
+    </insert>
+
+    <select id="countGoodsAttrValueCode" parameterType="String" resultType="Integer">
+        SELECT COUNT(GA.GOODS_ID)
+        FROM   TF_G_GOODS_ATTR GA
+        WHERE  GA.ATTR_VALUE_CODE=#{attrValueCode}
+    </select>
+
+    <select id="getAttrValueInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT V.ATTR_VALUE_NAME AS attrValueName
+        FROM   TD_G_ATTR_VAL V
+        WHERE  V.ATTR_CODE = #{attrCode}
+        AND    V.ATTR_VALUE_CODE = #{attrValueCode}
+        AND    V.OPERATE_TAG = #{operateTag}
+    </select>
+
+    <update id="updateAttrValueInfo" parameterType="AttrValInfoPO">
+        UPDATE TD_G_ATTR_VAL V
+        SET    V.ATTR_VALUE_NAME =#{attrValueName},
+        V.UPDATE_STAFF_ID=#{updateStaffId},
+        V.UPDATE_TIME=sysdate()
+        WHERE  V.ATTR_CODE = #{attrCode}
+        AND    V.ATTR_VALUE_CODE =#{attrValueCode}
+        AND    V.OPERATE_TAG = #{operateTag}
+    </update>
+
+    <delete id="removeAttrValueInfo" parameterType="AttrValInfoPO">
+        DELETE FROM  TD_G_ATTR_VAL
+        WHERE  ATTR_CODE = #{attrCode}
+        AND    ATTR_VALUE_CODE =#{attrValueCode}
+        AND    OPERATE_TAG = #{operateTag}
+    </delete>
+
+
+    <select id="listAttrInfoByParentCode" parameterType="HashMap" resultType="HashMap">
+        SELECT A.ATTR_CODE attrCode,
+        A.PARENT_ATTR_CODE parentAttrCode,
+        A.ATTR_NAME attrName,
+        A.ATTR_TYPE attrType,
+        A.NECESSARY_TAG necessaryTag,
+        V.ATTR_VALUE_CODE attrValueCode,
+        V.ATTR_VALUE_NAME attrValueName
+        FROM TD_G_ATTR A
+        LEFT JOIN TD_G_ATTR_VAL V
+        ON A.ATTR_CODE = V.ATTR_CODE
+        WHERE A.ATTR_GOODS_TYPE = #{goodsTypeId}
+        AND A.PARENT_ATTR_CODE IN
+        <foreach collection="searchAttrList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY A.ADMIN_SHOW_ORDER, V.ATTR_VALUE_SHOW_ORDER
+    </select>
+
+    <select id="listAttrInfo" parameterType="Integer" resultType="HashMap">
+        SELECT A.ATTR_CODE attrCode,
+        A.PARENT_ATTR_CODE parentAttrCode,
+        A.ATTR_NAME attrName,
+        A.ATTR_TYPE attrType,
+        A.NECESSARY_TAG necessaryTag,
+        V.ATTR_VALUE_CODE attrValueCode,
+        V.ATTR_VALUE_NAME attrValueName
+        FROM TD_G_ATTR A
+        LEFT JOIN TD_G_ATTR_VAL V
+        ON A.ATTR_CODE = V.ATTR_CODE
+        WHERE A.ATTR_GOODS_TYPE = #{goodsTypeId}
+        <if test="attrListType ==1">
+            AND A.NECESSARY_TAG =#{attrListType}
+        </if>
+        <if test="attrListType ==0">
+            AND A.NECESSARY_TAG =#{attrListType}
+        </if>
+        ORDER BY A.ADMIN_SHOW_ORDER, V.ATTR_VALUE_SHOW_ORDER
+    </select>
+
+    <select id="countAttr" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(A.ATTR_CODE)
+        FROM TD_G_ATTR A
+        WHERE A.ATTR_GOODS_TYPE =#{goodsTypeId}
+        <if test="attrListType ==1">
+            AND A.NECESSARY_TAG = #{attrListType}
+        </if>
+        <if test="attrListType ==0">
+            AND A.NECESSARY_TAG = #{attrListType}
+        </if>
+    </select>
+
+
+    <select id="listAttrInfoByDTO" parameterType="HashMap" resultType="AttrInfoPO">
+        SELECT
+        A.ATTR_CODE AS attrCode,
+        A.ATTR_TYPE AS attrType
+        FROM TD_G_ATTR A
+        WHERE A.ATTR_GOODS_TYPE =#{goodsTypeId}
+        <if test="attrListType ==1">
+            AND A.NECESSARY_TAG = #{attrListType}
+        </if>
+        <if test="attrListType ==0">
+            AND A.NECESSARY_TAG = #{attrListType}
+        </if>
+        <foreach collection="attrList" index="index" item="item" open="and" separator="or">
+            A.ATTR_CODE =#{item.attrCode} AND A.ATTR_TYPE=#{item.attrType}
+            <!-- 基础属性select类型attrValueCode不为空 -->
+            <if test="item.attrType==0 and attrListType ==1">
+                AND (#{item.attrValueCode} IS NOT NULL AND #{item.attrValueCode} !='')
+            </if>
+            <!--input类型attrValueName不为空 -->
+            <if test="item.attrType==1 and attrListType ==1">
+                AND (#{item.attrValueName} IS NOT NULL AND #{item.attrValueName} !='')
+            </if>
+        </foreach>
+    </select>
+
+    <select id="listAttrValueInfoByDTO" parameterType="HashMap" resultType="AttrValInfoPO">
+        SELECT
+        V.ATTR_CODE AS attrCode,
+        V.ATTR_VALUE_CODE AS attrValueCode,
+        V.ATTR_VALUE_NAME AS attrValueName
+        FROM TD_G_ATTR_VAL V
+        <foreach collection="attrList" index="index" item="item" open="where" separator="or">
+            (V.ATTR_CODE =#{item.attrCode} AND V.ATTR_VALUE_CODE=#{item.attrValueCode})
+        </foreach>
+    </select>
+
+</mapper>

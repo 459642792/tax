@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderMapper" >
+    <resultMap id="BaseResultMap" type="com.blueteam.entity.po.OrderPO" >
+        <id column="order_id" property="orderId" jdbcType="BIGINT"  />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="vendor_id" property="vendorId" jdbcType="INTEGER" />
+        <result column="order_state" property="orderState" jdbcType="TINYINT" />
+        <result column="complete_state" property="completeState" jdbcType="TINYINT" />
+        <result column="REFUND_STATE" property="refundState" jdbcType="TINYINT" />
+        <result column="comment_state" property="commentState" jdbcType="TINYINT" />
+        <result column="validity_state" property="validityState" jdbcType="TINYINT" />
+        <result column="order_source" property="orderSource" jdbcType="TINYINT" />
+        <result column="order_channel" property="orderChannel" jdbcType="TINYINT" />
+        <result column="pay_channel" property="payChannel" jdbcType="TINYINT" />
+        <result column="pay_type_id" property="payTypeId" jdbcType="TINYINT" />
+        <result column="pay_type_name" property="payTypeName" jdbcType="VARCHAR" />
+        <result column="pay_way_id" property="payWayId" jdbcType="TINYINT" />
+        <result column="pay_way_name" property="payTypeName" jdbcType="VARCHAR" />
+        <result column="original_price" property="originalPrice" jdbcType="BIGINT" />
+        <result column="pay_price" property="payPrice" jdbcType="BIGINT" />
+        <result column="coupon_amount" property="couponAmount" jdbcType="BIGINT" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="delivery_type" property="deliveryType" jdbcType="TINYINT" />
+        <result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR" />
+        <result column="delivery_fee" property="deliveryFee" jdbcType="BIGINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
+        <result column="pay_time" property="payTime" jdbcType="TIMESTAMP" />
+        <result column="promise_time" property="promiseTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="update_staff_id" property="updateStaffId" jdbcType="INTEGER" />
+        <result column="receive_time" property="receiveTime"  jdbcType="TIMESTAMP" />
+        <result column="comment_time" property="commentTime"  jdbcType="TIMESTAMP" />
+        <result column="comment_score" property="commentScore" jdbcType="INTEGER" />
+        <result column="version" property="version" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="ResultMap" extends="BaseResultMap" type="com.blueteam.entity.vo.VendorOrderVO">
+        <association property="orderDispatchPO" javaType="com.blueteam.entity.po.OrderDispatchPO">
+            <result column="order_id" jdbcType="BIGINT" property="orderId" />
+            <result column="contact_name" jdbcType="VARCHAR" property="contactName" />
+            <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
+            <result column="address_desc" jdbcType="VARCHAR" property="addressDesc" />
+            <result column="longitude" jdbcType="VARCHAR" property="longitude" />
+            <result column="latitude" jdbcType="VARCHAR" property="latitude" />
+        </association>
+        <collection property="orderGoodsItemPOS" ofType="com.blueteam.entity.po.OrderGoodsItemPO" column="user_id">
+            <result column="order_id" jdbcType="BIGINT" property="orderId" />
+            <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+            <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+            <result column="bar_code" jdbcType="VARCHAR" property="barCode" />
+            <result column="goods_num" jdbcType="INTEGER" property="goodsNum" />
+            <result column="goods_type_name" jdbcType="VARCHAR" property="goodsTypeName" />
+            <result column="main_brand_name" jdbcType="VARCHAR" property="mainBrandName" />
+            <result column="brand_name" jdbcType="VARCHAR" property="brandName" />
+            <result column="goods_photos" jdbcType="VARCHAR" property="goodsPhotos" />
+            <result column="original_price" jdbcType="BIGINT" property="originalPrice" />
+            <result column="pay_price2" jdbcType="BIGINT" property="payPrice" />
+            <result column="coupon_amount" jdbcType="BIGINT" property="couponAmount" />
+            <collection property="orderAttrPOS" ofType="com.blueteam.entity.po.OrderAttrPO">
+                <result column="order_id" jdbcType="BIGINT" property="orderId" />
+                <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+                <result column="attr_name" jdbcType="VARCHAR" property="attrName" />
+                <result column="attr_value_show_name" jdbcType="VARCHAR" property="attrValueShowName" />
+                <result column="show_tag" jdbcType="TINYINT" property="showTag" />
+                <result column="show_order" jdbcType="SMALLINT" property="showOrder" />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="baseOrderDetails" extends="BaseResultMap" type="com.blueteam.entity.vo.UserOrderVo">
+        <result column="vendorName" jdbcType="VARCHAR" property="vendorName" />
+        <result column="vendorPhone" jdbcType="VARCHAR" property="vendorPhone" />
+        <result column="vendorAddress" jdbcType="VARCHAR" property="vendorAddress" />
+        <association property="orderDispatch" javaType="com.blueteam.entity.vo.OrderDispatchVO">
+            <result column="contact_name" jdbcType="VARCHAR" property="contactName" />
+            <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
+            <result column="address_desc" jdbcType="VARCHAR" property="addressDesc" />
+        </association>
+        <association property="orderComment" javaType="com.blueteam.entity.vo.OrderComment">
+            <result column="score" jdbcType="INTEGER" property="score" />
+            <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+            <result column="comment_picture" jdbcType="VARCHAR" property="commentPicture" />
+        </association>
+        <association property="applyRefundRecordPO" javaType="com.blueteam.entity.po.ApplyRefundRecordPO">
+            <result column="refund_reason_code" jdbcType="TINYINT" property="refundReasonCode" />
+            <result column="refund_reason_desc" jdbcType="VARCHAR" property="refundReasonDesc" />
+            <result column="refund_remark" jdbcType="VARCHAR" property="refundRemark" />
+            <result column="process_status" jdbcType="TINYINT" property="processStatus" />
+            <result column="process_time" jdbcType="VARCHAR" property="processTime" />
+            <result column="create_time1" jdbcType="VARCHAR" property="createTime" />
+        </association>
+        <association property="refundResultPO" javaType="com.blueteam.entity.po.RefundResultPO">
+            <result column="result_state" jdbcType="INTEGER" property="resultState" />
+            <result column="createTimerr" jdbcType="TIMESTAMP" property="createTime" />
+        </association>
+        <collection property="orderGoodsItem" ofType="com.blueteam.entity.vo.OrderGoodsItemVO" column="user_id">
+            <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+            <result column="goods_num" jdbcType="INTEGER" property="goodsNum" />
+            <result column="goods_photos" jdbcType="VARCHAR" property="goodsPhotos" />
+            <result column="pay_price2" jdbcType="BIGINT" property="payPrice" />
+            <collection property="orderAttr" ofType="com.blueteam.entity.vo.OrderAttrVO">
+                <result column="attr_value_show_name" jdbcType="VARCHAR" property="attrValueShowName" />
+            </collection>
+        </collection>
+
+    </resultMap>
+
+
+    <resultMap id="baseCustomerOrder" type="com.blueteam.entity.bo.wechatapplet.CustomerOrderBO">
+        <result column="orderNo" jdbcType="VARCHAR" property="orderNo" />
+        <result column="orderId" jdbcType="BIGINT" property="orderId" />
+        <result column="orderSource" jdbcType="VARCHAR" property="orderSource" />
+        <result column="vendorName" jdbcType="VARCHAR" property="vendorName" />
+        <result column="vendorId" jdbcType="INTEGER" property="vendorId" />
+        <result column="payPrice" jdbcType="BIGINT" property="payPrice" />
+        <result column="refundPrice" jdbcType="BIGINT" property="refundPrice" />
+        <result column="orderState" jdbcType="TINYINT" property="orderState" />
+        <result column="completeState" jdbcType="TINYINT" property="completeState" />
+        <result column="refundState" jdbcType="TINYINT" property="refundState" />
+        <result column="commentState" jdbcType="TINYINT" property="commentState" />
+        <result column="validityState" jdbcType="TINYINT" property="validityState" />
+        <collection property="listGoods" ofType="com.blueteam.entity.vo.OrderGoodsVO">
+            <result column="goodsId" jdbcType="BIGINT" property="goodsId" />
+            <result column="goodsName" jdbcType="VARCHAR" property="goodsName" />
+            <result column="goodsPrice" jdbcType="BIGINT" property="goodsPrice" />
+            <result column="goodsNum" jdbcType="INTEGER" property="goodsNum" />
+            <result column="goodsImage" jdbcType="VARCHAR" property="goodsImage" />
+        </collection>
+    </resultMap>
+
+
+    <sql id="Base_Column_List" >
+    order_id, order_no, user_id, vendor_id, order_state, complete_state, REFUND_STATE,
+    comment_state,validity_state,order_source, order_channel, pay_channel, pay_type_id, pay_type_name, pay_way_id,
+    pay_way_name, original_price, pay_price, coupon_amount, delivery_type, delivery_fee,
+    create_time, complete_time, pay_time, promise_time,
+    update_time, update_staff_id,receive_time, comment_time
+    version
+  </sql>
+
+    <sql id="whereParams">
+        <where>
+            vendor_id=#{vendorId}
+            <if test="orderState > -1">
+                and order_state=#{orderState}
+            </if>
+            <if test="completeState > -1">
+                and complete_state=#{completeState}
+            </if>
+            <if test="refundState > -1">
+                and REFUND_STATE=#{refundState}
+            </if>
+            <if test="commentState > -1">
+                and comment_state=#{commentState}
+            </if>
+            <if test="commentScore > 0">
+                AND (comment_score>0 AND comment_score <![CDATA[ <= ]]> 3)
+            </if>
+            <if test="keyword != null">
+                AND (C.contact_name=#{keyword} OR C.contact_phone=#{keyword})
+            </if>
+        </where>
+    </sql>
+
+    <select id="getByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * from tf_b_order WHERE order_id=#{orderId}
+    </select>
+    <select id="getByOrderNo"  resultMap="BaseResultMap">
+        SELECT * from tf_b_order WHERE order_no=#{orderNo}
+    </select>
+
+
+    <select id="getOrderList" resultMap="ResultMap" parameterType="com.blueteam.entity.dto.VendorOrderDTO">
+        SELECT A.*,B.*,B.pay_price as 'pay_price2',C.* FROM tf_b_order A
+        LEFT JOIN tf_b_order_dispatch C ON A.order_id=C.order_id
+        LEFT JOIN tf_b_order_goods_item B ON A.order_id=B.order_id
+        <include refid="whereParams"/>
+        limit #{beginIndex},#{pageSize}
+    </select>
+
+    <select id="getCount" parameterType="com.blueteam.entity.dto.VendorOrderDTO" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM tf_b_order <include refid="whereParams"/>
+    </select>
+
+    <update id="receiveOrder" parameterType="com.blueteam.entity.dto.VendorOrderDTO">
+        UPDATE tf_b_order SET order_state=3,promise_time=now(),update_time=now(),version=(version+1) WHERE order_id=#{orderId} AND vendor_id=#{vendorId} AND order_state=2 AND REFUND_STATE=0
+    </update>
+
+    <update id="confirmOrder" parameterType="com.blueteam.entity.dto.VendorOrderDTO">
+        UPDATE tf_b_order SET order_state=4,complete_state=1,complete_time=now(),update_time=now(),version=(version+1)
+        WHERE order_id=#{orderId} AND vendor_id=#{vendorId} AND order_state=3 AND REFUND_STATE=0 AND version=#{version}
+    </update>
+    <insert id="saveOrder" parameterType="com.blueteam.entity.po.OrderPO">
+        insert into tf_b_order
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderId != null" >
+                order_id,
+            </if>
+            <if test="orderNo != null" >
+                order_no,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="vendorId != null" >
+                vendor_id,
+            </if>
+            <if test="orderState != null" >
+                order_state,
+            </if>
+            <if test="completeState != null" >
+                complete_state,
+            </if>
+            <if test="refundState != null" >
+                refund_state,
+            </if>
+            <if test="commentState != null" >
+                comment_state,
+            </if>
+            <if test="validityState != null" >
+                validity_state,
+            </if>
+            <if test="orderSource != null" >
+                order_source,
+            </if>
+            <if test="orderChannel != null" >
+                order_channel,
+            </if>
+            <if test="payChannel != null" >
+                pay_channel,
+            </if>
+            <if test="payTypeId != null" >
+                pay_type_id,
+            </if>
+            <if test="payTypeName != null" >
+                pay_type_name,
+            </if>
+            <if test="payWayId != null" >
+                pay_way_id,
+            </if>
+            <if test="payWayName != null" >
+                pay_way_name,
+            </if>
+            <if test="originalPrice != null" >
+                original_price,
+            </if>
+            <if test="payPrice != null" >
+                pay_price,
+            </if>
+            <if test="remark != null" >
+                remark,
+            </if>
+            <if test="couponAmount != null" >
+                coupon_amount,
+            </if>
+            <if test="deliveryType != null" >
+                delivery_type,
+            </if>
+            <if test="deliveryFee != null" >
+                delivery_fee,
+            </if>
+            <if test="deliveryTime != null" >
+                delivery_time,
+            </if>
+            <if test="deliveryAddress != null" >
+                delivery_address,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="payTime != null" >
+                pay_time,
+            </if>
+            <if test="promiseTime != null" >
+                promise_time,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+            <if test="updateStaffId != null" >
+                update_staff_id,
+            </if>
+            <if test="receiveTime != null" >
+                receive_time,
+            </if>
+            <if test="commentTime != null" >
+                comment_time,
+            </if>
+            <if test="completeTime != null" >
+                complete_time,
+            </if>
+            <if test="version != null" >
+                version,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderId != null" >
+                #{orderId,jdbcType=BIGINT},
+            </if>
+            <if test="orderNo != null" >
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="vendorId != null" >
+                #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="orderState != null" >
+                #{orderState,jdbcType=TINYINT},
+            </if>
+            <if test="completeState != null" >
+                #{completeState,jdbcType=TINYINT},
+            </if>
+            <if test="refundState != null" >
+                #{refundState,jdbcType=TINYINT},
+            </if>
+            <if test="commentState != null" >
+                #{commentState,jdbcType=TINYINT},
+            </if>
+            <if test="validityState != null" >
+                #{validityState,jdbcType=TINYINT},
+            </if>
+            <if test="orderSource != null" >
+                #{orderSource,jdbcType=TINYINT},
+            </if>
+            <if test="orderChannel != null" >
+                #{orderChannel,jdbcType=TINYINT},
+            </if>
+            <if test="payChannel != null" >
+                #{payChannel,jdbcType=TINYINT},
+            </if>
+            <if test="payTypeId != null" >
+                #{payTypeId,jdbcType=TINYINT},
+            </if>
+            <if test="payTypeName != null" >
+                #{payTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="payWayId != null" >
+                #{payWayId,jdbcType=TINYINT},
+            </if>
+            <if test="payWayName != null" >
+                #{payWayName,jdbcType=VARCHAR},
+            </if>
+            <if test="originalPrice != null" >
+                #{originalPrice,jdbcType=BIGINT},
+            </if>
+            <if test="payPrice != null" >
+                #{payPrice,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="couponAmount != null" >
+                #{couponAmount,jdbcType=BIGINT},
+            </if>
+            <if test="deliveryType != null" >
+                #{deliveryType,jdbcType=TINYINT},
+            </if>
+            <if test="deliveryFee != null" >
+                #{deliveryFee,jdbcType=BIGINT},
+            </if>
+            <if test="deliveryTime != null" >
+                #{deliveryTime,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryAddress != null" >
+                #{deliveryAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime != null" >
+                #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="promiseTime != null" >
+                #{promiseTime,jdbcType=TIMESTAMP},
+            </if>
+
+
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateStaffId != null" >
+                #{updateStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="receiveTime != null" >
+                #{receiveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="commentTime != null" >
+                #{commentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="completeTime != null" >
+                #{completeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null" >
+                #{version,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="orderDetail" resultMap="ResultMap" parameterType="java.lang.Long">
+        SELECT A.*,B.*,B.pay_price as 'pay_price2',C.*,D.* FROM tf_b_order A
+        LEFT JOIN tf_b_order_dispatch D ON A.order_id=D.order_id
+        LEFT JOIN tf_b_order_goods_item B ON A.order_id=B.order_id
+        LEFT JOIN (SELECT * from tf_b_order_attr WHERE order_id=#{orderId} ORDER BY show_order) C ON B.goods_id=C.goods_id
+        WHERE A.order_id=#{orderId}
+    </select>
+
+    <select id="orderDetail2" resultMap="ResultMap">
+        SELECT A.*,B.*,B.pay_price as 'pay_price2',C.*,D.* FROM tf_b_order A
+        LEFT JOIN tf_b_order_dispatch D ON A.order_id=D.order_id
+        LEFT JOIN tf_b_order_goods_item B ON A.order_id=B.order_id
+        LEFT JOIN (SELECT * from tf_b_order_attr WHERE order_id=#{orderId} ORDER BY show_order) C ON B.goods_id=C.goods_id
+        WHERE A.order_no=#{orderNo}
+    </select>
+
+    <update id="updateOrder" parameterType="com.blueteam.entity.po.OrderPO" >
+        update tf_b_order
+        <set >
+            <if test="orderNo != null" >
+                order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="vendorId != null" >
+                vendor_id = #{vendorId,jdbcType=INTEGER},
+            </if>
+            <if test="orderState != null" >
+                order_state = #{orderState,jdbcType=TINYINT},
+            </if>
+            <if test="completeState != null" >
+                complete_state = #{completeState,jdbcType=TINYINT},
+            </if>
+            <if test="refundState != null" >
+                refund_state = #{refundState,jdbcType=TINYINT},
+            </if>
+            <if test="commentState != null" >
+                comment_state = #{commentState,jdbcType=TINYINT},
+            </if>
+            <if test="validityState != null" >
+                validity_state = #{validityState,jdbcType=BIT},
+            </if>
+            <if test="orderChannel != null" >
+                order_channel = #{orderChannel,jdbcType=TINYINT},
+            </if>
+            <if test="payChannel != null" >
+                pay_channel = #{payChannel,jdbcType=TINYINT},
+            </if>
+            <if test="payTypeId != null" >
+                pay_type_id = #{payTypeId,jdbcType=TINYINT},
+            </if>
+            <if test="payTypeName != null" >
+                pay_type_name = #{payTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="payWayId != null" >
+                pay_way_id = #{payWayId,jdbcType=TINYINT},
+            </if>
+            <if test="payWayName != null" >
+                pay_way_name = #{payWayName,jdbcType=VARCHAR},
+            </if>
+            <if test="originalPrice != null" >
+                original_price = #{originalPrice,jdbcType=BIGINT},
+            </if>
+            <if test="payPrice != null" >
+                pay_price = #{payPrice,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="couponAmount != null" >
+                coupon_amount = #{couponAmount,jdbcType=BIGINT},
+            </if>
+            <if test="deliveryType != null" >
+                delivery_type = #{deliveryType,jdbcType=TINYINT},
+            </if>
+            <if test="deliveryFee != null" >
+                delivery_fee = #{deliveryFee,jdbcType=BIGINT},
+            </if>
+            <if test="deliveryTime != null" >
+                delivery_time = #{deliveryTime,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryAddress != null" >
+                delivery_address = #{deliveryAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="payTime != null" >
+                pay_time = #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="promiseTime != null" >
+                promise_time = #{promiseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateStaffId != null" >
+                update_staff_id = #{updateStaffId,jdbcType=INTEGER},
+            </if>
+            <if test="receiveTime != null" >
+                receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="commentTime != null" >
+                comment_time = #{commentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="commentScore != null" >
+                comment_score = #{commentScore,jdbcType=INTEGER},
+            </if>
+            <if test="completeTime != null" >
+                complete_time = #{completeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null" >
+                version = #{version,jdbcType=INTEGER}+1,
+            </if>
+        </set>
+        where order_id = #{orderId,jdbcType=BIGINT} AND  version = #{version,jdbcType=INTEGER}
+    </update>
+    <select id="listCustomerOrder" parameterType="com.blueteam.entity.bo.wechatapplet.CustomerzSearchOrderBO" resultMap="baseCustomerOrder">
+        SELECT
+        bo.order_no AS orderNo,
+        bo.order_id AS orderId,
+        bo.order_source AS  orderSource,
+        v.`Name` AS vendorName,
+        v.id AS  vendorId,
+        bo.pay_price AS payPrice,
+        arr.refund_fee AS refundPrice,
+        bo.order_state AS orderState,
+        bo.complete_state AS completeState,
+        bo.refund_state AS refundState,
+        bo.comment_state AS commentState,
+        bo.validity_state AS validityState,
+        ogi.goods_id AS goodsId,
+        ogi.goods_name AS goodsName,
+        ogi.pay_price AS goodsPrice,
+        ogi.goods_num AS goodsNum,
+        ogi.goods_photos AS goodsImage
+        FROM
+        (select * from   tf_b_order
+        WHERE
+        user_id = #{userId}
+        AND validity_state = 1
+        <trim prefix="AND">
+            <foreach collection="map" item="orderValue" index="orderKey"  separator="AND" >
+                <choose>
+                    <when test="orderKey == 'refund_state' and orderValue == 2">
+                        <![CDATA[  (   ${orderKey} =  #{orderValue}   or  ${orderKey} = 1) ]]>
+                    </when>
+                    <otherwise>
+                        <![CDATA[   ${orderKey} =  #{orderValue} ]]>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </trim>
+        <![CDATA[  ORDER BY ( CASE WHEN order_state = 0 THEN 0 ELSE 1 END),
+        (CASE WHEN refund_state != 0 THEN 0 ELSE 1 END ),
+        update_time DESC ]]>
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ) bo
+        JOIN vendorinfo v ON bo.vendor_id = v.Id
+        LEFT JOIN tf_b_order_goods_item ogi ON bo.order_id = ogi.order_id
+        LEFT JOIN (
+        SELECT
+        order_id,
+        refund_fee
+        FROM
+        tf_m_apply_refund_record
+        WHERE
+        process_status = 1
+        ) arr ON bo.order_id = arr.order_id
+        ORDER BY ( CASE WHEN bo.order_state = 0 THEN 0 ELSE 1 END),
+        (CASE WHEN bo.refund_state != 0 THEN 0 ELSE 1 END ),
+        bo.update_time DESC
+    </select>
+    <select id="getCustomerOrderCount"  parameterType="com.blueteam.entity.bo.wechatapplet.CustomerzSearchOrderBO" resultType="java.lang.Integer">
+        SELECT
+        COUNT(bo.order_no)
+        FROM
+        tf_b_order bo
+        WHERE
+        bo.user_id = #{userId}
+        AND bo.validity_state = 1
+        <trim prefix="AND">
+            <foreach collection="map" item="orderValue" index="orderKey"  separator="AND" >
+                <choose>
+                    <when test="orderKey == 'refund_state' and orderValue == 2">
+                        <![CDATA[  (   ${orderKey} =  #{orderValue}   or  ${orderKey} = 1) ]]>
+                    </when>
+                    <otherwise>
+                        <![CDATA[   ${orderKey} =  #{orderValue} ]]>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </trim>
+    </select>
+
+
+
+    <update id="commentOrderFinish">
+        UPDATE tf_b_order SET comment_state=1,comment_time=now(),comment_score=#{score},update_time=now() WHERE order_id=#{orderId}
+    </update>
+    <select id="getWaitReceiveOrder" parameterType="int" resultType="int">
+        SELECT COUNT(1) FROM tf_b_order WHERE vendor_id=#{vendorId}
+        AND order_state=2 AND complete_state=0 AND  refund_state=0 AND comment_state=0
+    </select>
+
+    <select id="getLowerOrder" parameterType="int" resultType="int">
+        SELECT COUNT(1) FROM tf_b_order WHERE vendor_id=#{vendorId} AND (comment_score>0 AND comment_score <![CDATA[ < ]]> 3)
+    </select>
+    <!--用户获取详情 最垃圾得sql -->
+    <select id="getOrderDetail" resultMap="baseOrderDetails">
+       SELECT
+            A.*, V.`Name` AS vendorName,
+            V.Phone AS vendorPhone,
+               V.Addr AS vendorAddress,
+            B.*,D.*, oc.*,arr.*,rr.*,rr.create_time AS  createTimerr
+        FROM
+            tf_b_order A
+        JOIN vendorinfo V ON A.vendor_id = V.Id
+        LEFT JOIN tf_b_order_dispatch D ON A.order_id = D.order_id
+        LEFT JOIN (
+            SELECT
+                B.order_id,
+                B.goods_name,
+                B.goods_num,
+                B.goods_photos,
+                B.pay_price as pay_price2,
+                a.attr_value_show_name
+            FROM
+                tf_b_order_goods_item b
+            JOIN tf_b_order_attr a ON b.goods_id = a.goods_id and b.order_id = a.order_id AND  a.show_tag=1
+            WHERE
+                b.order_id = #{orderId}
+            ORDER BY
+                a.show_order ASC
+        ) B ON A.order_id = B.order_id
+        LEFT JOIN (
+            SELECT
+                order_id,
+                score,
+                comment_content,
+                comment_picture
+            FROM
+                tf_b_order_comment
+            WHERE
+                deleted_flag = 1
+        ) oc ON A.order_id = oc.order_id
+        LEFT JOIN (select *,create_time as create_time1 from tf_m_apply_refund_record  where  order_id = #{orderId} ORDER BY apply_refund_id desc LIMIT 1 ) arr ON A.order_id = arr.order_id
+        LEFT  JOIN  tf_m_refund_result rr ON A.order_id =  rr.order_id
+        WHERE
+            A.order_no = #{orderNo}
+            and
+             A.user_id= #{userId}
+   </select>
+
+    <select id="getOrderIdByNo" parameterType="string" resultType="long">
+        SELECT order_id FROM tf_b_order WHERE order_no = #{orderNo}
+    </select>
+
+    <update id="updateScoreAndCommentStatus" parameterType="long">
+        UPDATE tf_b_order SET comment_score=0,comment_time=NULL WHERE order_id=#{orderId}
+    </update>
+    <select id="getTodaySalesAmount" resultType="java.lang.Integer">
+        SELECT COUNT(pay_price) FROM tf_b_order
+        WHERE order_state=4 AND complete_state=1 AND vendor_id=#{vendorId}
+        AND complete_time>#{beginTime} AND complete_time <![CDATA[ <= ]]> #{endTime}
+    </select>
+    <!--查询30分钟用户未付款的订单-->
+    <update id="updateByUserOrderNoPay">
+        UPDATE tf_b_order
+        SET complete_state = 2,
+         complete_time = NOW(),
+         update_time = now(),
+         version = version + 1
+        WHERE
+            order_state = 0
+        AND complete_state = 0
+        AND version = version
+        AND TIMESTAMPDIFF(MINUTE, create_time, NOW()) >= 30
+      </update>
+    <!--查询60分钟商家为接单的订单-->
+    <select id="listOrderByVendorNoReceiving" resultMap="BaseResultMap">
+        <![CDATA[       select * from tf_b_order where   order_state = 2
+        AND complete_state = 0 AND refund_state = 0 AND  TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 60]]>
+    </select>
+    <!--查询退款中的订单-->
+    <select id="listOrderByRrundIng" resultMap="BaseResultMap">
+       <![CDATA[ select * from tf_b_order where refund_state = 2 AND complete_state = 0]]>
+    </select>
+    <!--查询申请退款已经3天未处理的订单-->
+    <select id="listOrderByVendorNoRefund" resultMap="BaseResultMap">
+        <![CDATA[ SELECT
+                    O.*
+                FROM
+                    tf_b_order O
+                JOIN tf_m_apply_refund_record arr ON O.order_id = arr.order_id
+                AND arr.process_status = 0
+                AND O.refund_state = 1
+                AND TIMESTAMPDIFF(DAY, arr.create_time, NOW()) >= 3]]>
+    </select>
+
+    <select id="getOrderGoodsByOrderId" parameterType="long" resultType="map">
+        SELECT * FROM tf_b_order_goods_item WHERE order_id=#{orderId}
+    </select>
+
+    <select id="getSettlementOrder" parameterType="int" resultMap="BaseResultMap">
+        SELECT order_no,complete_time,pay_price FROM tf_b_order_goods_item WHERE settlement_state=#{settlementId}
+    </select>
+</mapper>

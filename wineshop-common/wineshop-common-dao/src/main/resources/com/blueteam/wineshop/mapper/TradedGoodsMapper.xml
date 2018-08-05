@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.TradedGoodsMapper">
+    <resultMap id="tradedGoods" type="com.blueteam.entity.po.TradedGoods">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="brand_name" jdbcType="VARCHAR" property="brandName"/>
+        <result column="goods_price" jdbcType="INTEGER" property="goodsPrice"/>
+        <result column="goods_status" jdbcType="INTEGER" property="goodsStatus"/>
+        <result column="goods_genre" jdbcType="INTEGER" property="goodsGenre"/>
+        <result column="goods_details" jdbcType="VARCHAR" property="goodsDetails"/>
+
+
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="DATE" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="DATE" property="updateDate"/>
+    </resultMap>
+    <!-- 商品列表 -->
+    <select id="listTradedGoods" resultType="java.util.HashMap">
+        <![CDATA[
+		 select *
+FROM
+	(
+		SELECT
+			tg.id AS id,
+			tg.goods_name AS goodsName,
+			tg.brand_name AS brandName,
+			tg.goods_price AS goodsPrice,
+			tgc.counts AS counts,
+			tg.goods_status AS goodsStatus,
+			IFNULL(tgi.image_url,'') AS imageUrl,
+			date_format(tg.create_date,'%Y-%m-%d') AS createDate
+		FROM
+			traded_goods tg
+		LEFT JOIN goods_table_image gti ON tg.id = gti.traded_goods_id
+		LEFT JOIN (
+			SELECT
+				id,
+				image_url
+			FROM
+				traded_goods_image
+			WHERE
+				type = 1
+		) tgi ON gti.traded_goods_image_id = tgi.id
+		LEFT JOIN (
+			SELECT
+				gcr.traded_goods_id AS id,
+				COUNT(*) AS counts
+			FROM
+				goods_cash_record gcr
+			GROUP BY
+				traded_goods_id
+		) AS tgc ON tgc.id = tg.id
+		WHERE
+			tg.goods_status != 9
+		]]>
+        <if test="goodsName != null">
+            <![CDATA[ and tg.goods_name like "%"#{goodsName}"%"]]>
+        </if>
+        <if test="brandName != null">
+            <![CDATA[and tg.brand_name like "%"#{brandName}"%"]]>
+        </if>
+        <if test="goodsStatus != null">
+            <![CDATA[ and tg.goods_status = #{goodsStatus}]]>
+        </if>
+        <![CDATA[ ) as tt
+		 	ORDER BY tt.goodsStatus DESC,tt.createDate DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+
+    <!-- 商品列表总数 -->
+    <select id="listCountTradedGoods" resultType="int">
+        <![CDATA[
+SELECT COUNT(*)
+FROM
+	(
+		SELECT
+			tg.id AS id,
+			tg.goods_name AS goodsName,
+			tg.brand_name AS brandName,
+			tg.goods_price AS goodsPrice,
+			tgc.counts AS counts,
+			tg.goods_status AS goodsStatus,
+			tgi.image_url AS imageUrl,
+			tg.create_date AS createDate
+		FROM
+			traded_goods tg
+		LEFT JOIN goods_table_image gti ON tg.id = gti.traded_goods_id
+		LEFT JOIN (
+			SELECT
+				id,
+				image_url
+			FROM
+				traded_goods_image
+			WHERE
+				type = 1
+		) tgi ON gti.traded_goods_image_id = tgi.id
+		LEFT JOIN (
+			SELECT
+				gcr.traded_goods_id AS id,
+				COUNT(*) AS counts
+			FROM
+				goods_cash_record gcr
+			GROUP BY
+				traded_goods_id
+		) AS tgc ON tgc.id = tg.id
+		WHERE
+			tg.goods_status != 9
+		]]>
+        <if test="goodsName != null">
+            <![CDATA[ and tg.goods_name like "%"#{goodsName}"%"]]>
+        </if>
+        <if test="brandName != null">
+            <![CDATA[and tg.brand_name like "%"#{brandName}"%"]]>
+        </if>
+        <if test="goodsStatus != null">
+            <![CDATA[ and tg.goods_status = #{goodsStatus}]]>
+        </if>
+        <![CDATA[ ) as t]]>
+    </select>
+
+
+    <!-- 获取商品详情 -->
+    <select id="getTradedGoods" resultType="java.util.HashMap">
+        <![CDATA[
+			SELECT
+	tg.id AS id,
+	tg.goods_name AS goodsName,
+	tg.brand_name AS brandName,
+	tg.goods_price AS goodsPrice,
+	tg.goods_status AS goodsStatus,
+	tg.goods_details AS goodsDetails,
+tg.id AS goodsTableImageId,
+	tgi.id AS tradedGoodsImageId,
+	IFNULL(tgi.image_url,'') AS imageUrl,
+    date_format(tg.create_date,'%Y-%m-%d') AS createDate
+FROM
+	traded_goods tg
+LEFT JOIN goods_table_image gti ON tg.id = gti.traded_goods_id
+LEFT JOIN (
+	SELECT
+		id,
+		image_url
+	FROM
+		traded_goods_image
+	WHERE
+		type = 1
+) tgi ON gti.traded_goods_image_id = tgi.id
+WHERE
+	tg.id = #{id}
+		]]>
+    </select>
+
+    <!-- 保存商品 -->
+    <insert id="saveTradedGoods" parameterType="com.blueteam.entity.po.TradedGoods"
+            useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+		INSERT INTO traded_goods (
+	goods_name,
+	brand_name,
+	goods_price,
+	goods_status,
+	goods_genre,
+	goods_details,
+	create_by,
+	create_date,
+	update_by,
+	update_date
+)
+VALUES
+	(
+		#{goodsName},
+		#{brandName},
+		#{goodsPrice},
+		#{goodsStatus},
+		#{goodsGenre},
+		#{goodsDetails},
+		#{createBy},
+		#{createDate},
+		#{updateBy},
+		#{updateDate}
+	)
+		]]>
+
+
+    </insert>
+
+    <!-- 编辑商品 -->
+    <update id="updateTradedGoods" parameterType="com.blueteam.entity.po.TradedGoods">
+        <![CDATA[
+			UPDATE traded_goods SET 
+	goods_name = #{goodsName},
+	brand_name = #{brandName},
+	goods_price = #{goodsPrice},
+	goods_genre = #{goodsGenre},
+	goods_details = #{goodsDetails},
+	update_by = #{updateBy},
+	update_date = #{updateDate}
+ where id = #{id}
+		]]>
+    </update>
+    <!-- 编辑商品 -->
+    <update id="updateStatusTradedGoods" parameterType="com.blueteam.entity.po.TradedGoods">
+        <![CDATA[
+			UPDATE traded_goods SET 
+	goods_status = #{goodsStatus},
+	update_by = #{updateBy},
+	update_date = #{updateDate}
+ where id = #{id}
+		]]>
+    </update>
+</mapper>

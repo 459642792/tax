@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.PromotionMapper">
+    <!-- 首页促销活动分类 -->
+    <resultMap id="PromotionCatagory" type="com.blueteam.entity.po.PromotionCatagoryPO">
+        <id property="promotionCatagoryId" column="promotion_catagory_id"/>
+        <result property="name" column="name" />
+        <result property="model" column="model" />
+        <result property="logo" column="logo" />
+        <result property="banner" column="banner" />
+        <result property="summary" column="summary" />
+        <result property="updateStaffId" column="update_staff_id" />
+        <result property="updateStaffName" column="updateStaffName" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+    <!-- 首页促销活动店铺信息 -->
+    <resultMap id="PromotionInfo" type="com.blueteam.entity.po.PromotionInfoPO">
+        <id property="promotionInfoId" column="promotion_info_id"/>
+        <result property="promotionCatagoryId" column="promotion_catagory_id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="vendorName" column="vendor_name" />
+        <result property="goodsId" column="goods_id" />
+        <result property="goodsName" column="goods_name" />
+        <result property="cityCode" column="city_code" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="status" column="status" />
+        <result property="weight" column="weight" />
+        <result property="visits" column="visits" />
+        <result property="salesCount" column="sales_count" />
+        <result property="updateStaffId" column="update_staff_id" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+    <!-- 首页促销商品信息 -->
+    <resultMap id="PromotionGoods" type="com.blueteam.entity.vo.PromotionGoodsVO">
+        <result property="vendorId" column="vendor_id" />
+        <result property="vendorName" column="vendor_name" />
+        <result property="goodsId" column="goods_id" />
+        <result property="goodsName" column="goods_name" />
+        <result property="weight" column="weight" />
+        <result property="price" column="price" />
+        <result property="vendorAddress" column="vendor_address" />
+        <result property="longitude" column="longitude" />
+        <result property="latitude" column="latitude" />
+        <collection property="goodsImage" column="goods_id" select="selectPromotionGoodsImages"></collection>
+        <collection property="goodsAttrName" column="goods_id" select="selectPromotionGoodsAttr"></collection>
+    </resultMap>
+    <!-- 查询首页促销活动分类列表 -->
+    <select id="listPromotionCatagory" resultMap="PromotionCatagory">
+        select pc.*,usr.NickName as updateStaffName from promotion_catagory pc
+        left join userinfo usr on usr.Id = pc.update_staff_id
+    </select>
+    <!-- 根据ID查询首页促销活动分类 -->
+    <select id="getPromotionCatagoryById" resultMap="PromotionCatagory">
+        select * from promotion_catagory where promotion_catagory_id=#{promotionCatagoryId}
+    </select>
+    <!-- 添加首页促销活动分类 -->
+    <insert id="addPromotionCatagory">
+        insert into promotion_catagory(
+        name,
+        model,
+        logo,
+        banner,
+        summary,
+        update_staff_id,
+        create_time)
+        values(
+         #{name},
+         #{model},
+         #{logo},
+         #{banner},
+         #{summary},
+         #{updateStaffId},
+         now()
+        )
+    </insert>
+    <!-- 更新首页促销活动分类 -->
+    <update id="updatePromotionCatagory">
+        update promotion_catagory set
+        name=#{name},
+        model=#{model},
+        logo=#{logo},
+        banner=#{banner},
+        summary=#{summary},
+        update_staff_id=#{updateStaffId},
+        update_time=now()
+        where promotion_catagory_id=#{promotionCatagoryId}
+    </update>
+    <!-- 删除首页促销活动分类 -->
+    <delete id="deletePromotionCatagory">
+        delete from promotion_catagory where promotion_catagory_id=#{promotionCatagoryId}
+    </delete>
+    <!-- 查询促销活动分类下商品信息 -->
+    <select id="listPromotionInfoByCatagory" parameterType="hashmap" resultMap="PromotionInfo">
+        select * from promotion_info
+        <where>
+            <if test="promotionCatagoryId !=null">
+                promotion_catagory_id = #{promotionCatagoryId}
+            </if>
+            <if test="cityCode != null">
+                and city_code like #{cityCode}
+            </if>
+            <if test="status != null">
+                and status=#{status}
+            </if>
+        </where>
+    </select>
+    <!-- 添加活动店铺商品信息 -->
+    <insert id="addPromotionInfo">
+        insert into promotion_info(
+        promotion_catagory_id,
+        vendor_id,
+        vendor_name,
+        goods_id,
+        goods_name,
+        city_code,
+        start_time,
+        end_time,
+        weight,
+        update_staff_id,
+        create_time
+        ) values(
+        #{promotionCatagoryId},
+        #{vendorId},
+        #{vendorName},
+        #{goodsId},
+        #{goodsName},
+        #{cityCode},
+        #{startTime},
+        #{endTime},
+        #{weight},
+        #{updateStaffId},
+        now()
+        )
+    </insert>
+    <!-- 更新活动店铺商品信息 -->
+    <update id="updatePromotionInfo">
+        update promotion_info set
+        vendor_id=#{vendorId},
+        vendor_name=#{vendorName},
+        goods_id=#{goodsId},
+        goods_name=#{goodsName},
+        city_code=#{cityCode},
+        start_time=#{startTime},
+        end_time=#{endTime},
+        weight=#{weight},
+        update_staff_id=#{updateStaffId},
+        update_time=#{updateTime}
+        where promotion_info_id=#{promotionInfoId}
+    </update>
+    <!-- 更新活动店铺商品信息状态 -->
+    <update id="updatePromotionInfoStatus">
+        update promotion_info set status=#{status} where promotion_info_id=#{promotionInfoId}
+    </update>
+    <!-- 删除活动店铺商品信息 -->
+    <delete id="deletePromotionInfo">
+        delete from promotion_info where promotion_info_id=#{promotionInfoId}
+    </delete>
+    <!-- 检查权重是否重复 -->
+    <select id="checkPromotionWeight" resultType="integer">
+        select count(*) from promotion_info where city_code=#{cityCode} and weight=#{weight} and status=1
+    </select>
+    <!-- 查询店铺在售商品 -->
+    <select id="selectGoodsByVendorId" resultType="com.blueteam.entity.po.GoodsInfoPO">
+        select g.GOODS_ID as goodsId,g.GOODS_NAME as goodsName from tf_g_goods g
+        left join tf_g_goods_vendor gv on gv.GOODS_ID=g.GOODS_ID
+        where gv.VENDOR_ID=#{vendorId} and g.GOODS_STATE=1 and gv.VENDOR_GOODS_STATE=1
+    </select>
+    <!-- C端查询促销商品详情 -->
+    <select id="listPromotionGoods" parameterType="hashmap" resultMap="PromotionGoods">
+        select pi.vendor_id,pi.vendor_name,pi.goods_id,pi.goods_name,pi.weight,gv.SALE_PRICE as price,
+              vd.longitude,vd.latitude,vd.Addr as vendor_address
+        from promotion_info pi
+        left join tf_g_goods_vendor gv on gv.GOODS_ID=pi.GOODS_ID and gv.VENDOR_ID=pi.VENDOR_ID
+        left join vendorinfo vd on vd.Id=pi.VENDOR_ID
+        <where>
+            pi.status=1
+            <if test="promotionCatagoryId !=null">
+                and pi.promotion_catagory_id = #{promotionCatagoryId}
+            </if>
+            <if test="cityCode != null">
+                and pi.city_code like #{cityCode}
+            </if>
+        </where>
+        order by pi.weight desc
+    </select>
+    <!-- 查询商品图片 -->
+    <select id="selectPromotionGoodsImages" resultType="string">
+        select GOODS_PHOTO from tf_g_goods_photo where GOODS_ID=#{goodsId}
+    </select>
+    <!-- 查询商品属性 -->
+    <select id="selectPromotionGoodsAttr" resultType="string">
+        select ATTR_VALUE_SHOW_NAME from tf_g_goods_attr where GOODS_ID=#{goodsId}
+    </select>
+    <!-- 查询商家促销商品上下架状态 -->
+    <select id="getVendorGoodsState" resultType="integer">
+        select VENDOR_GOODS_STATE from tf_g_goods_vendor where GOODS_ID=#{goodsId} and VENDOR_ID=#{vendorId}
+    </select>
+    <!-- 查询商品本身上下架状态 -->
+    <select id="getGoodsState" resultType="integer">
+        select GOODS_STATE from tf_g_goods where GOODS_ID=#{goodsId};
+    </select>
+</mapper>

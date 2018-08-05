@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderGoodsItemPOMapper" >
+  <insert id="saveOrerGoodsItem" parameterType="com.blueteam.entity.po.OrderGoodsItemPO" >
+    insert into tf_b_order_goods_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+         order_id,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="barCode != null" >
+        bar_code,
+      </if>
+      <if test="goodsNum != null" >
+        goods_num,
+      </if>
+      <if test="goodsTypeName != null" >
+        goods_type_name,
+      </if>
+      <if test="mainBrandName != null" >
+        main_brand_name,
+      </if>
+      <if test="brandName != null" >
+        brand_name,
+      </if>
+      <if test="goodsPhotos != null" >
+        goods_photos,
+      </if>
+      <if test="originalPrice != null" >
+        original_price,
+      </if>
+      <if test="payPrice != null" >
+        pay_price,
+      </if>
+      <if test="couponAmount != null" >
+        coupon_amount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="barCode != null" >
+        #{barCode,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsNum != null" >
+        #{goodsNum,jdbcType=INTEGER},
+      </if>
+      <if test="goodsTypeName != null" >
+        #{goodsTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainBrandName != null" >
+        #{mainBrandName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null" >
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPhotos != null" >
+        #{goodsPhotos,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPrice != null" >
+        #{originalPrice,jdbcType=BIGINT},
+      </if>
+      <if test="payPrice != null" >
+        #{payPrice,jdbcType=BIGINT},
+      </if>
+      <if test="couponAmount != null" >
+        #{couponAmount,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+</mapper>

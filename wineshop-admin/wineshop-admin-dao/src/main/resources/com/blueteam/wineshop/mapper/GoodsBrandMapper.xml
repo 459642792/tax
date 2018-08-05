@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.GoodsBrandMapper">
+
+    <select id="countMainBrandByName" parameterType="String" resultType="Integer">
+        SELECT COUNT(M.MAIN_BRAND_ID)
+        FROM   TD_G_BRAND_MAIN M
+        WHERE  M.MAIN_BRAND_NAME=#{brandName}
+    </select>
+
+    <insert id="saveMainBrand" parameterType="BrandMainInfoPO">
+        INSERT INTO TD_G_BRAND_MAIN (MAIN_BRAND_NAME, MAIN_BRAND_PHOTO, MAIN_BRAND_DESC, CREATE_STAFF_ID, UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        VALUES (#{mainBrandName}, #{mainBrandPhoto},#{mainBrandDesc},#{createStaffId} ,#{updateStaffId} , sysdate(), sysdate())
+    </insert>
+
+    <select id="getMainBrandInfo" parameterType="Integer" resultType="HashMap">
+        SELECT M.MAIN_BRAND_NAME  mainBrandName ,
+               M.MAIN_BRAND_PHOTO mainBrandPhoto,
+               M.MAIN_BRAND_DESC  mainBrandDesc
+        FROM   TD_G_BRAND_MAIN M
+        WHERE  M.MAIN_BRAND_ID = #{mainBrandId}
+    </select>
+
+    <update id="updateMainBrand" parameterType="BrandMainInfoPO">
+        UPDATE TD_G_BRAND_MAIN M
+        SET    M.MAIN_BRAND_NAME=#{mainBrandName},
+               M.MAIN_BRAND_PHOTO=#{mainBrandPhoto},
+               M.MAIN_BRAND_DESC=#{mainBrandDesc},
+               M.UPDATE_STAFF_ID=#{updateStaffId},
+               M.UPDATE_TIME=sysdate()
+        WHERE  M.MAIN_BRAND_ID=#{mainBrandId}
+    </update>
+
+    <select id="countMainBrandGoods" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(1)
+        FROM   TF_G_GOODS G
+        WHERE  G.MAIN_BRAND_ID=#{mainBrandId}
+    </select>
+
+    <select id="countSubBrand" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(1)
+        FROM   TD_G_BRAND_SUB  S
+        WHERE  S.MAIN_BRAND_ID=#{mainBrandId}
+    </select>
+
+
+    <delete id="removeMainBrand" parameterType="Integer">
+        DELETE FROM TD_G_BRAND_MAIN
+        WHERE  MAIN_BRAND_ID=#{mainBrandId}
+    </delete>
+
+    <select id="countSubBrandByName" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(1)
+        FROM   TD_G_BRAND_SUB S
+        WHERE  S.MAIN_BRAND_ID =#{mainBrandId}
+        AND    S.BRAND_NAME =#{brandName}
+    </select>
+
+    <insert id="saveSubBrand" parameterType="BrandSubInfoPO">
+        INSERT INTO TD_G_BRAND_SUB (MAIN_BRAND_ID, BRAND_NAME, STATE_TAG, BRAND_GOODS_TYPE, BRAND_PHOTO, BRAND_DESC, CREATE_STAFF_ID, UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        VALUES (#{mainBrandId}, #{brandName}, #{stateTag}, #{brandGoodsType}, #{brandPhoto}, #{brandDesc}, #{createStaffId}, #{updateStaffId}, sysdate(), sysdate())
+    </insert>
+
+    <select id="getSubBrandInfo" parameterType="Integer" resultType="HashMap">
+        SELECT S.MAIN_BRAND_ID mainBrandId,
+               S.BRAND_NAME  brandName,
+               S.BRAND_PHOTO brandPhoto,
+               S.BRAND_DESC  brandDesc,
+               S.BRAND_GOODS_TYPE brandGoodsType,
+               GT.GOODS_TYPE_NAME brandGoodsTypeName
+        FROM   TD_G_BRAND_SUB S ,TD_G_GOODS_TYPE  GT
+        WHERE  S.BRAND_GOODS_TYPE = GT.GOODS_TYPE_ID
+        AND    S.BRAND_ID =#{brandId}
+    </select>
+
+    <select id="countSubBrandGoods" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(1)
+        FROM   TF_G_GOODS G
+        WHERE  G.BRAND_ID=#{brandId}
+    </select>
+
+    <update id="updateSubBrand" parameterType="BrandSubInfoPO">
+        UPDATE TD_G_BRAND_SUB S
+        SET    S.BRAND_NAME     = #{brandName},
+               S.BRAND_GOODS_TYPE = #{brandGoodsType},
+               S.BRAND_PHOTO      = #{brandPhoto},
+               S.BRAND_DESC       = #{brandDesc},
+               S.UPDATE_STAFF_ID =#{updateStaffId},
+               S.UPDATE_TIME =SYSDATE()
+        WHERE  S.BRAND_ID = #{brandId}
+    </update>
+    <delete id="removeSubBrand" parameterType="Integer">
+        DELETE FROM TD_G_BRAND_SUB
+        WHERE   BRAND_ID=#{brandId}
+    </delete>
+
+    <update id="updateMainBrandUpdateTime" parameterType="HashMap">
+        UPDATE TD_G_BRAND_MAIN M
+        SET    M.UPDATE_STAFF_ID=#{updateStaffId},
+               M.UPDATE_TIME=sysdate()
+        WHERE  M.MAIN_BRAND_ID=#{mainBrandId}
+    </update>
+
+    <select id="listBrandInfo" parameterType="BrandSearchDTO" resultType="HashMap">
+        SELECT M.MAIN_BRAND_ID mainBrandId,
+        M.MAIN_BRAND_NAME mainBrandName,
+        S.BRAND_ID brandId,
+        S.BRAND_NAME brandName,
+        S.STATE_TAG stateTag,
+        M.UPDATE_TIME mainBrandUpdateTime,
+        S.UPDATE_TIME brandUpdateTime
+        FROM TD_G_BRAND_MAIN M LEFT JOIN TD_G_BRAND_SUB S
+        ON M.MAIN_BRAND_ID = S.MAIN_BRAND_ID
+        <where>
+            <if test="brandName != null and brandName!=''">
+                (M.MAIN_BRAND_NAME LIKE "%"#{brandName}"%" OR S.BRAND_NAME LIKE "%"#{brandName}"%")
+            </if>
+            <if test="stateTag != null">
+                AND (S.STATE_TAG = #{stateTag})
+            </if>
+            <if test="updateFrom != null and updateFrom!=''">
+                AND M.UPDATE_TIME >= str_to_date(#{updateFrom},'%Y-%m-%d')
+            </if>
+            <if test="updateTo != null and updateTo!=''">
+                AND M.UPDATE_TIME &lt; date_add(str_to_date(#{updateTo},'%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+        </where>
+        <if test="orderTag != null and orderTag == 0">
+            ORDER BY M.UPDATE_TIME DESC, S.UPDATE_TIME DESC
+        </if>
+        <if test="orderTag == null || orderTag == 1">
+            ORDER BY M.UPDATE_TIME , S.UPDATE_TIME
+        </if>
+
+    </select>
+
+    <update id="updateVendorGoodsState" parameterType="BrandSubInfoPO">
+        UPDATE TF_G_GOODS_VENDOR GV
+        SET    GV.VENDOR_GOODS_STATE = #{stateTag},
+               GV.UPDATE_STAFF_ID=#{updateStaffId},
+               GV.UPDATE_TIME=sysdate()
+        WHERE  GV.GOODS_ID IN
+       (SELECT G.GOODS_ID
+        FROM   TF_G_GOODS G
+        WHERE  G.BRAND_ID = #{brandId})
+    </update>
+
+    <update id="updateVendorBrandState" parameterType="BrandSubInfoPO">
+        UPDATE TF_G_VENDOR_BRAND VB
+        SET    VB.UPDATE_STAFF_ID = #{updateStaffId},
+               VB.BRAND_GOODS_AMOUNT = 0,
+               VB.UPDATE_TIME = sysdate()
+        WHERE  VB.BRAND_ID =#{brandId}
+    </update>
+
+    <update id="updateGoodsState" parameterType="BrandSubInfoPO">
+        UPDATE TF_G_GOODS G
+        SET    G.GOODS_STATE=#{stateTag},
+               G.UPDATE_STAFF_ID = #{updateStaffId},
+               G.UPDATE_TIME =sysdate()
+        WHERE  G.BRAND_ID=#{brandId}
+    </update>
+
+    <update id="updateSubBrandState" parameterType="BrandSubInfoPO">
+        UPDATE TD_G_BRAND_SUB S
+        SET    S.STATE_TAG = #{stateTag},
+               S.UPDATE_STAFF_ID = #{updateStaffId}
+        WHERE  S.BRAND_ID = #{brandId}
+    </update>
+
+    <select id="listMainBrand" parameterType="String" resultType="HashMap">
+        SELECT M.MAIN_BRAND_ID    mainBrandId ,
+               M.MAIN_BRAND_NAME  mainBrandName
+        FROM   TD_G_BRAND_MAIN M
+        WHERE  M.MAIN_BRAND_NAME LIKE "%"#{mainBrandName}"%"
+    </select>
+
+    <select id="listSubBrand" parameterType="HashMap" resultType="AdminBrandVO">
+        SELECT BRAND_ID    brandId,
+               BRAND_NAME  brandName,
+               STATE_TAG   brandStateTag,
+               UPDATE_TIME brandUpdateTime
+        FROM   TD_G_BRAND_SUB S
+        WHERE  S.MAIN_BRAND_ID =#{mainBrandId}
+        AND    S.STATE_TAG =#{stateTag}
+    </select>
+
+
+    <select id="listSubBrandTypeLimited" parameterType="HashMap" resultType="AdminBrandVO">
+        SELECT BRAND_ID    brandId,
+               BRAND_NAME  brandName,
+               STATE_TAG   brandStateTag,
+               UPDATE_TIME brandUpdateTime
+        FROM   TD_G_BRAND_SUB S
+        WHERE  S.MAIN_BRAND_ID =#{mainBrandId}
+        AND    S.STATE_TAG =#{stateTag}
+        AND    S.BRAND_GOODS_TYPE=#{goodsTypeId}
+    </select>
+
+    <select id="listGoodsPhoto" parameterType="Long" resultType="AdminPhotoVO">
+        SELECT P.GOODS_PHOTO goodsPhoto,
+               P.PHOTO_STATE photoState,
+               P.PHOTO_TONE  photoTone
+        FROM   TF_G_GOODS_PHOTO P
+        WHERE  P.GOODS_ID =#{goodsId}
+    </select>
+
+</mapper>

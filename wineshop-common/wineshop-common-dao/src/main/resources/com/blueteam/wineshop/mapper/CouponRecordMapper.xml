@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.CouponRecordMapper">
+    <resultMap id="couponRecord" type="com.blueteam.entity.po.CouponRecord">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Title" jdbcType="VARCHAR" property="Title"/>
+        <result column="Remark" jdbcType="VARCHAR" property="Remark"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="CreateBy" jdbcType="INTEGER" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+        <result column="CouponId" jdbcType="INTEGER" property="CouponId"/>
+        <result column="VendorInfoCouponId" jdbcType="INTEGER" property="VendorInfoCouponId"/>
+        <result column="Money" jdbcType="DECIMAL" property="Money"/>
+        <result column="TotalMoney" jdbcType="DECIMAL" property="TotalMoney"/>
+        <result column="OrderNo" jdbcType="VARCHAR" property="OrderNo"/>
+    </resultMap>
+
+    <select id="CouponRecordList" resultMap="couponRecord">
+        SELECT * FROM CouponRecord WHERE UserId = #{UserId} and CouponId=#{CouponId}
+    </select>
+
+    <insert id="insertCouponRecord" parameterType="com.blueteam.entity.po.CouponRecord">
+        <![CDATA[
+    	insert into CouponRecord (Title, Remark, UpdateDate, 
+      CreateBy, CreateDate, UpdateBy, 
+      UserId, CouponId ,OrderNo,Money,TotalMoney,VendorInfoCouponId)values (#{Title},#{Remark},#{UpdateDate},#{CreateBy},#{CreateDate},#{UpdateBy},
+      #{UserId},#{CouponId},#{OrderNo},#{Money},#{TotalMoney},#{VendorInfoCouponId})
+ 	  ]]>
+    </insert>
+    <select id="getCouponRecord" resultMap="couponRecord" parameterType="java.lang.Integer">
+        <![CDATA[
+			SELECT * FROM CouponRecord WHERE CouponId=#{CouponId}
+		]]>
+    </select>
+    <delete id="removeCouponRecord">
+        <![CDATA[delete from CouponRecord where CouponId = #{couponInfoId}]]>
+    </delete>
+    <!-- 每张优惠券对应的详细记录 -->
+    <select id="vendorCouponRecordList" resultMap="couponRecord">
+        <![CDATA[
+			select rec.*,umtp.third_party_nick_name
+			from CouponRecord rec
+			left join UserInfo usr on usr.Id = rec.UserId
+			LEFT JOIN (select tpui.*,umtp.user_info_id AS useriD from third_party_user_info tpui
+LEFT JOIN (select * from user_middle_third_party where middle_status = 1) umtp ON umtp.third_party_id = tpui.id where third_party_status = 1 and third_party_type =1 and user_type = 4 ) umtp ON usr.id
+ = umtp.useriD
+			where rec.VendorInfoCouponId = #{couponId}
+		ORDER BY rec.UpdateDate desc  LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+    <select id="vendorCouponRecordListCount" parameterType="int" resultType="int">
+        select count(*) from CouponRecord rec
+        left join UserInfo usr on usr.Id = rec.UserId
+        where rec.VendorInfoCouponId = #{couponId}
+    </select>
+
+    <select id="findByCouponId" resultMap="couponRecord" parameterType="int">
+        select c.* from CouponRecord c where c.CouponId in (select id from CouponInfo where ExpandId = #{couponId})
+    </select>
+</mapper>

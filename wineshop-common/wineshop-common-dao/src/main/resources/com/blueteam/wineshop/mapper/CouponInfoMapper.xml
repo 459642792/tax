@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.CouponInfoMapper">
+    <resultMap id="couponInfo" type="com.blueteam.entity.po.CouponInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="Money" jdbcType="DOUBLE" property="Money"/>
+        <result column="BeginTime" jdbcType="VARCHAR" property="BeginTime"/>
+        <result column="EndTime" jdbcType="VARCHAR" property="EndTime"/>
+        <result column="Count" jdbcType="INTEGER" property="Count"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="Condition" jdbcType="VARCHAR" property="Condition"/>
+        <result column="CostLimitMoney" jdbcType="DOUBLE" property="CostLimitMoney"/>
+        <result column="CityCode" jdbcType="VARCHAR" property="CityCode"/>
+        <result column="ForeignKey" jdbcType="VARCHAR" property="ForeignKey"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="Title" jdbcType="VARCHAR" property="Title"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+        <result column="CostStatus" jdbcType="VARCHAR" property="CostStatus"/>
+        <result column="ExpandId" jdbcType="INTEGER" property="ExpandId"/>
+        <result column="Addr" jdbcType="VARCHAR" property="Addr"/>
+        <result column="Status" jdbcType="VARCHAR" property="Status"/>
+    </resultMap>
+
+    <resultMap type="com.blueteam.entity.po.CouponInfo" id="o2mMap"
+               extends="couponInfo">
+        <collection property="couponRecords" column="Id"
+                    select="com.blueteam.wineshop.mapper.CouponRecordMapper.findByCouponId"/>
+    </resultMap>
+
+    <select id="checkCoupon" resultMap="couponInfo">
+        SELECT * FROM CouponInfo
+        WHERE ExpandId = #{Id} and Type=#{Type} and CostStatus='N' and
+        EndTime>=CURDATE() and UserId = #{UserId}
+    </select>
+
+    <select id="CouponInfoList" resultMap="couponInfo">
+        SELECT * FROM CouponInfo
+        WHERE ForeignKey = #{ForeignKey}
+    </select>
+
+    <select id="couponxiaofeiCount" resultMap="couponInfo">
+        SELECT * FROM
+        CouponInfo WHERE ExpandId = #{Id} and Type=#{Type}
+    </select>
+
+    <select id="CouponInfoListDetail" resultMap="couponInfo">
+        <![CDATA[
+	   SELECT * FROM CouponInfo WHERE  ((Type='CREATE_COUPON_CODE' AND ForeignKey = #{ForeignKey}) or (Type='CREATE_COUPON_CODE_VENDOR_ADMIN' or Type='CREATE_COUPON_CODE_VENDOR_CARRIER')) and EndTime>= CURDATE() and BeginTime <=  CURDATE() and Status!=90  and CostStatus='N'
+	 AND (CityCode is  NULL or CityCode = '' or   LOCATE(CityCode,#{cityCode}) >0)
+]]>
+    </select>
+
+    <select id="couponDetail" resultMap="couponInfo">
+        SELECT * FROM CouponInfo
+        WHERE Id = #{Id}
+    </select>
+
+    <insert id="insertCoupon" parameterType="com.blueteam.entity.po.CouponInfo">
+        insert into CouponInfo
+        (`Type`,Money,BeginTime,EndTime,`Count`,Detail,`Condition`,CostLimitMoney,CityCode,ForeignKey,CreateBy,CreateDate,UpdateDate,UpdateBy,Title,UserId,CostStatus,ExpandId,Addr)
+        values(#{Type},#{Money},#{BeginTime},#{EndTime},#{Count},#{Detail},#{Condition},#{CostLimitMoney},#{CityCode},#{ForeignKey},#{CreateBy},#{CreateDate},#{UpdateDate},#{UpdateBy},#{Title},#{UserId},#{CostStatus},#{ExpandId},#{Addr})
+    </insert>
+
+    <select id="UserCouponList" resultMap="couponInfo">
+        SELECT * FROM CouponInfo WHERE UserId = #{UserId} and Type=#{Type} and CostStatus='N' ORDER BY CASE WHEN
+        (date_format(endTime,'%Y-%m-%d')>=CURDATE()) THEN status ELSE 90 END asc,BeginTime
+        asc
+    </select>
+
+    <!-- 用户查看自己领取的优惠券列表集合 -->
+    <select id="UserCouponLists" resultMap="couponInfo">
+        SELECT * FROM CouponInfo
+        WHERE UserId = #{UserId} and Type=#{Type} and CostStatus='N' and
+        EndTime>= CURDATE() and ExpandId=#{VendorId}
+    </select>
+
+
+    <!-- 优惠券列表 -->
+    <select id="vendorCouponList" resultType="com.blueteam.entity.po.CouponInfo">
+        select * from CouponInfo where ForeignKey = #{ForeignKey} and Type=#{Type}
+    </select>
+
+    <select id="vendorCouponAndRecords" resultType="java.util.HashMap">
+        select
+        info.Id,
+        info.Title,
+        info.BeginTime,
+        info.EndTime,
+        info.CostLimitMoney,
+        info.Money Money,
+        rec.TotalMoney-rec.Money realMoney
+        from CouponInfo info
+        join CouponRecord rec on info.Id =
+        rec.CouponId
+        where info.ForeignKey=#{vendorId} and Type=#{type}
+        order by info.Id
+    </select>
+
+    <select id="vendorCouponAndRecordsNewCount" resultType="int">
+        select
+        count(*) from CouponInfo info
+        where info.ForeignKey=#{vendorId} and
+        info.Type=#{type}
+    </select>
+    <select id="vendorCouponAndRecordsNew" resultMap="o2mMap">
+        <![CDATA[
+			select  * from (
+			select 
+				info.Id,
+				info.Title,
+				info.BeginTime,
+				info.EndTime,
+				info.CostLimitMoney,
+				info.Money Money,
+				info.`Condition`,
+				info.Count,
+				info.`Status`
+			from CouponInfo info
+			where info.ForeignKey=#{vendorId} and info.Type=#{type}
+				ORDER BY 				 info.Status asc,
+				(
+				CASE
+				WHEN ID IN (
+					SELECT
+						id
+					FROM
+						CouponInfo cpi
+					WHERE
+						CURDATE() >= cpi.BeginTime
+					AND CURDATE() <= cpi.EndTime
+					AND cpi.ForeignKey = #{vendorId}
+				) THEN
+					0
+				ELSE
+					1
+				END
+			),(
+				CASE
+				WHEN ID IN (
+					SELECT
+						id
+					FROM
+						CouponInfo cpi
+					WHERE
+				 CURDATE() <= cpi.EndTime
+					AND cpi.ForeignKey = #{vendorId}
+				) THEN
+					0
+				ELSE
+					1
+				END
+			),info.beginTime asc
+		) t LIMIT ${(pageIndex-1)*pageSize},${pageSize} ]]>
+    </select>
+    <update id="updateCouponInfo">
+        <![CDATA[
+			update CouponInfo set CostStatus = #{costStatus} where Id = #{Id}
+		]]>
+    </update>
+    <select id="listCouponInfoVendorInfo" resultType="java.util.HashMap">
+        <![CDATA[
+			SELECT
+				v.Name AS vendorInfoName,
+				v.Image AS vendorInfoImage,
+				vc.Id AS couponInfoId,
+				vc.Money AS money,
+				vc.`Condition` AS `condition`,
+				vc.CostLimitMoney AS costLimitMoney,
+				vc.UserId AS userId
+			FROM
+				(
+					SELECT
+						c.Id,
+						c.Id AS couponInfoId,
+						c.Money AS money,
+						c.`Condition` AS `condition`,
+						c.CostLimitMoney AS costLimitMoney,
+						c.ForeignKey AS vendorInfoId,
+						c.UserId AS userId,
+						c.CostStatus AS costStatus,
+						c.BeginTime AS beginTime,
+						c.EndTime AS endTime
+					FROM
+						CouponInfo c
+					WHERE
+						Type = 'DISCOUNT_COUPON_CODE'
+					AND (ForeignKey = #{ vendorInfoId } OR ForeignKey = 0 ) and UserId = #{ userId }
+				) vc
+			LEFT JOIN VendorInfo v ON  #{ vendorInfoId } = v.Id
+			WHERE
+				vc.CostStatus = 'N'
+			AND date_format(vc.beginTime,'%Y-%m-%d') <= CURDATE()
+			AND date_format(vc.endTime,'%Y-%m-%d') >= CURDATE()
+			AND vc.UserId = #{ userId }
+			AND (
+				vc.`condition` != ''
+				OR vc.costLimitMoney <= #{ totalMoney }
+			)
+			ORDER BY
+				`Condition` DESC,
+				Money DESC
+		]]>
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.blueteam.entity.po.CouponInfo">
+        update CouponInfo
+        <set>
+            <if test="Type != null">
+                Type = #{Type},
+            </if>
+            <if test="Money != null">
+                Money = #{Money},
+            </if>
+            <if test="BeginTime != null">
+                BeginTime = #{BeginTime},
+            </if>
+            <if test="EndTime != null">
+                EndTime = #{EndTime},
+            </if>
+            <if test="Count != null">
+                Count = #{Count},
+            </if>
+            <if test="Detail != null">
+                Detail = #{Detail},
+            </if>
+            <if test="Condition != null">
+                `Condition` = #{Condition},
+            </if>
+            <if test="CostLimitMoney != null">
+                CostLimitMoney = #{CostLimitMoney},
+            </if>
+            <if test="CityCode != null">
+                CityCode = #{CityCode},
+            </if>
+            <if test="ForeignKey != null">
+                ForeignKey = #{ForeignKey},
+            </if>
+            <if test="CreateBy != null">
+                CreateBy = #{CreateBy},
+            </if>
+            <if test="CreateDate != null">
+                CreateDate = #{CreateDate},
+            </if>
+            <if test="Addr != null">
+                Addr = #{Addr},
+            </if>
+            <if test="UpdateDate != null">
+                UpdateDate = #{UpdateDate},
+            </if>
+            <if test="UpdateBy != null">
+                UpdateBy = #{UpdateBy},
+            </if>
+            <if test="Title != null">
+                Title = #{Title},
+            </if>
+            <if test="UserId != null">
+                UserId = #{UserId},
+            </if>
+            <if test="CostStatus != null">
+                CostStatus = #{CostStatus},
+            </if>
+            <if test="Status != null">
+                Status = #{Status},
+            </if>
+        </set>
+        where Id = #{Id}
+    </update>
+
+    <!-- 判断指定的时间范围是否与所有的生效时间范围重叠 -->
+    <select id="countOfRepeatTime" parameterType="map" resultType="int">
+        select count(*) from CouponInfo where Type = #{type} and ForeignKey =
+        #{vendorId}
+        and EndTime >= #{beginTime} and #{endTime} >= BeginTime and (Status != 90
+        or Status is null)
+        <if test="id != 0">
+            and Id != #{id}
+        </if>
+    </select>
+
+    <!-- 对管理员后台优惠券数据进行查询 -->
+    <select id="admincouponList" resultMap="couponInfo">
+        <![CDATA[
+        SELECT *
+        FROM CouponInfo p
+        WHERE ((Type = 'CREATE_COUPON_CODE' AND now() >= BeginTime
+        ) OR Type = 'CREATE_COUPON_CODE_VENDOR_ADMIN' OR status = 90 OR
+        (Type = 'CREATE_COUPON_CODE_VENDOR_CARRIER'
+        AND now() >= BeginTime))
+        ]]>
+
+        <if test="Addr!= null and Addr!=''">
+            and p.Addr like "%"#{Addr}"%"
+        </if>
+        <if test="Name!=null and Name!=''">
+            and p.UserId in (
+            SELECT A.ID FROM (
+            select U.id from UserInfo U where U.NickName like "%"#{Name}"%"
+            UNION
+            SELECT V.id FROM vendorInfo V WHERE V.Name LIKE "%"#{Name}"%"
+            ) A)
+        </if>
+        <if test="BeginTime != null and  BeginTime!=''">
+            <![CDATA[and #{BeginTime}>= p.BeginTime]]>
+        </if>
+        <if test="EndTime != null and EndTime!=''">
+        <![CDATA[and  p.EndTime >=#{EndTime}]]>
+        </if>
+        <![CDATA[
+        ORDER BY p.Status ASC,
+        CASE
+        WHEN ID IN (
+        SELECT id
+        FROM
+        CouponInfo cpi
+        WHERE
+        now() >= cpi.BeginTime
+        AND now() <= date_add(cpi.EndTime, INTERVAL 1 DAY)
+        )
+        THEN
+        0
+        ELSE
+        1
+        END,
+        CASE
+        WHEN ID IN (
+        SELECT id
+        FROM
+        CouponInfo cpi
+        WHERE
+        now() <= cpi.EndTime
+        )
+        THEN
+        0
+        ELSE
+        1
+        END
+        ]]>
+        <![CDATA[
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ]]>
+</select>
+
+    <!-- 对管理员后台优惠券数据进行查询 -->
+    <select id="admincouponCount" resultMap="couponInfo">
+        <![CDATA[
+        SELECT *
+        FROM CouponInfo p
+        WHERE ((Type = 'CREATE_COUPON_CODE' AND now() >= BeginTime
+        ) OR Type = 'CREATE_COUPON_CODE_VENDOR_ADMIN' OR status = 90 OR
+        (Type = 'CREATE_COUPON_CODE_VENDOR_CARRIER'
+        AND now() >= BeginTime))
+        ]]>
+        <if test="Addr!= null and Addr!=''">
+            and p.Addr like "%"#{Addr}"%"
+        </if>
+        <if test="Name!=null and Name!=''">
+            and ((p.ForeignKey in (select id from UserInfo where NickName like "%"#{Name}"%")) OR (p.ForeignKey IN
+            (SELECT id FROM vendorInfo WHERE Name LIKE "%"#{Name}"%")))
+            <!-- and p.UserId in (select id from UserInfo where NickName like '%'+#{Name}+'%') -->
+        </if>
+        <if test="BeginTime != null and  BeginTime!=''">
+            <![CDATA[and #{BeginTime}>= p.BeginTime]]>
+        </if>
+        <if test="EndTime != null and EndTime!=''">
+            <![CDATA[and  p.EndTime>=#{EndTime}]]>
+        </if>
+        <![CDATA[
+        ORDER BY p.Status ASC,
+        CASE
+        WHEN ID IN (
+        SELECT
+        id
+        FROM
+        CouponInfo cpi
+        WHERE
+        now() >= cpi.BeginTime
+        AND now() <= date_add(cpi.EndTime, INTERVAL 1 DAY)
+        ) THEN
+        0
+        ELSE
+        1
+        END
+        ,
+        CASE
+        WHEN ID IN (
+        SELECT
+        id
+        FROM
+        CouponInfo cpi
+        WHERE
+        now() <= cpi.EndTime
+        ) THEN
+        0
+        ELSE
+        1
+        END
+        ]]>
+    </select>
+
+    <!--获取所有用户在指定时间失效的优惠劵-->
+    <select id="selectUserCouponExpireDays" resultMap="couponInfo">
+        SELECT * FROM CouponInfo
+        WHERE [TYPE] = 'DISCOUNT_COUPON_CODE' AND
+        DATEDIFF(DAY,now(),EndTime)=${days}
+    </select>
+</mapper>

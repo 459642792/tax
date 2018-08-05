@@ -1,0 +1,71 @@
+.update_goods_verify_body{
+    height: 800px;
+}
+
+.update_goods_verify_body .preTile{
+    font-size: 20px;
+    font-family: inherit;
+    font-weight: bold;
+    display: block;
+    width:100%;
+    margin-top:10px;
+}
+.update_goods_verify_body .update_goods_verify_title{
+    padding-left:10px;
+    margin-top:10px;
+}
+.preImageListContents{
+    padding:2%;
+    box-sizing: border-box;
+}
+.preImageListContents img{
+    width:100%;
+    display: block;
+    padding:10px;
+}
+.noData{
+    text-align: center;
+    color:#E4E4E4;
+}
+.color_red{
+    color: #da2220;
+}
+#goods_verify_vendor_list tr:hover{
+    cursor: pointer;
+}
+#goods_verify_vendor_list .selectActive td{
+    background: #ececec;
+}
+.goodsImageBox{
+    float: right;
+    width: 30%;
+    text-align: center;
+    height: 100%;
+    overflow-y: scroll;
+}
+#goods_verify_list .tableBtn{
+    width:50px;
+}
+#goods_verify_list .tableBtn img{
+    width:25px;
+    height:25px;
+}
+.sorting_disabled:hover{
+    cursor: pointer;
+}
+#goods_verify_list .clickSort{
+    background: url('./../../../Content/Home/image/table_sort.png') no-repeat center right;
+}
+
+#goods_verify_list .hasSortAsc{
+    background: #EEEEEE;
+    background: url('./../../../Content/Home/image/sort_up.png') no-repeat center right #EEEEEE;
+}
+#goods_verify_list .hasSortDesc{
+    background: #EEEEEE;
+    background: url('./../../../Content/Home/image/sort_down.png') no-repeat center right #EEEEEE;
+}
+#goods_verify_list_wrapper .dt-toolbar{
+    padding:0;
+    border-bottom:0;
+}

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.MessageSubMapper" >
+    <resultMap id="baseMessageTemplate" type="com.blueteam.entity.po.MessageTemplatePO" >
+        <constructor >
+            <idArg column="message_template_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="template_genre" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="template_type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="template_title" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="template_argument" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="template_subject" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="create_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="update_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+        </constructor>
+    </resultMap>
+    <resultMap id="baseMessageSubject" type="com.blueteam.entity.po.MessageSubjectPO" >
+        <constructor >
+            <idArg column="message_subject_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="detailed_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+            <arg column="message_source" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="subject_genre" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="subject_type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="subject_state" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="subject_title" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="subject_content" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="create_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="update_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+        </constructor>
+    </resultMap>
+    <resultMap id="baseMessageContent" type="com.blueteam.entity.po.MessageContentPO" >
+        <constructor >
+            <idArg column="message_content_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="message_subject_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="message_content" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="create_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+        </constructor>
+    </resultMap>
+    <select id="listMessageTemplatePO" resultMap="baseMessageTemplate"  >
+      SELECT
+            *
+        FROM
+	  tf_m_message_template
+    </select>
+
+
+    <insert id="saveMessageSubject" parameterType="com.blueteam.entity.po.MessageSubjectPO" >
+        insert into tf_m_message_subject
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="messageSource != null" >
+                message_source,
+            </if>
+            <if test="subjectGenre != null" >
+                subject_genre,
+            </if>
+            <if test="subjectType != null" >
+                subject_type,
+            </if>
+            <if test="subjectState != null" >
+                subject_state,
+            </if>
+            <if test="subjectTitle != null" >
+                subject_title,
+            </if>
+            <if test="subjectContent != null" >
+                subject_content,
+            </if>
+                create_time,
+            <if test="createBy != null" >
+                create_by,
+            </if>
+                update_time,
+            <if test="updateBy != null" >
+                update_by,
+            </if>
+            <if test="detailedId != null" >
+                detailed_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="messageSource != null" >
+                #{messageSource,jdbcType=INTEGER},
+            </if>
+            <if test="subjectGenre != null" >
+                #{subjectGenre,jdbcType=VARCHAR},
+            </if>
+            <if test="subjectType != null" >
+                #{subjectType,jdbcType=INTEGER},
+            </if>
+            <if test="subjectState != null" >
+                #{subjectState,jdbcType=INTEGER},
+            </if>
+            <if test="subjectTitle != null" >
+                #{subjectTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="subjectContent != null" >
+                #{subjectContent,jdbcType=VARCHAR},
+            </if>
+            now(),
+            <if test="createBy != null" >
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+                now(),
+            <if test="updateBy != null" >
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="detailedId != null" >
+                #{detailedId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="listUnreadMessageCount" resultType="java.util.HashMap">
+        SELECT
+            subject_genre AS genre,
+            count(*) AS total
+        FROM
+            tf_m_message_subject
+        WHERE
+            user_id = #{userId}
+        AND subject_state = 0
+        GROUP BY
+            subject_genre
+    </select>
+    <select id="getUnreadByCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(message_subject_id)
+        FROM
+            tf_m_message_subject
+        WHERE
+            user_id = #{userId}
+        AND message_source =#{userSource}
+        <if test="subjectState != null">
+            AND subject_state = #{subjectState}
+        </if>
+        AND create_time > date_sub(now(), INTERVAL 7 DAY)
+    </select>
+    <select id="listMessage" resultType="com.blueteam.entity.vo.message.MessageVo">
+        SELECT
+            subject_title AS subjectTitle,
+            subject_content AS subjectContent,
+            subject_state AS subjectState,
+            subject_genre AS subjectGenre,
+            create_time AS createTime,
+            detailed_id AS detailedId
+        FROM
+            tf_m_message_subject
+        WHERE
+            user_id = #{userId}
+        AND message_source = #{userSource}
+        AND create_time > date_sub(now(), INTERVAL 7 DAY)
+        order by create_time desc
+           LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+    <update id="updateUnread">
+        	update tf_m_message_subject
+            set subject_state = 1
+            where user_id =  #{userId}
+            AND message_source = #{userSource}
+            and subject_state = 0
+    </update>
+    <select id="getUserPhoneByOrderNo" resultType="java.lang.String">
+        SELECT
+            Telephone
+        FROM
+            userinfo
+        WHERE
+            id = (
+                SELECT
+                    user_id
+                FROM
+                    tf_b_order
+                WHERE
+                    order_no =  #{orderNo}
+            )
+    </select>
+    <select id="getVendorPhoneByVendorId" resultType="java.util.Map">
+      select  `Name` AS vendorName,Telephone as telephone from vendorinfo where id =   #{vendorId}
+    </select>
+    <!--根据商品code获取商家电话 名称-->
+    <select id="listVendorIdByBarCode" resultType="java.util.Map">
+        SELECT
+            v.`Name` AS vendorName,
+            v.Telephone AS telephone
+        FROM
+            tf_b_goods_verify gv
+        JOIN vendorinfo v ON gv.VENDOR_ID = v.id
+        where gv.VERIFY_STATE = 0 and gv.VERIFY_BAR_CODE = #{barCode}
+            </select>
+</mapper>

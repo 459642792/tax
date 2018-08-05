@@ -1,0 +1,156 @@
+﻿.tooltip {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: 120%;
+    opacity: 0;
+    left: 0;
+    z-index: 65534;
+    text-align: center;
+    display: block;
+}
+
+.tooltip > span {
+    padding: 12px 12px;
+    background-color: #353535;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #666), color-stop(1, #353535));
+    color: #FFF;
+    margin: 0px 20px;
+    display: inline-block;
+    border-radius: 4px 4px;
+    font-size: 14px;
+    box-shadow: 2px 2px 15px #000;
+}
+
+.tooltip.tooltip-show {
+    display: block;
+    -webkit-animation: tooltipShow 0.5s ease-out both;
+    -moz-animation: tooltipShow 0.5s ease-out both;
+    -o-animation: tooltipShow 0.5s ease-out both;
+    animation: tooltipShow 0.5s ease-out both;
+}
+
+@-moz-keyframes tooltipShow {
+    0% {
+        bottom: 0%;
+        opacity: 0;
+    }
+
+    60% {
+        bottom: 14%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 12%;
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes tooltipShow {
+    0% {
+        bottom: 0%;
+        opacity: 0;
+    }
+
+    60% {
+        bottom: 14%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 12%;
+        opacity: 1;
+    }
+}
+
+@-o-keyframes tooltipShow {
+    0% {
+        bottom: 0%;
+        opacity: 0;
+    }
+
+    60% {
+        bottom: 14%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 12%;
+        opacity: 1;
+    }
+}
+
+@keyframes tooltipShow {
+    0% {
+        bottom: 0%;
+        opacity: 0;
+    }
+
+    60% {
+        bottom: 14%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 12%;
+        opacity: 1;
+    }
+}
+
+.tooltip.tooltip-hide {
+    bottom: 120%;
+    opacity: 0;
+    -webkit-animation: tooltipHide 0.5s linear;
+    -moz-animation: tooltipHide 0.5s linear;
+    -o-animation: tooltipHide 0.5s linear;
+    animation: tooltipHide 0.5s linear;
+}
+
+@-moz-keyframes tooltipHide {
+    0% {
+        bottom: 12%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 15%;
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes tooltipHide {
+    0% {
+        bottom: 12%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 15%;
+        opacity: 0;
+    }
+}
+
+@-o-keyframes tooltipHide {
+    0% {
+        bottom: 12%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 15%;
+        opacity: 0;
+    }
+}
+
+@keyframes tooltipHide {
+    0% {
+        bottom: 12%;
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 15%;
+        opacity: 0;
+    }
+}

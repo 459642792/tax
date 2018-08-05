@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.ReVendorMapper">
+    <resultMap id="rendorInfo" type="com.blueteam.entity.po.ReVendor">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="AreaAddr" jdbcType="VARCHAR" property="AreaAddr"/>
+        <result column="CarriersName" jdbcType="VARCHAR" property="CarriersName"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="OrderField" jdbcType="INTEGER" property="OrderField"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="ClickCount" jdbcType="INTEGER" property="ClickCount"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="EabledFlag" jdbcType="VARCHAR" property="EabledFlag"/>
+        <result column="TradingArea" jdbcType="VARCHAR" property="TradingArea"/>
+        <result column="vendorId" jdbcType="INTEGER" property="vendorId"/>
+        <result column="CarriersName" jdbcType="VARCHAR" property="CarriersName"/>
+    </resultMap>
+
+    <!--新增推荐商家-->
+    <insert id="insert" parameterType="com.blueteam.entity.po.ReVendor" useGeneratedKeys="true" keyProperty="id">
+        insert into ReVendor
+        (AreaAddr,CarriersName,CreateDate,OrderField,CreateBy,UpdateDate,ClickCount,UpdateBy,EabledFlag,TradingArea,vendorId,VendorName)
+        values(#{AreaAddr},#{CarriersName},#{CreateDate},#{OrderField},#{CreateBy},#{UpdateDate},#{ClickCount},#{UpdateBy},#{EabledFlag},#{TradingArea},#{vendorId},#{VendorName})
+
+
+    </insert>
+
+    <!--修改推荐商家-->
+    <update id="update" parameterType="com.blueteam.entity.po.ReVendor">
+        update ReVendor set OrderField=#{OrderField} where Id = #{Id}
+    </update>
+
+    <!--推荐商家列表-->
+    <select id="listReVendor" resultMap="rendorInfo">
+        <![CDATA[
+		SELECT *  FROM (
+		SELECT @rownum := @rownum + 1 AS r, d.*
+        FROM (SELECT @rownum := 0) row, ReVendor d
+        WHERE d.EabledFlag = 'Y'
+		]]>
+        <if test="VendorName != null and  VendorName!=''">
+            and d.VendorName like "%"#{VendorName}"%"
+        </if>
+        <if test="TradingArea != null and  TradingArea!=''">
+            and d.TradingArea like "%"#{TradingArea}"%"
+        </if>
+        ORDER BY UpdateDate DESC
+        <![CDATA[ ) as t
+		 where t.r > (#{pageIndex}-1) * #{pageSize} and t.r <= #{pageIndex} * #{pageSize}
+		]]>
+    </select>
+
+    <!--推荐商家列表条数-->
+    <select id="ReVendorCount" resultType="int">
+        <![CDATA[
+		SELECT count(*)  FROM (
+		SELECT @rownum := @rownum + 1 AS r, d.*
+        FROM (SELECT @rownum := 0) row, ReVendor d
+        WHERE d.EabledFlag = 'Y'
+		]]>
+        <if test="VendorName != null and  VendorName!=''">
+            <![CDATA[ and d.VendorName like "%"#{VendorName}"%"]]>
+        </if>
+        <if test="TradingArea != null and  TradingArea!=''">
+            <![CDATA[ and d.TradingArea like "%"#{TradingArea}"%"]]>
+        </if>
+        ORDER BY UpdateDate DESC
+        <![CDATA[ ) as t
+		]]>
+    </select>
+
+    <!--推荐商家最大Id-->
+    <select id="MaxOrderField" resultType="int">
+        select IFNULL(MAX(OrderField),0) from ReVendor where AreaAddr=#{AreaAddr}
+    </select>
+
+    <!--删除推荐商家-->
+    <delete id="DeleteReVendor" parameterType="int">
+        delete from ReVendor where Id=#{Id}
+    </delete>
+
+    <!--查询本地区的推荐商家-->
+    <select id="listReVendor2" resultMap="rendorInfo">
+        SELECT * from ReVendor WHERE AreaAddr=#{AreaAddr} AND EabledFlag='Y' order by OrderField asc
+    </select>
+
+    <!--按区域查询推荐商家的信息-->
+    <select id="revendorDetail" resultMap="rendorInfo">
+        SELECT * FROM ReVendor WHERE vendorId = #{Id}
+    </select>
+
+    <!--修改推荐商家-->
+    <update id="updateClick" parameterType="com.blueteam.entity.po.ReVendor">
+        update ReVendor set ClickCount=#{ClickCount} where Id = #{Id}
+    </update>
+</mapper>

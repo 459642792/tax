@@ -1,0 +1,106 @@
+﻿.register {
+    padding-bottom: 100px;
+}
+
+.register_header {
+    width: 840px;
+    margin: 0 auto;
+    border: none;
+}
+
+.active {
+    color: #f93c3c;
+}
+
+.register_header ul {
+    position: relative;
+    border-bottom: 2px solid #f2f2f2;
+}
+
+.register_header ul:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.register_header ul li {
+    width: 50%;
+    text-align: center;
+    border-top: none;
+    margin-left: 0;
+    position: relative;
+    height: 48px;
+    line-height: 48px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.register_header ul li > img {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.register_header i {
+    display: block;
+    width: 50%;
+    border-top: 2px solid #f93c3c;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    transition: all linear 0.5S;
+}
+
+.nickname {
+    text-align: center;
+}
+
+.nickname p:first-child {
+    display: inline-block;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.nickname p:first-child > img {
+    width: 100%;
+}
+
+.nickname > p {
+    margin-top: 12px;
+}
+
+.forget_psw {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.forget_psw > a {
+    margin-left: 370px;
+    color: #333;
+    text-decoration: none;
+}
+
+.zizhiPics, .register_box > div > div.images_box {
+    height: auto;
+}
+
+.tips {
+    display: block;
+}
+
+.register_box {
+    min-height: 377px;
+}
+
+.register_button {
+    background: #f93c3c;
+}
+
+.step3_button {
+    background: #cccccc;
+}
+
+.bind .code_input {
+    width: 236px !important;
+}

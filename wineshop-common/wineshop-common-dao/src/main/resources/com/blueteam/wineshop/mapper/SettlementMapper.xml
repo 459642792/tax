@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.SettlementMapper">
+    <!-- SettlementPO -->
+    <resultMap id="settlementPO" type="com.blueteam.entity.po.SettlementPO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="region" jdbcType="VARCHAR" property="region" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="vendor_name" jdbcType="VARCHAR" property="vendorName" />
+        <result column="all_balanced_amounts" jdbcType="DECIMAL"
+            property="allBalancedAmounts" />
+        <result column="balanced_amounts" jdbcType="DECIMAL" property="balancedAmounts" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="create_username" jdbcType="VARCHAR" property="createUsername" />
+        <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="count_type" jdbcType="INTEGER" property="countType" />
+        <result column="count_no" jdbcType="VARCHAR" property="countNo" />
+    </resultMap>
+
+    <resultMap id="settlementListSumVO" type="com.blueteam.entity.vo.SettlementListSumVO">
+        <result column="region" jdbcType="VARCHAR" property="region" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="vendor_name" jdbcType="VARCHAR" property="vendorName" />
+        <result column="all_amounts" jdbcType="DECIMAL" property="allAmounts" />
+        <result column="all_balanced_amounts" jdbcType="DECIMAL"
+            property="allBalancedAmounts" />
+        <result column="all_unbalanced_amounts" jdbcType="DECIMAL"
+            property="allUnbalancedAmounts" />
+        <result column="balanced_amounts" jdbcType="DECIMAL" property="balancedAmounts" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <resultMap id="settlementListVO" type="com.blueteam.entity.vo.SettlementListVO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="region" jdbcType="VARCHAR" property="region" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="vendor_name" jdbcType="VARCHAR" property="vendorName" />
+        <result column="all_amounts" jdbcType="DECIMAL" property="allAmounts" />
+        <result column="all_balanced_amounts" jdbcType="DECIMAL"
+            property="allBalancedAmounts" />
+        <result column="all_unbalanced_amounts" jdbcType="DECIMAL"
+            property="allUnbalancedAmounts" />
+        <result column="balanced_amounts" jdbcType="DECIMAL" property="balancedAmounts" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="create_username" jdbcType="VARCHAR" property="createUsername" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    </resultMap>
+
+    <resultMap id="orderListVO" type="com.blueteam.entity.vo.OrderListVO">
+        <result column="order_id" jdbcType="INTEGER" property="orderId" />
+        <result column="order_no" jdbcType="INTEGER" property="orderNo" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="original_price" jdbcType="DECIMAL" property="originalPrice" />
+        <result column="user_id" jdbcType="INTEGER" property="userName" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="pay_price" jdbcType="DECIMAL" property="payPrice" />
+        <result column="coupon_amount" jdbcType="DECIMAL" property="couponAmount" />
+        <result column="complete_time" jdbcType="TIMESTAMP" property="completeTime" />
+    </resultMap>
+
+    <resultMap id="dateMap" type="java.util.Map">
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+
+    
+
+    <!-- 查询结算统计列表数据  不包含总数额数据 -->
+    <select id="pageQuerySettlementList" resultMap="settlementListSumVO"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT
+        vendor.id as vendor_id, vendor.Name as vendor_name,vendor.TradingArea as region,
+        IFNULL(settlement.all_balanced_amounts,0) as all_balanced_amounts,settlement.create_time 
+       FROM
+		    (
+		        SELECT
+		            *
+		        FROM
+		            vendorinfo
+				    <where>
+			            <if test="vendorName != null and vendorName !='' ">
+			              <![CDATA[   and Name like "%"#{vendorName}"%"]]>
+			           </if>
+			            <if test="region != null and region !='' ">
+			              <![CDATA[  and TradingArea like "%"#{region}"%"]]>
+			           </if>
+		            </where>
+		    ) vendor
+		LEFT JOIN (
+		    SELECT
+		        settlement.*
+		    FROM
+		        tf_b_order_settlement settlement,
+		        (
+		            SELECT
+		                MAX(id) AS maxid,
+		                vendor_id
+		            FROM
+		                tf_b_order_settlement
+		            GROUP BY
+		                vendor_id
+		        ) maxTemp
+		    WHERE
+		    maxTemp.maxid = settlement.id
+		    AND maxTemp.vendor_id = settlement.vendor_id
+		    <if test="startTime != null ">
+                  AND settlement.create_time &gt;=#{startTime} 
+            </if>
+            <if test="endTime != null ">
+                 AND settlement.create_time &lt;=#{endTime}  
+            </if>
+		) settlement ON settlement.vendor_id = vendor.id
+          ORDER BY settlement.create_time DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+    <select id="pageQuerySettlementCount" resultType="int"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT COUNT(1)
+          FROM
+            (
+                SELECT
+                    *
+                FROM
+                    vendorinfo
+               <where>
+                <if test="vendorName != null and vendorName !='' ">
+                  <![CDATA[   AND Name like "%"#{vendorName}"%"]]>
+               </if>
+                <if test="region != null and region !='' ">
+                  <![CDATA[  AND TradingArea like "%"#{region}"%"]]>
+               </if>
+               </where>
+            ) vendor
+        LEFT JOIN (
+            SELECT
+                settlement.*
+            FROM
+                tf_b_order_settlement settlement,
+                (
+                    SELECT
+                        MAX(id) AS maxid,
+                        vendor_id
+                    FROM
+                        tf_b_order_settlement
+                    GROUP BY
+                        vendor_id
+                ) maxTemp
+            WHERE
+            maxTemp.maxid = settlement.id
+            AND maxTemp.vendor_id = settlement.vendor_id
+            <if test="startTime != null ">
+                 AND settlement.create_time &gt;=#{startTime} 
+            </if>
+            <if test="endTime != null ">
+                 AND settlement.create_time &lt;=#{endTime}  
+            </if>
+        ) settlement ON settlement.vendor_id = vendor.id
+    </select>
+
+    <!-- 结算历史列表数据 -->
+    <select id="pageVendorSettlementHistoryCount" resultType="int"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT COUNT(1) FROM tf_b_order_settlement settlement
+        WHERE settlement.vendor_id=#{vendorId}
+    </select>
+    <select id="pageVendorSettlementHistoryList" resultMap="settlementListVO"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT settlement.* FROM tf_b_order_settlement
+        settlement WHERE
+        settlement.vendor_id=#{vendorId}
+        ORDER BY settlement.create_time DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!--未 结算历史列表数据 -->
+    <select id="pageNotSettlementOrderCount" resultType="int"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT COUNT(1)
+        FROM tf_b_order ord
+        WHERE ord.vendor_id=#{vendorId} AND
+        ord.complete_state=1 AND ord.order_state=4
+        AND ord.settlement_state=-1  
+        AND ord.complete_time &gt;=#{startTime} and ord.complete_time &lt;=#{endTime}  
+    </select>
+    <select id="pageNotSettlementOrderList" resultMap="orderListVO"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT ord.order_id, ord.order_no
+        ,ord.vendor_id,ord.original_price,ord.pay_price,ord.coupon_amount,ord.complete_time
+        ,uinfo.id as user_id ,uinfo.UserName as user_name
+        FROM tf_b_order ord
+        LEFT JOIN userinfo uinfo ON ord.user_id=uinfo.id 
+        WHERE ord.vendor_id=#{vendorId} AND ord.complete_state=1 AND ord.order_state=4 AND 
+        ord.settlement_state=-1 
+        AND ord.complete_time&gt;=#{startTime} and ord.complete_time &lt;=#{endTime}
+        ORDER BY ord.complete_time DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 结算历史列表数据 -->
+    <select id="pageSettlementedOrderCount" resultType="int"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT COUNT(1) FROM tf_b_order ord WHERE ord.vendor_id=#{vendorId} and  ord.settlement_state=#{settlementId} 
+    </select>
+    <select id="pageSettlementedOrderList" resultMap="orderListVO"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT ord.order_id, ord.order_no
+        ,ord.vendor_id,ord.original_price,ord.pay_price,ord.coupon_amount,ord.complete_time
+        ,uinfo.id as user_id ,uinfo.UserName as user_name 
+        FROM tf_b_order ord
+        LEFT JOIN userinfo uinfo ON ord.user_id=uinfo.id WHERE
+        ord.vendor_id=#{vendorId} and ord.settlement_state=#{settlementId}
+        ORDER BY ord.complete_time DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <!-- 获取最后结算时间 -->
+    <select id="findLastSettlementDate" resultType="java.util.Date"
+        parameterType="int">
+        SELECT create_time
+        FROM tf_b_order_settlement
+        WHERE
+        vendor_id=#{vendorId} ORDER BY id limit 0,1
+    </select>
+
+    <!-- 获取最后结算时间 -->
+    <select id="findLastSettlementAllDate" resultMap="dateMap"
+        parameterType="com.blueteam.entity.dto.SettlementQueryDTO">
+        SELECT start_time ,end_time ,create_time
+        FROM
+        tf_b_order_settlemen
+        WHERE id=#{settlementId} AND vendor_id=#{vendorId} ORDER BY id limit 0,1
+    </select>
+
+    <!-- 获取最后结算时间 -->
+    <select id="getSettlementListSumVO" resultMap="settlementListSumVO"
+        parameterType="java.util.List">
+        SELECT ord.vendor_id as vendor_id ,SUM(ord.pay_price) as all_amounts
+        FROM tf_b_order ord WHERE ord.vendor_id IN
+        <foreach item="item" index="index" collection="list" open="("
+            separator="," close=")">
+            #{item}
+        </foreach>
+        AND ord.complete_state=1 AND ord.order_state=4 GROUP BY ord.vendor_id
+    </select>
+
+	<select id="pageSettlementInfo" parameterType="com.blueteam.entity.dto.SettlementQueryDTO" resultMap="settlementPO">
+		SELECT * FROM tf_b_order_settlement WHERE vendor_id=#{vendorId}
+		order by end_time DESC
+		limit #{beginIndex},#{pageSize}
+	</select>
+
+	<select id="getCount" parameterType="com.blueteam.entity.dto.SettlementQueryDTO" resultType="int">
+		SELECT IFNULL(COUNT(*),0) FROM tf_b_order_settlement WHERE vendor_id=#{vendorId}
+	</select>
+
+	<select id="getLastRecordByVD" parameterType="int" resultMap="settlementPO">
+		SELECT * FROM tf_b_order_settlement WHERE vendor_id=#{vendorId} order by id desc limit 1
+	</select>
+</mapper>

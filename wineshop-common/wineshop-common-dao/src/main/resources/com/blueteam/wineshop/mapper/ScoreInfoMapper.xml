@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.ScoreInfoMapper">
+
+    <resultMap id="scoreInfoBase" type="com.blueteam.entity.po.ScoreInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="ProductId" jdbcType="INTEGER" property="ProductId"/>
+        <result column="Score" jdbcType="DOUBLE" property="Score"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="VendorId" jdbcType="INTEGER" property="VendorId"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="OrderNo" jdbcType="VARCHAR" property="OrderNo"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+
+        <result column="nickName" property="nickName"/>
+        <result column="venderName" property="venderName"/>
+        <result column="HeadImageUrl" property="HeadImageUrl"/>
+
+    </resultMap>
+
+
+    <resultMap id="scoreInfo" type="com.blueteam.entity.po.ScoreInfo" extends="scoreInfoBase">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="ProductId" jdbcType="INTEGER" property="ProductId"/>
+        <result column="Score" jdbcType="DOUBLE" property="Score"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="VendorId" jdbcType="INTEGER" property="VendorId"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="OrderNo" jdbcType="VARCHAR" property="OrderNo"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+
+        <association property="userName" column="UserId" select="com.blueteam.wineshop.mapper.UserInfoMapper.getUserNameById"/>
+        <association property="nickName" column="UserId" select="com.blueteam.wineshop.mapper.UserInfoMapper.getNickNameById"/>
+        <association property="HeadImageUrl" column="UserId" select="com.blueteam.wineshop.mapper.UserInfoMapper.getHeadImageUrlById"/>
+    </resultMap>
+
+    <select id="ScoreInfo" resultMap="scoreInfo">
+        SELECT * FROM ScoreInfo WHERE OrderNo = #{OrderNo} and UserId = #{UserId} and Type=#{Type}
+    </select>
+
+    <select id="ScoreInfoList" resultMap="scoreInfo">
+        SELECT * FROM ScoreInfo WHERE VendorId = #{VendorId}
+    </select>
+
+    <!-- 查询商家评论 -->
+    <select id="CommonInfoList" resultMap="scoreInfo">
+        SELECT * FROM ScoreInfo WHERE VendorId = #{VendorId} and Type=#{Type} ORDER BY CreateDate desc
+    </select>
+
+    <!--评论条数 -->
+    <select id="GetScoreCount" resultType="int">
+        SELECT count(*) from ScoreInfo where VendorId = #{VendorId} and Type=#{Type}
+    </select>
+
+    <!-- 订单评论列表 -->
+    <select id="CommonOrderList" resultMap="scoreInfo">
+        SELECT * FROM ScoreInfo WHERE OrderNo = #{OrderNo} order by CreateDate DESC
+    </select>
+
+    <!--查询商家回复-->
+    <select id="VendorBackList" resultMap="scoreInfo">
+        SELECT * FROM ScoreInfo WHERE OrderNo = #{OrderNo} and Type=#{Type} order by CreateDate ASC
+    </select>
+
+    <!-- 新增商家评论 -->
+    <insert id="insertComment" parameterType="com.blueteam.entity.po.ScoreInfo" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into ScoreInfo
+        (ProductId,Score,Detail,CreateBy,UpdateBy,CreateDate,UpdateDate,VendorId,Type,OrderNo,UserId)
+        values(#{ProductId},#{Score},#{Detail},#{CreateBy},#{UpdateBy},#{CreateDate},#{UpdateDate},#{VendorId},#{Type},#{OrderNo},#{UserId})
+
+
+    </insert>
+
+    <!-- 某个商家获取其下所有的评论 、评分-->
+    <select id="findAllVendorScore" resultMap="scoreInfo">
+        <![CDATA[
+		select *  from ScoreInfo
+			where Type = #{type} and VendorId = #{vendorId}
+		ORDER BY CreateDate desc  LIMIT ${(pageIndex-1)*pageSize},${pageIndex*pageSize}
+		]]>
+    </select>
+    <select id="findAllVendorScoreCount" resultType="int">
+        select count(*) from ScoreInfo where Type = #{type} and VendorId = #{vendorId}
+    </select>
+    <!-- 某个商家获取其下所有的评论 、评分  p3-->
+    <select id="findNewAllVendorScore" resultType="java.util.Map">
+        <![CDATA[
+		select * FROM
+	(
+		SELECT si.Id AS id,
+	si.ProductId AS productId,
+	si.Detail AS detail,
+	si.CreateBy AS createBy,
+	si.UpdateBy AS updateBy,
+	si.CreateDate AS createDate,
+	si.UpdateDate AS updateDate,
+	si.VendorId AS vendorId,
+	si.Type AS type,
+	si.UserId AS userId,
+	si.OrderNo AS orderNo,
+	si.Score AS score,
+	IFNULL(sif.Detail, 0) AS vendorInfo_detail,
+	tp.third_party_nick_name  AS nickName,
+	tp.third_party_nick_name AS userName FROM
+			(
+				SELECT
+					*
+				FROM
+					ScoreInfo
+				WHERE
+					Type =#{type}
+				AND VendorId = #{vendorId}
+			) si
+		LEFT JOIN (
+			SELECT
+				*
+			FROM
+				ScoreInfo
+			WHERE
+				Type = #{vendorInfoType}
+			AND VendorId = #{vendorId}
+		) sif ON sif.orderNo = si.orderNo
+		LEFT JOIN UserInfo ui ON si.UserId = ui.Id
+  LEFT  JOIN (select * from user_middle_third_party where middle_status = 1) um ON um.user_info_id = ui.Id
+ LEFT JOIN
+(select * from third_party_user_info where user_type = 4 AND third_party_type = 1 and third_party_status = 1 ) tp
+ ON tp.id = um.third_party_id
+	) AS tt ORDER BY tt.CreateDate DESC LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+    <select id="findNewAllVendorScoreCount" resultType="int">
+        select count(*) from (
+        SELECT
+        sif.Detail
+        FROM
+        (
+        SELECT
+        *
+        FROM
+        ScoreInfo
+        WHERE
+        Type =#{type}
+        AND VendorId = #{vendorId}
+        ) si
+        LEFT JOIN (
+        SELECT
+        *
+        FROM
+        ScoreInfo
+        WHERE
+        Type = #{vendorInfoType}
+        AND VendorId = #{vendorId}
+        ) sif ON sif.orderNo = si.orderNo ) AS tt
+    </select>
+    <select id="countVendorScore" resultType="java.util.Map">
+        <![CDATA[
+		select IFNULL(sum(Score),0)  as scores,count(*) as sums from ScoreInfo  where Type = #{type} and VendorId = #{vendorId}
+		]]>
+    </select>
+    <select id="getScoreInfo" resultType="java.util.Map">
+        <![CDATA[
+
+		SELECT
+	se.VendorId AS vendorInfoId,
+	cif.Id AS carriersInfoId,
+	se.UserId AS userId
+FROM
+	ScoreInfo se
+LEFT JOIN VendorInfo vif ON se.VendorId = vif.Id
+LEFT JOIN CarriersInfo cif ON locate(
+	vif.CityCode,
+	ManagementArea
+) != 0
+WHERE
+	se.Id = #{scoreInfoId}
+
+		]]>
+
+    </select>
+
+
+    <select id="selectScoreAndUserByID" resultMap="scoreInfoBase">
+        SELECT SI.Detail,si.Type,si.VendorId,si.UserId,UI.NickName,VI.Name AS venderName,si.Score,si.CreateDate
+        FROM ScoreInfo AS SI
+        LEFT JOIN UserInfo AS UI
+        ON SI.UserId = UI.Id
+        LEFT JOIN VendorInfo AS VI
+        ON SI.VendorId = VI.Id
+        where si.id=#{id}
+    </select>
+
+
+    <!--获取被回复用户ID-->
+    <select id="selectBeAnsweredUserID" resultMap="scoreInfoBase">
+        SELECT oi.UserId FROM ScoreInfo AS SI
+        LEFT JOIN OrderInfo AS OI
+        ON SI.Type='COMMENTADMIN_CODE_VENDOR' AND oi.OrderNo = si.OrderNo
+        WHERE si.id = #{id}
+    </select>
+</mapper>

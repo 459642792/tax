@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderDispatchPOMapper" >
+  <insert id="saveOrderDispatch" parameterType="com.blueteam.entity.po.OrderDispatchPO" >
+    insert into tf_b_order_dispatch
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="dispatchName != null" >
+        dispatch_name,
+      </if>
+      <if test="dispatchType != null" >
+        dispatch_type,
+      </if>
+      <if test="dispatchProvider != null" >
+        dispatch_provider,
+      </if>
+      <if test="dispatchFee != null" >
+        dispatch_fee,
+      </if>
+      <if test="dispatchDetail != null" >
+        dispatch_detail,
+      </if>
+      <if test="contactName != null" >
+        contact_name,
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone,
+      </if>
+      <if test="addressName != null" >
+        address_name,
+      </if>
+      <if test="addressDesc != null" >
+        address_desc,
+      </if>
+      <if test="inputAddress != null" >
+        input_address,
+      </if>
+      <if test="structuredAddress != null" >
+        structured_address,
+      </if>
+      <if test="longitude != null" >
+        longitude,
+      </if>
+      <if test="latitude != null" >
+        latitude,
+      </if>
+      <if test="cityCode != null" >
+        city_code,
+      </if>
+      <if test="adCode != null" >
+        ad_code,
+      </if>
+      <if test="townCode != null" >
+        town_code,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="updateStaffId != null" >
+        update_staff_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="dispatchName != null" >
+        #{dispatchName,jdbcType=VARCHAR},
+      </if>
+      <if test="dispatchType != null" >
+        #{dispatchType,jdbcType=TINYINT},
+      </if>
+      <if test="dispatchProvider != null" >
+        #{dispatchProvider,jdbcType=VARCHAR},
+      </if>
+      <if test="dispatchFee != null" >
+        #{dispatchFee,jdbcType=BIGINT},
+      </if>
+      <if test="dispatchDetail != null" >
+        #{dispatchDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+        #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="addressName != null" >
+        #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="addressDesc != null" >
+        #{addressDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="inputAddress != null" >
+        #{inputAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="structuredAddress != null" >
+        #{structuredAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="longitude != null" >
+        #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adCode != null" >
+        #{adCode,jdbcType=VARCHAR},
+      </if>
+      <if test="townCode != null" >
+        #{townCode,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateStaffId != null" >
+        #{updateStaffId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+</mapper>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--映射-->
+<mapper namespace="">
+
+
+    <!--C端发送的消息 BEGIN========-->
+    <!-- 发表订单评价 -->
+    <intercept controller="CommentInfoController" action="cityList">
+
+    </intercept>
+
+    <!-- 发现评论点赞 -->
+    <intercept controller="DiscoverController" action="insertUpvote">
+
+    </intercept>
+
+    <!-- 交易成功 -->
+    <intercept controller="DiscoverController" action="insertUpvote">
+
+    </intercept>
+
+    <!--C端发送的消息 END=======-->
+
+
+    <!--商家端发送的消息 BEGIN========-->
+    <!-- 回复订单评价 -->
+    <intercept controller="VendorInfoController" action="addMerchantsCommentsUsers">
+
+    </intercept>
+
+    <!-- 商家入驻 -->
+    <intercept controller="VendorController" action="addVendorInfo">
+
+    </intercept>
+
+    <!-- 提交认证 -->
+    <intercept controller="VendorController" action="authentication">
+
+    </intercept>
+
+    <!-- 酒币兑换 -->
+    <intercept controller="GoodsCashRecordController" action="cashGoods">
+
+    </intercept>
+
+    <!--商家端发送的消息 END=======-->
+
+
+    <!--平台端发送的消息 BEGIN========-->
+    <!-- 结算 -->
+    <intercept controller="SettlementRecordsController" action="insertSettlementRecords">
+
+    </intercept>
+
+    <!--酒币兑换发货-->
+    <intercept controller="GoodsCashRecordController" action="expressGoods">
+
+    </intercept>
+
+    <!-- 审核认证 -->
+    <intercept controller="VendorController" action="adminAuthenticate">
+
+    </intercept>
+
+    <!-- 发现审核 -->
+    <intercept controller="DiscoverController" action="AduitStatus">
+
+    </intercept>
+
+    <!-- 推荐店铺 -->
+    <intercept controller="ReVendorController" action="reVendorAdd">
+
+    </intercept>
+
+    <!-- 管理员认证商家 -->
+    <intercept controller="VendorController" action="adminAuthenticateVendor">
+
+    </intercept>
+    <!--平台端发送的消息 END=======-->
+
+
+    <!--运营商端发送消息 BEGIN=======-->
+    <!-- 提交发现 -->
+    <intercept controller="DiscoverController" action="Adddiscover" userType="1">
+
+    </intercept>
+
+    <!--  运营商端商家入驻 -->
+    <intercept controller="CarriersController" action="enter">
+
+    </intercept>
+
+    <!--  运营商端提交认证信息 -->
+    <intercept controller="CarriersController" action="postAuthenticateData">
+
+    </intercept>
+
+
+    <!-- 审核认证 -->
+    <intercept controller="CarriersController" action="authenticate">
+
+    </intercept>
+    <!--运营商端发送消息 END=======-->
+
+
+</mapper>

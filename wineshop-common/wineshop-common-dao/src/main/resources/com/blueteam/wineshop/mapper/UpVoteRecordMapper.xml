@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.UpVoteRecordMapper">
+    <resultMap id="UpviteRecord" type="com.blueteam.entity.po.UpVoteRecord">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="UserName" jdbcType="VARCHAR" property="UserName"/>
+        <result column="ForeignKey" jdbcType="INTEGER" property="ForeignKey"/>
+        <result column="UserImage" jdbcType="VARCHAR" property="UserImage"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+
+        <result column="title" property="title"/>
+        <result column="nickName" property="nickName"/>
+    </resultMap>
+
+    <!-- 新增发现数据 -->
+    <insert id="insertUpvoteRecord" parameterType="com.blueteam.entity.po.UpVoteRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into UpvoteRecord
+        (UserName,ForeignKey,UserImage,UserId,CreateDate,CreateBy,UpdateDate,UpdateBy)
+        values(#{UserName},#{ForeignKey},#{UserImage},#{UserId},#{CreateDate},#{CreateBy},#{UpdateDate},#{UpdateBy})
+
+
+    </insert>
+
+    <!-- 删除评论记录（取消点赞） -->
+    <delete id="deleteUpvoteRecord" parameterType="java.util.List">
+        delete from UpvoteRecord where ForeignKey = #{ForeignKey} and UserId=#{UserId}
+    </delete>
+
+    <select id="RecordCount" resultType="int">
+        select count(*) from UpvoteRecord where ForeignKey = #{ForeignKey} and UserId=#{UserId}
+    </select>
+
+    <select id="upvoteRecordDetail" resultMap="UpviteRecord">
+        SELECT * FROM UpvoteRecord WHERE ForeignKey = #{ForeignKey} and UserId=#{UserId}
+    </select>
+
+    <!-- 删除所有的点赞信息 -->
+    <delete id="deleteUpvote" parameterType="java.lang.Integer">
+        delete from UpvoteRecord where ForeignKey = #{ForeignKey}
+    </delete>
+
+    <!--查询点赞记录-->
+    <select id="getRecord" resultMap="UpviteRecord">
+        SELECT * FROM UpvoteRecord WHERE Id=#{Id}
+    </select>
+
+    <select id="selectDiscoverTitleAndNikeName" resultMap="UpviteRecord">
+        SELECT ui.NickName,d.Title,ur.UserId FROM UpvoteRecord AS UR
+        LEFT JOIN UserInfo AS UI
+        ON UR.UserId = UI.Id
+        LEFT JOIN SmallRoutineComment AS SRC
+        ON UR.ForeignKey = SRC.ID
+        LEFT JOIN Discover AS D
+        ON SRC.ForeignKey = d.Id
+        WHERE UR.id = #{id}
+    </select>
+</mapper>

@@ -1,0 +1,90 @@
+.ui-datepicker .ui-datepicker-title select.ui-datepicker-year {
+    margin-top: 5px;
+}
+
+.ui-datepicker .ui-datepicker-title select.ui-datepicker-month {
+    margin-top: 5px;
+}
+thead td{
+    border-left: none !important;
+    border-bottom: none !important;
+
+}
+
+.promotion_btn{
+    padding-left: 10px;
+    margin-left: 10px;
+    margin-top: -4px;
+}
+.orderAdmin_detail_titile {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+.ad_displayNon{
+    position: absolute;
+    height: 140px;
+    z-index: 999;
+    background: #fff;
+    margin-left: 75px;
+    width: 200px;
+    border: 1px solid #aaa;
+    display: none;
+    overflow: auto;
+}
+.ad_displayNon ul{
+    padding: 0 5px;
+    margin: 0;
+}
+.ad_displayNon li{
+    list-style: none;
+    padding: 3px 0px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 12px ;
+}
+.promotion_btn1{
+    padding: 5px 40px;
+    margin-top: 36px;
+    margin-left: 75px;
+    margin-bottom: 50px;
+}
+.editAdList_img{
+    background: #f2f2f2;
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ccc;
+    margin-left: 80px;
+    margin-top: -15px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+.editAdList_img input {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+.editAdList_img img{
+    height: 100%;
+    width: 100%;
+    display: none;
+}
+.editAdList_imgAdd{
+    margin-top: 50px;
+}
+.links_content a{
+    cursor: pointer;
+}
+#editAD_listText{
+    height: 80px;
+}
+.redColor {
+    color: red;
+    padding-top: 5px;
+}
+.editError{
+    padding-left: 75px;display: block
+}

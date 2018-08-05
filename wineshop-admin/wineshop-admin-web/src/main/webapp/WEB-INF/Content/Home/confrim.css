@@ -1,0 +1,228 @@
+/*******背景幕******/
+.backdrop {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    opacity: 0.6;
+}
+
+.layer {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    opacity: 0;
+}
+
+/*******confirm弹出框******/
+.confirm-box {
+    display: table;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10000;
+}
+
+.confirm-main {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    z-index: 10001;
+}
+
+.confirmation {
+    z-index: 1040;
+    animation: fadeInDown 0.4s both;
+    transform-origin: bottom center 0;
+    -webkit-animation: fadeInDown 0.4s both;
+    -webkit-transform-origin: bottom center 0;
+}
+
+.confirmation.fade .confirm-dialog {
+    transform: translate(0px, -25%);
+    transition: transform 0.3s ease-out 0s;
+}
+
+.confirmation.in .confirm-dialog {
+    transform: translate(0px, 0px);
+}
+
+.confirm-dialog {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 29px;
+    position: relative;
+    width: auto;
+    z-index: 1050;
+}
+
+.confirm-content {
+    background-clip: padding-box;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    outline: 0 none;
+    position: relative;
+}
+
+.confirm-header {
+    min-height: 16.4286px;
+    padding: 10px;
+}
+
+.confirm-header .close {
+    margin-top: -2px;
+}
+
+.confirm-title {
+    height: 30px;
+    line-height: 30px;
+    margin: 0;
+    text-align: center
+}
+
+.confirm-close {
+    background: url("http://m.laiyihuo.com/Content/themes/img_v3/close.png") no-repeat;
+    border: medium none;
+    height: 30px;
+    width: 30px;
+    background-size: 30px 30px;
+    display: block;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.confirm-open {
+    overflow: hidden;
+}
+
+.confirm-body {
+    position: relative;
+    text-align: left;
+    padding: 35px 18px 25px 18px;
+    box-sizing: border-box;
+    font-size: 1.4em;
+    color: #333
+}
+.confirm-body .labelTile{
+    display: inline-block;
+    margin-right:10px;
+}
+.confirm-body .confirmInputText{
+    display: inline-block;
+    width:60%;
+    padding-left:10px;
+    border:1px solid #00a0e9;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.confirm-body .errorMessage{
+    color: red;
+    font-size:14px;
+    margin-top:10px;
+}
+.confirm-footer {
+    padding: 20px 10px 20px 10px;
+    text-align: right;
+}
+
+.confirm-footer .btn {
+    width: 100px
+}
+
+.confirm-footer .alert {
+    width: 100%
+}
+
+.confirm-footer:before, .confirm-footer:after {
+    content: " ";
+    display: table;
+}
+
+.confirm-footer:after {
+    clear: both;
+}
+
+.confirm-footer:before, .confirm-footer:after {
+    content: " ";
+    display: table;
+}
+
+.confirm-footer:after {
+    clear: both;
+}
+
+.confirm-footer .btn + .btn {
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.confirm-footer .btn-group .btn + .btn {
+    margin-left: -1px;
+}
+
+.confirm-footer .btn-block + .btn-block {
+    margin-left: 0;
+}
+
+.confirm-footer .btn-minor {
+    background-color: #459e48;
+    color: #fff;
+    border: 1px solid #459e48;
+}
+
+@media screen and (min-width: 768px) {
+    .confirm-dialog {
+        padding-bottom: 30px;
+        padding-top: 30px;
+        width: 600px;
+    }
+
+    .confirm-content {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -100%, 0);
+        transform: translate3d(0, -100%, 0);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+@-webkit-keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -100%, 0);
+        transform: translate3d(0, -100%, 0);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}

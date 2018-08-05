@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.OrderFeePOMapper" >
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.OrderFeePO" >
+    <constructor >
+      <arg column="order_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="fee_type_code" jdbcType="TINYINT" javaType="java.lang.Byte" />
+      <arg column="fee_type_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="receivable_fee" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="real_fee" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="counpon_amount" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="fee_belong" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <insert id="insert" parameterType="com.blueteam.entity.po.OrderFeePO" >
+    insert into tf_b_order_fee (order_id, fee_type_code, fee_type_name, 
+      receivable_fee, real_fee, counpon_amount, 
+      fee_belong)
+    values (#{orderId,jdbcType=BIGINT}, #{feeTypeCode,jdbcType=TINYINT}, #{feeTypeName,jdbcType=VARCHAR}, 
+      #{receivableFee,jdbcType=BIGINT}, #{realFee,jdbcType=BIGINT}, #{counponAmount,jdbcType=BIGINT}, 
+      #{feeBelong,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.blueteam.entity.po.OrderFeePO" >
+    insert into tf_b_order_fee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="feeTypeCode != null" >
+        fee_type_code,
+      </if>
+      <if test="feeTypeName != null" >
+        fee_type_name,
+      </if>
+      <if test="receivableFee != null" >
+        receivable_fee,
+      </if>
+      <if test="realFee != null" >
+        real_fee,
+      </if>
+      <if test="counponAmount != null" >
+        counpon_amount,
+      </if>
+      <if test="feeBelong != null" >
+        fee_belong,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="feeTypeCode != null" >
+        #{feeTypeCode,jdbcType=TINYINT},
+      </if>
+      <if test="feeTypeName != null" >
+        #{feeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="receivableFee != null" >
+        #{receivableFee,jdbcType=BIGINT},
+      </if>
+      <if test="realFee != null" >
+        #{realFee,jdbcType=BIGINT},
+      </if>
+      <if test="counponAmount != null" >
+        #{counponAmount,jdbcType=BIGINT},
+      </if>
+      <if test="feeBelong != null" >
+        #{feeBelong,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>

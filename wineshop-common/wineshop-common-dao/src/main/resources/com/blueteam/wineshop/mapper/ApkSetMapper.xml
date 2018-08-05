@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.ApkSetMapper">
+    <resultMap id="apkInfo" type="com.blueteam.entity.po.Apkset">
+        <id column="apk_id" jdbcType="INTEGER" property="apk_id"/>
+        <result column="apk_name" jdbcType="VARCHAR" property="apk_name"/>
+        <result column="apk_des" jdbcType="VARCHAR" property="apk_des"/>
+        <result column="apk_url" jdbcType="VARCHAR" property="apk_url"/>
+        <result column="apk_version" jdbcType="VARCHAR" property="apk_version"/>
+        <result column="createby" jdbcType="VARCHAR" property="createby"/>
+        <result column="createdate" jdbcType="VARCHAR" property="createdate"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+    </resultMap>
+
+
+    <!-- 新增数据 -->
+    <insert id="insertapk" parameterType="com.blueteam.entity.po.Apkset" useGeneratedKeys="true" keyProperty="id">
+        insert into ApkSet
+        (apk_name,apk_des,apk_url,apk_version,createby,createdate,UpdateDate,UpdateBy)
+        values(#{apk_name},#{apk_des},#{apk_url},#{apk_version},#{createby},#{createdate},#{UpdateDate},#{UpdateBy})
+
+
+    </insert>
+
+    <!-- 修改数据 -->
+    <update id="updateapk" parameterType="com.blueteam.entity.po.Apkset">
+        update ApkSet set apk_name =
+        #{apk_name},apk_des=#{apk_des},apk_url=#{apk_url},apk_version=#{apk_version},UpdateDate=#{UpdateDate},UpdateBy=#{UpdateBy}
+        where apk_id = #{apk_id}
+    </update>
+
+    <!-- 详情数据 -->
+    <select id="getApk" resultMap="apkInfo">
+        SELECT * FROM ApkSet WHERE apk_id =#{apk_id}
+    </select>
+
+    <!-- 详情数据 -->
+    <select id="SelApk" resultMap="apkInfo">
+        SELECT * FROM ApkSet
+    </select>
+</mapper>

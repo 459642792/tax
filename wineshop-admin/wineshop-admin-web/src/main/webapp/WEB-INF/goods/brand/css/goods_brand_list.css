@@ -1,0 +1,116 @@
+.brandAble label{
+    display: inline-block;
+    margin-left:10px;
+    position: relative;
+}
+#brandListTable{
+    width:100%;
+}
+
+#brandListTable tr{
+    cursor: pointer;
+}
+#brandListTable tr td,
+#brandListTable tr th{
+     width:20%;
+     padding:5px 0px;
+     border:1px solid #ececec;
+     font-size: 14px;
+ }
+
+#brandListTable tr th{
+    font-size: 12px;
+}
+#brandListTable .brandAdd,
+#brandListTable .brandEdit,
+#brandListTable .brandDelete{
+    min-width:60px;
+    height: 30px;
+    line-height: 30px;
+    color: #ffffff;
+    border:none;
+    outline:none;
+    border-radius: 5px;
+    margin-right:3%;
+}
+#brandListTable .brandAdd{
+    background:#0099CC ;
+}
+#brandListTable .brandEdit{
+    background: #33CC33;
+}
+#brandListTable .brandDelete{
+    background:#FF0000;
+}
+#brandListTable .noBrandAdd{
+    background: #ffffff;
+}
+#brandListTable .addSubBrand{
+    background: #33CC33;
+    color: #ffffff;
+    display: inline-block;
+    margin-right:10px;
+    width:20px;
+    height: 20px;
+    line-height:20px;
+    text-align: center;
+}
+#brandListTable tbody tr td.details-control{
+    padding-left:30px !important;
+    background:url('./../../../Content/Home/image/details_open.png') no-repeat 2px center;
+}
+#brandListTable tbody .details td.details-control{
+    background: url('./../../../Content/Home/image/details_close.png') no-repeat 2px center;
+}
+#brandListTable .errorMessage{
+    text-align: center;
+    color: #000;
+}
+#brandListTable .errorMessage p{
+    margin:20px auto;
+}
+#brandListTable .tableBtn,
+#subBrandTable .tableBtn{
+    display: inline-block;
+    width:50px;
+}
+#brandListTable .tableBtn img,
+#subBrandTable .tableBtn img{
+    width:20px;
+    height: 20px;
+}
+#subBrandTable tr td{
+    border:1px solid #ececec;
+}
+#subBrandTable .subBrandStatus{
+    width: 40px;
+    margin-left:5px;
+    margin-right:5px;
+}
+.nosubBrandData{
+    padding:10px 0px;
+    width:100%;
+    text-align: center;
+    background: #ffffff;
+}
+.clearDate{
+    position: absolute;
+    top:10px;
+    right:35px;
+    z-index:10;
+}
+.clearDate img{
+    width:15px;
+}
+.subBrandName input{
+    width:60%;
+}
+.brandLabelTile span{
+    display: inline-block;
+    color: red;
+    margin-right: 2px;
+}
+
+
+
+

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.OrderCommentPOMapper">
+  <resultMap id="BaseResultMap" type="com.blueteam.entity.po.OrderCommentPO">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+    <result column="deleted_flag" jdbcType="TINYINT" property="deletedFlag" />
+    <result column="comment_picture" jdbcType="VARCHAR" property="commentPicture" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+    <result column="head_image" jdbcType="VARCHAR" property="headImage"/>
+  </resultMap>
+
+
+
+  <select id="getByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select * from tf_b_order_comment
+    where order_id = #{orderId} AND deleted_flag=0
+  </select>
+
+
+  <insert id="insert" parameterType="com.blueteam.entity.po.OrderCommentPO">
+    insert into tf_b_order_comment (id, created_time, update_time, 
+      user_id, order_id, score, 
+      comment_content, comment_picture,
+      vendor_id,user_name,goods_name,head_image)
+    values (#{id,jdbcType=BIGINT}, now(), now(),
+      #{userId,jdbcType=INTEGER}, #{orderId,jdbcType=BIGINT}, #{score,jdbcType=INTEGER}, 
+      #{commentContent,jdbcType=VARCHAR},  #{commentPicture,jdbcType=LONGVARCHAR},
+      #{vendorId},#{userName},#{goodsName},#{headImage})
+  </insert>
+
+  <sql id="queryParams">
+      <where>
+        deleted_flag=0
+        <if test="vendorId != null">
+          AND vendor_id=#{vendorId}
+        </if>
+      </where>
+  </sql>
+
+  <select id="getCommentList" parameterType="com.blueteam.entity.dto.VendorOrderDTO" resultMap="BaseResultMap">
+    select * from tf_b_order_comment
+    <include refid="queryParams"/>
+    limit #{beginIndex},#{pageSize}
+  </select>
+
+  <select id="getCount" parameterType="com.blueteam.entity.dto.VendorOrderDTO" resultType="int">
+    SELECT COUNT(*) FROM tf_b_order_comment <include refid="queryParams"/>
+  </select>
+
+  <select id="getCommentListByOrderId" resultMap="BaseResultMap">
+    select * from tf_b_order_comment
+    WHERE order_id=#{orderId} AND user_id=#{userId}
+  </select>
+
+  <update id="delComment" parameterType="long">
+    UPDATE tf_b_order_comment SET deleted_flag=1 WHERE id=#{id}
+  </update>
+
+  <select id="averageScore" parameterType="int" resultType="double">
+    SELECT IFNULL(AVG(score),5) from tf_b_order_comment WHERE vendor_id=#{vendorId}
+  </select>
+
+</mapper>

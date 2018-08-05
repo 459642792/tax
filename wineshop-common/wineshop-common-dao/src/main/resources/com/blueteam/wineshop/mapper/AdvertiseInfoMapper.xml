@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.AdvertiseInfoMapper">
+    <resultMap id="advertiseInfo" type="com.blueteam.entity.po.AdvertiseInfo">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="TypeCode" jdbcType="VARCHAR" property="TypeCode"/>
+        <result column="Name" jdbcType="VARCHAR" property="Name"/>
+        <result column="SortNumber" jdbcType="INTEGER" property="SortNumber"/>
+        <result column="Img" jdbcType="VARCHAR" property="Img"/>
+        <result column="Url" jdbcType="VARCHAR" property="Url"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="EnableFlag" jdbcType="VARCHAR" property="EnableFlag"/>
+        <result column="ForeignKey" jdbcType="VARCHAR" property="ForeignKey"/>
+        <result column="CityCode" jdbcType="VARCHAR" property="CityCode"/>
+
+        <result column="foreignName" jdbcType="VARCHAR" property="foreignName"/>
+
+        <result column="brandId" jdbcType="INTEGER" property="brandId"/>
+        <result column="clickCount" jdbcType="INTEGER" property="clickCount"/>
+        <result column="creator" jdbcType="NVARCHAR" property="creator"/>
+        <result column="brandName" jdbcType="NVARCHAR" property="brandName"/>
+    </resultMap>
+
+
+    <resultMap id="advertiseInfoMap" type="com.blueteam.entity.po.AdvertiseInfo" extends="advertiseInfo">
+
+        <association property="city" javaType="com.blueteam.entity.dto.City">
+            <result column="provinceCode" jdbcType="NVARCHAR" property="provinceCode"/>
+            <result column="provinceName" jdbcType="NVARCHAR" property="provinceName"/>
+            <result column="oCityCode" jdbcType="NVARCHAR" property="cityCode"/>
+            <result column="cityName" jdbcType="NVARCHAR" property="cityName"/>
+            <result column="districtCode" jdbcType="NVARCHAR" property="districtCode"/>
+            <result column="districtName" jdbcType="NVARCHAR" property="districtName"/>
+            <result column="FullName" jdbcType="NVARCHAR" property="fullName"/>
+        </association>
+
+    </resultMap>
+
+    <resultMap id="pageReultMap" type="com.blueteam.entity.dto.PageResult">
+        <result column="count" jdbcType="INTEGER" property="count"/>
+        <collection property="list" resultMap="advertiseInfoMap" javaType="List">
+            <id property="count" column="count"/>
+        </collection>
+    </resultMap>
+
+    <!--<sql id="common_citys">
+        WITH EnableCitys AS(
+        SELECT Code,ParentCode,Name AS cName FROM CityInfo WHERE EnableFlag='Y'
+        ),
+        provinceCitys AS(
+        SELECT *,code AS provinceCode,cName AS provinceName,'' AS ocityCode,'' AS cityName,'' AS districtCode,'' AS
+        districtName,cName AS FullName
+        FROM EnableCitys WHERE ParentCode='ROOT'
+        ),
+        ocitys AS (
+        SELECT EC.*,PC.CODE AS provinceCode,pc.cName AS provinceName,ec.Code AS ocityCode,ec.cName AS cityName,'' AS
+        districtCode,'' AS districtName, (pc.cName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN provinceCitys AS PC
+        ON EC.ParentCode = PC.Code
+        WHERE LOCATE('_',EC.ParentCode)=0 AND EC.ParentCode != 'ROOT'
+        ),
+        disCitys AS(
+        SELECT EC.*,C.provinceCode,C.provinceName,C.ocityCode,C.cityName,EC.Code AS districtCode,EC.cName AS
+        districtName,(c.provinceName+c.cityName+ec.cName) AS FullName
+        FROM EnableCitys AS EC
+        LEFT JOIN ocitys AS C
+        ON EC.ParentCode = C.Code
+        WHERE CHARINDEX('_',EC.ParentCode) != 0
+        ),
+        citys AS(
+        SELECT * FROM provinceCitys
+        UNION ALL
+        SELECT * FROM ocitys
+        UNION ALL
+        SELECT * FROM disCitys
+        )
+    </sql>
+    -->
+
+    <insert id="insert" parameterType="com.blueteam.entity.po.AdvertiseInfo"
+            useGeneratedKeys="true" keyProperty="Id">
+        insert into AdvertiseInfo (TypeCode, Name, SortNumber,
+        Img, Url, CreateBy,
+        CreateDate, UpdateBy, UpdateDate,
+        EnableFlag, ForeignKey, CityCode,BrandId
+        )
+        values (#{TypeCode,jdbcType=VARCHAR}, #{Name,jdbcType=VARCHAR}, #{SortNumber,jdbcType=INTEGER},
+        #{Img,jdbcType=VARCHAR}, #{Url,jdbcType=VARCHAR}, #{CreateBy,jdbcType=NVARCHAR},
+        #{CreateDate,jdbcType=TIMESTAMP}, #{UpdateBy,jdbcType=NVARCHAR}, #{UpdateDate,jdbcType=TIMESTAMP},
+        #{EnableFlag,jdbcType=VARCHAR}, #{ForeignKey,jdbcType=VARCHAR},
+        #{CityCode,jdbcType=VARCHAR},#{brandId,jdbcType=INTEGER}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.blueteam.entity.po.AdvertiseInfo">
+        update AdvertiseInfo
+        set TypeCode = #{TypeCode,jdbcType=VARCHAR},
+        Name = #{Name,jdbcType=VARCHAR},
+        SortNumber = #{SortNumber,jdbcType=INTEGER},
+        Img = #{Img,jdbcType=VARCHAR},
+        Url = #{Url,jdbcType=VARCHAR},
+        CreateBy = #{CreateBy,jdbcType=NVARCHAR},
+        CreateDate = #{CreateDate,jdbcType=TIMESTAMP},
+        UpdateBy = #{UpdateBy,jdbcType=NVARCHAR},
+        UpdateDate = #{UpdateDate,jdbcType=TIMESTAMP},
+        EnableFlag = #{EnableFlag,jdbcType=VARCHAR},
+        ForeignKey = #{ForeignKey,jdbcType=VARCHAR},
+        CityCode = #{CityCode,jdbcType=VARCHAR},
+        BrandId=#{brandId,jdbcType=INTEGER}
+        where Id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="advertiseInfo">
+        SELECT * FROM AdvertiseInfo WHERE EnableFlag = 'Y' AND ID=#{Id}
+    </select>
+<sql id="areaCount">
+SET  @areaCount := ( SELECT COUNT(id) FROM AdvertiseInfo WHERE EnableFlag = 'Y' and TypeCode=#{TypeCode}   AND CityCode=#{CityCode});
+</sql>
+    <sql id="cityCount">
+        SET  @cityCount := ( SELECT COUNT(id) FROM AdvertiseInfo WHERE EnableFlag = 'Y' and TypeCode=#{TypeCode}   AND CityCode=(select CityCode from cityinfo  where code=#{CityCode}));
+    </sql>
+    <sql id="provinceCount">
+        SET  @provinceCount := ( SELECT COUNT(id) FROM AdvertiseInfo WHERE EnableFlag = 'Y' and TypeCode=#{TypeCode}   AND CityCode=(select ProvinceCode from cityinfo  where code=#{CityCode}));
+    </sql>
+    <select id="AdvertiseInfoList" resultMap="advertiseInfo">
+      <include refid="areaCount"/>
+        <include refid="cityCount"/>
+        <include refid="provinceCount"/>
+    SELECT * FROM AdvertiseInfo WHERE EnableFlag = 'Y' and TypeCode=#{TypeCode} and  CityCode =
+        (select case when @areaCount != 0 THEN
+        #{CityCode}
+        when @cityCount != 0 THEN
+        (select CityCode from cityinfo  where code=#{CityCode})
+        when @provinceCount != 0 THEN
+        (select ProvinceCode from cityinfo  where code=#{CityCode})
+        else NULL END )
+        ORDER BY CreateDate desc LIMIT 1
+    </select>
+
+    <select id="VendorTopList" resultMap="advertiseInfo">
+        SELECT  * FROM AdvertiseInfo WHERE EnableFlag = 'Y' and ForeignKey=#{ForeignKey} and TypeCode=#{TypeCode}
+        order by SortNumber asc LIMIT 0,3;
+    </select>
+
+    <!-- 十大品牌图片 2017-5-2专属调整-->
+    <select id="SdppList" resultMap="advertiseInfo">
+        SELECT  * FROM AdvertiseInfo WHERE EnableFlag = 'Y' and BrandId=#{ForeignKey} and TypeCode=#{TypeCode}
+        order by UpdateDate desc LIMIT 0,6;
+    </select>
+
+    <select id="VendorPhotoList" resultMap="advertiseInfo">
+        SELECT * FROM AdvertiseInfo WHERE EnableFlag = 'Y' and ForeignKey=#{ForeignKey} and TypeCode=#{TypeCode} order
+        by CreateDate desc
+    </select>
+
+    <select id="selectAdvByYYS" resultMap="advertiseInfo">
+
+
+        SELECT T.*,VI.Name as foreignName FROM(
+        SELECT * FROM AdvertiseInfo AS AI
+        WHERE LOCATE(CityCode,(  SELECT ManagementArea FROM CarriersInfo WHERE ID=#{carriersId})) !=0 AND EnableFlag = 'Y'
+        <if test="typeCode != null">
+            AND TypeCode=#{typeCode}
+        </if>
+        <if test="cityCode != null and cityCode!=''">
+            AND CityCode = #{cityCode}
+        </if>
+        )T
+        LEFT JOIN VendorInfo AS VI
+        ON T.ForeignKey = VI.ID
+        order by T.SortNumber ASC
+    </select>
+
+    <sql id="AREAS_switchSortNum">
+    SET @AREAS := (SELECT  ManagementArea  FROM CarriersInfo WHERE ID=#{carriersId})
+  </sql>
+    <sql id="sortNum_switchSortNum">
+    SET @sortNum:=(SELECT  SortNumber FROM AdvertiseInfo WHERE ID = #{id})
+    </sql>
+    <sql id="switchNum_switchSortNum">
+       <![CDATA[   SET @switchNum:= (SELECT SortNumber FROM AdvertiseInfo WHERE EnableFlag='Y'
+        AND TypeCode=#{typeCode}
+        AND SortNumber < @sortNum
+        AND	CityCode = #{cityCode}
+        AND  LOCATE(CityCode,@AREAS) !=0
+        ORDER BY SortNumber DESC LIMIT 1)]]>
+    </sql>
+    <sql id="switchId_switchSortNum">
+       <![CDATA[ SET @switchId:= (SELECT id FROM AdvertiseInfo WHERE EnableFlag='Y'
+        AND TypeCode=#{typeCode}
+        AND SortNumber < @sortNum
+        AND	CityCode = #{cityCode}
+        AND  LOCATE(CityCode,@AREAS) !=0
+        ORDER BY SortNumber DESC LIMIT 1)]]>
+    </sql>
+    <!-- 交换运营商广告 -->
+    <update id="switchSortNum">
+        <include refid="AREAS_switchSortNum"/>;
+        <include refid="sortNum_switchSortNum"/>;
+        <include refid="switchNum_switchSortNum"/>;
+        <include refid="switchId_switchSortNum"/>;
+		 UPDATE   AdvertiseInfo SET SortNumber= @switchNum WHERE ID = #{id} AND @switchId IS NOT NULL AND @switchId != 0;
+		 UPDATE   AdvertiseInfo SET SortNumber= @sortNum WHERE ID = @switchId  AND @switchId IS NOT  NULL AND @switchId != 0;
+    </update>
+
+    <!-- 修改点击数 -->
+    <update id="updates" parameterType="com.blueteam.entity.po.AdvertiseInfo">
+        <![CDATA[
+
+
+		   update  AdvertiseInfo set ClickCount=#{clickCount} where Id = #{Id}
+
+
+        ]]>
+    </update>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from AdvertiseInfo
+        where Id = #{Id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="findMaxSortNumber" resultType="com.blueteam.entity.po.AdvertiseInfo">
+        select SortNumber from AdvertiseInfo
+        where TypeCode = #{imageType} and ForeignKey =#{vendorId} order by SortNumber desc LIMIT 0,1;
+    </select>
+
+    <select id="getImagesByType" resultMap="advertiseInfo">
+        select a.id,a.TypeCode,a.Name,a.Img,a.url,a.CreateBy,a.CreateDate,a.UpdateBy,a.UpdateDate,a.EnableFlag,a.ForeignKey,a.CityCode
+        from AdvertiseInfo a where a.ForeignKey = #{vendorId}
+        and a.TypeCode = #{type} ORDER BY a.SortNumber asc
+    </select>
+
+    <delete id="removeHeadImage" parameterType="int">
+        delete from AdvertiseInfo where Id = #{id}
+    </delete>
+
+    <select id="getImagesByIdAndType" resultMap="advertiseInfo">
+        select * from AdvertiseInfo where TypeCode=#{type} and ForeignKey =
+        (select ForeignKey from AdvertiseInfo where Id=#{id})
+        order by SortNumber
+    </select>
+
+    <!-- 顶部头图前置 -->
+    <update id="swapSortNumber" parameterType="map">
+        update AdvertiseInfo set SortNumber =
+        case Id
+        when #{firstId} then #{secondSortNumber}
+        when #{secondId} then #{firstSortNumber}
+        else SortNumber end
+        where Id = #{firstId} or Id = #{secondId}
+    </update>
+
+    <!--<sql id="sql_selectAdvByWhere">
+        <include refid="common_citys"></include>
+        ,whereadvs AS (
+        SELECT AI.*,C.*,IFNULL(C.FullName,'全国') AS cityFullname,VI.Name AS foreignName,UI.NickName AS Creator,PI.Name as
+        brandName FROM AdvertiseInfo AS AI
+        LEFT JOIN citys AS C
+        ON AI.CityCode = C.Code
+        LEFT JOIN UserInfo AS UI
+        ON AI.CreateBy = UI.UserName
+        LEFT JOIN PinpaiInfo AS PI
+        ON PI.ID = AI.brandId
+        LEFT JOIN VendorInfo AS VI
+        ON AI.ForeignKey = VI.Id
+
+        <where>
+            <if test="pinpaiId!=null and pinpaiId!=0">
+                PI.ID = #{pinpaiId}
+            </if>
+            <if test="typeCode!=null and typeCode != ''">
+                AND AI.TypeCode = #{typeCode}
+            </if>
+
+        </where>
+        ),advs AS (
+        SELECT * FROM whereadvs
+        <where>
+            <if test="cityName !=null and cityName != ''">
+                cityFullname LIKE '%${cityName}%'
+            </if>
+        </where>
+
+        )
+    </sql>
+    -->
+
+    <sql id="count">
+   SET @count = (
+  SELECT count(*)
+  FROM (
+   SELECT AI.*,C.*,IFNULL(C.FullName,'全国') AS cityFullname,VI.Name AS foreignName,UI.NickName AS Creator,PI.Name as brandName
+   FROM AdvertiseInfo AS AI
+        LEFT JOIN ( select code,FullName, ProvinceCode provinceCode, ProvinceName provinceName , CityName cityName,
+                  DistrictCode districtCode, DistrictName districtName
+                    from CityInfo WHERE  EnableFlag='Y') AS C
+        ON AI.CityCode = C.Code
+        LEFT JOIN UserInfo AS UI
+        ON AI.CreateBy = UI.UserName
+        LEFT JOIN PinpaiInfo AS PI
+        ON PI.ID = AI.brandId
+        LEFT JOIN VendorInfo AS VI
+        ON AI.ForeignKey = VI.Id
+        <where>
+            <if test="pinpaiId!=null and pinpaiId!=0">
+                PI.ID = #{pinpaiId}
+            </if>
+            <if test="typeCode!=null and typeCode != ''">
+                AND AI.TypeCode = #{typeCode}
+            </if>
+            <if test="cityName !=null and cityName != ''">
+                AND IFNULL(C.FullName,'全国')  LIKE  "%"#{cityName}"%"
+            </if>
+        </where>
+        order by AI.CreateDate
+  )cc)
+    </sql>
+
+
+    <select id="selectAdvByWhere" resultMap="pageReultMap">
+        <include refid="count"></include>;
+        SELECT @count AS  count,
+        AI.*,C.*,IFNULL(C.FullName,'全国') AS cityFullname,VI.Name AS foreignName,UI.NickName AS
+        Creator,PI.Name as brandName
+        FROM AdvertiseInfo AS AI
+        LEFT JOIN ( select code,FullName, ProvinceCode provinceCode, ProvinceName provinceName , CityName cityName,
+        DistrictCode districtCode, DistrictName districtName
+        from CityInfo WHERE EnableFlag='Y') AS C
+        ON AI.CityCode = C.Code
+        LEFT JOIN UserInfo AS UI
+        ON AI.CreateBy = UI.UserName
+        LEFT JOIN PinpaiInfo AS PI
+        ON PI.ID = AI.brandId
+        LEFT JOIN VendorInfo AS VI
+        ON AI.ForeignKey = VI.Id
+        <where>
+            <if test="pinpaiId!=null and pinpaiId!=0">
+                PI.ID = #{pinpaiId}
+            </if>
+            <if test="typeCode!=null and typeCode != ''">
+                AND AI.TypeCode = #{typeCode}
+            </if>
+            <if test="cityName !=null and cityName != ''">
+                AND  IFNULL(C.FullName,'全国')  LIKE  "%"#{cityName}"%"
+            </if>
+        </where>
+        order by AI.CreateDate
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="findAdvByID" resultMap="advertiseInfoMap">
+         SELECT AI.*,C.* FROM
+         (select code,FullName, ProvinceCode provinceCode, ProvinceName provinceName , CityName cityName,
+                  DistrictCode districtCode, DistrictName districtName
+                    from CityInfo WHERE  EnableFlag='Y')AS C
+        RIGHT JOIN AdvertiseInfo AS AI
+        ON C.Code = AI.CityCode
+        WHERE AI.ID = #{id}
+    </select>
+
+    <select id="getVendorImagesByForeignKey" resultMap="advertiseInfo">
+        SELECT * from AdvertiseInfo
+        WHERE ForeignKey=#{foreignKey} and
+        TypeCode IN
+        <foreach collection="types" item="type" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+        ORDER BY TypeCode,SortNumber
+
+
+    </select>
+</mapper>

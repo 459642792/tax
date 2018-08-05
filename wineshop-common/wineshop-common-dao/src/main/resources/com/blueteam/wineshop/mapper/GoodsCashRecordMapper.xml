@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.GoodsCashRecordMapper">
+    <resultMap id="goodsCashRecord" type="com.blueteam.entity.po.GoodsCashRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="traded_goods_id" jdbcType="INTEGER" property="tradedGoodsId"/>
+        <result column="order_number" jdbcType="VARCHAR" property="orderNumber"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="cash_price" jdbcType="INTEGER" property="cashPrice"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="express_company" jdbcType="VARCHAR" property="expressCompany"/>
+        <result column="express_numbers" jdbcType="VARCHAR" property="expressNumbers"/>
+        <result column="express_date" jdbcType="TIMESTAMP" property="expressDate"/>
+
+        <result column="vendorinfo_id" jdbcType="INTEGER" property="vendorinfoId"/>
+
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="DATE" property="updateDate"/>
+
+        <result column="userId" jdbcType="INTEGER" property="userId"/>
+        <result column="balance" jdbcType="INTEGER" property="balance"/>
+        <result column="vendorName" property="vendorName"/>
+    </resultMap>
+
+    <!-- 保存兑换记录 -->
+    <insert id="saveGoodsCashRecord" parameterType="com.blueteam.entity.po.GoodsCashRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+		INSERT INTO goods_cash_record (
+			traded_goods_id,
+			order_number,
+			goods_name,
+			amount,
+			cash_price,
+			status,
+			express_company,
+			express_numbers,
+			vendorinfo_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date
+		)
+		VALUES
+			(
+				#{tradedGoodsId},
+				#{orderNumber},
+				#{goodsName},
+				#{amount},
+				#{cashPrice},
+				#{status},
+				#{expressCompany},
+				#{expressNumbers},
+				#{vendorinfoId},
+				#{createBy},
+				#{createDate},
+				#{updateBy},
+				#{updateDate}
+			)
+		]]>
+
+    </insert>
+
+    <!-- 发货兑换商品 -->
+    <update id="updateGoodsCashRecord" parameterType="com.blueteam.entity.po.GoodsCashRecord">
+        <![CDATA[
+			UPDATE goods_cash_record SET 
+				status = #{status},
+				express_company = #{expressCompany},
+				express_numbers = #{expressNumbers},
+				express_date = #{expressDate},
+				update_by = #{updateBy},
+				update_date = #{updateDate}
+ 			where id = #{id}
+		]]>
+    </update>
+    <!-- 获取兑换详情 -->
+    <select id="getGoodsCashRecords" resultMap="goodsCashRecord">
+        select * from goods_cash_record where id = #{goodsCashRecordId}
+    </select>
+    <!-- 获取兑换商品详情 -->
+    <select id="getGoodsCashRecord" resultType="java.util.HashMap">
+        <![CDATA[
+			SELECT
+				gcr.id AS id,
+				gcr.order_number AS orderNumber,
+				gcr.cash_price AS cashPrice,
+				gcr.amount AS counts,
+				gcr.goods_name AS goodsName,
+				vi.Name AS vendorInfoName,
+				ci.Name AS carriersInfoName,
+				IFNULL(date_format(gcr.express_date,'%Y-%m-%d'),'') AS expressDate,
+				vi.ContactPerson AS userInfoName,
+				vi.Telephone AS phone,
+				vi.Addr AS address,
+				gcr.status AS status,
+			    date_format(gcr.create_date,'%Y-%m-%d') AS createDate,
+				IFNULL(gcr.express_company,'') AS expressCompany,
+				IFNULL(gcr.express_numbers,'') AS expressNumbers
+			FROM
+				goods_cash_record gcr
+			LEFT JOIN VendorInfo vi ON gcr.vendorinfo_id = vi.Id
+			LEFT JOIN CarriersInfo ci ON vi.CityCode = ci.ManagementArea
+			WHERE
+				gcr.id = #{id}
+		]]>
+    </select>
+
+    <!-- 兑换商品列表 -->
+    <select id="listGoodsCashRecord" resultType="java.util.HashMap">
+        <![CDATA[
+		 select *
+		FROM
+			(
+		SELECT
+			gcr.id AS id,
+			gcr.goods_name AS goodsName,
+			IFNULL(tgi.image_url, '') as imageUrl,
+			gcr.order_number AS orderNumber,
+			gcr.cash_price AS cashPrice,
+			gcr.amount AS counts,
+			vi.Name AS vendorInfoName,
+			ci.Name AS carriersInfoName,
+			IFNULL(date_format(gcr.express_date,'%Y-%m-%d'),''
+			) AS expressDate,
+				IFNULL(date_format(gcr.create_date,'%Y-%m-%d'),'' )AS createDate,
+			vi.ContactPerson AS userInfoName,
+			vi.Telephone AS phone,
+			vi.Addr AS address,
+			gcr.status AS status,
+		    date_format(gcr.update_date,'%Y-%m-%d') AS updateDate,
+			IFNULL(gcr.express_company,'') AS expressCompany,
+			IFNULL(gcr.express_numbers,'') AS expressNumbers
+		FROM
+			goods_cash_record gcr
+		LEFT JOIN VendorInfo vi ON gcr.vendorinfo_id = vi.Id
+		LEFT JOIN CarriersInfo ci ON vi.CityCode = ci.ManagementArea
+		LEFT JOIN goods_table_image gti on gcr.traded_goods_id = gti.traded_goods_id
+		LEFT JOIN traded_goods_image tgi on gti.traded_goods_image_id = tgi.id
+		WHERE
+			1=1
+		]]>
+        <if test="tradedGoodsId != null">
+            <![CDATA[ and gcr.traded_goods_id  = #{tradedGoodsId}]]>
+        </if>
+        <if test="vendorInfoId != null">
+            <![CDATA[ and gcr.vendorinfo_id = #{vendorInfoId}]]>
+        </if>
+        <if test="orderNumber != null">
+            <![CDATA[ and gcr.order_number like "%"#{orderNumber}"%"]]>
+        </if>
+        <if test="vendorInfoName != null">
+            <![CDATA[and vi.Name like "%"#{vendorInfoName}"%"]]>
+        </if>
+        <if test="cashStatus != null">
+            <![CDATA[ and gcr.status = #{cashStatus}]]>
+        </if>
+        <if test="beginTime != null ">
+            <![CDATA[and gcr.create_date >= #{beginTime}]]>
+        </if>
+        <if test="endTime != null ">
+            <![CDATA[ AND gcr.create_date < date_add(#{endTime}, INTERVAL 1 DAY)]]>
+        </if>
+        <![CDATA[ ) as tt
+		 ORDER BY]]>
+        <choose>
+            <when test="vendorInfoId != null">
+                tt.createDate DESC
+            </when>
+            <when test="tradedGoodsId != null">
+                tt.createDate DESC
+            </when>
+            <otherwise>
+                tt.status ASC,
+                tt.createDate ASC
+            </otherwise>
+        </choose> <![CDATA[ LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+
+    <!-- 兑换商品列表总数 -->
+    <select id="listCountGoodsCashRecord" resultType="int">
+        <![CDATA[
+	SELECT COUNT(*)
+	FROM
+		(
+		SELECT
+			gcr.id AS id,
+			gcr.order_number AS orderNumber,
+			gcr.cash_price AS cashPrice,
+			gcr.amount AS counts,
+			vi.Name AS vendorInfoName,
+			ci.Name AS carriersInfoName,
+			IFNULL(date_format(gcr.express_date,'%Y-%m-%d'),''
+			) AS expressDate,
+				IFNULL(date_format(gcr.create_date,'%Y-%m-%d'),''
+				) AS createDate,
+			vi.ContactPerson AS userInfoName,
+			vi.Telephone AS phone,
+			vi.Addr AS address,
+			gcr.status AS status,
+			date_format(gcr.update_date,'%Y-%m-%d') AS updateDate,
+			IFNULL(gcr.express_company,'') AS expressCompany,
+			IFNULL(gcr.express_numbers,'') AS expressNumbers
+		FROM
+			goods_cash_record gcr
+		LEFT JOIN VendorInfo vi ON gcr.vendorinfo_id = vi.Id
+		LEFT JOIN CarriersInfo ci ON vi.CityCode = ci.ManagementArea
+		LEFT JOIN goods_table_image gti on gcr.traded_goods_id = gti.traded_goods_id
+		LEFT JOIN traded_goods_image tgi on gti.traded_goods_image_id = tgi.id
+		WHERE
+			1=1
+		]]>
+        <if test="tradedGoodsId != null">
+            <![CDATA[ and gcr.traded_goods_id  = #{tradedGoodsId}]]>
+        </if>
+        <if test="vendorInfoId != null">
+            <![CDATA[ and gcr.vendorinfo_id = #{vendorInfoId}]]>
+        </if>
+        <if test="orderNumber != null">
+            <![CDATA[ and gcr.order_number like "%"#{orderNumber}"%"]]>
+        </if>
+        <if test="vendorInfoName != null">
+            <![CDATA[and vi.Name like "%"#{vendorInfoName}"%"]]>
+        </if>
+        <if test="cashStatus != null">
+            <![CDATA[ and gcr.status = #{cashStatus}]]>
+        </if>
+        <if test="beginTime != null ">
+            <![CDATA[and date_format(gcr.create_date,'%Y-%m-%d') >= #{beginTime}]]>
+        </if>
+        <if test="endTime != null ">
+            <![CDATA[and #{endTime} >= date_format(gcr.create_date,'%Y-%m-%d')]]>
+        </if>
+        <![CDATA[ ) as t]]>
+    </select>
+
+    <select id="selectCashByID" resultMap="goodsCashRecord">
+        DECLARE @UserID INT
+        DECLARE @VendoerID INT
+        DECLARE @prodctName NVARCHAR(50)
+        DECLARE @wine INT
+        DECLARE @Amount INT
+        DECLARE @CreateDate DATETIME
+        DECLARE @VendorName NVARCHAR(100)
+
+        SELECT @UserID =
+        VI.UserId,@prodctName=GCR.goods_name,@wine=GCR.cash_price,@VendoerID=GCR.vendorinfo_id,@CreateDate=GCR.create_date,@Amount
+        = gcr.amount,@VendorName = VI.Name
+        FROM goods_cash_record AS GCR
+        LEFT JOIN VendorInfo AS VI
+        ON GCR.vendorinfo_id = vi.Id
+        WHERE GCR.ID =#{id}
+        ;
+        WITH currency_record_ID AS(
+        SELECT amount,status FROM currency_record WHERE vendorinfo_id=@VendoerID
+        ),
+        totalAdd AS (
+        SELECT IFNULL(SUM(amount),0) AS total FROM currency_record_ID WHERE status=1
+        ),
+        totalM AS(
+        SELECT IFNULL(SUM(amount),0) AS total FROM currency_record_ID WHERE status=0
+        )
+
+        SELECT (totalAdd.total - totalM.total) AS balance,@UserID AS userId,@VendoerID AS venderId,@prodctName AS
+        goods_name,@wine AS cash_price,@CreateDate AS create_date,@Amount AS amount,@VendorName AS vendorName
+
+        FROM totalAdd,totalM
+
+
+    </select>
+</mapper>

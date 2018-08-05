@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.DiscoverMapper">
+    <resultMap id="discoverInfo" type="com.blueteam.entity.po.Discover">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="Title" jdbcType="VARCHAR" property="Title"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="Label" jdbcType="VARCHAR" property="Label"/>
+        <result column="IsUser" jdbcType="VARCHAR" property="IsUser"/>
+        <result column="Status" jdbcType="INTEGER" property="Status"/>
+        <result column="Visits" jdbcType="INTEGER" property="Visits"/>
+        <result column="IsShow" jdbcType="CHAR" property="IsShow"/>
+        <result column="HandLine" jdbcType="CHAR" property="HandLine"/>
+        <result column="Detail" jdbcType="VARCHAR" property="Detail"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="Reason" jdbcType="VARCHAR" property="Reason"/>
+        <result column="VendorType" jdbcType="VARCHAR" property="VendorType"/>
+        <result column="Groom" jdbcType="VARCHAR" property="Groom"/>
+
+        <result column="userId" property="userId"/>
+        <result column="carriersId" property="carriersId"/>
+    </resultMap>
+
+    <resultMap id="discoverInfo_cityMap" type="com.blueteam.entity.po.Discover" extends="discoverInfo">
+        <association property="city" javaType="com.blueteam.entity.dto.City">
+            <result column="provinceCode" jdbcType="NVARCHAR" property="provinceCode"/>
+            <result column="provinceName" jdbcType="NVARCHAR" property="provinceName"/>
+            <result column="oCityCode" jdbcType="NVARCHAR" property="cityCode"/>
+            <result column="cityName" jdbcType="NVARCHAR" property="cityName"/>
+            <result column="districtCode" jdbcType="NVARCHAR" property="districtCode"/>
+            <result column="districtName" jdbcType="NVARCHAR" property="districtName"/>
+            <result column="FullName" jdbcType="NVARCHAR" property="fullName"/>
+        </association>
+    </resultMap>
+
+    <!-- 查询发现列表 -->
+    <select id="DiscoverList" resultMap="discoverInfo">
+        <![CDATA[
+        select * from Discover d
+        where 1=1
+        ]]>
+        <if test="Title != null and  Title!=''">
+            <![CDATA[ and d.Title like "%"#{Title}"%"]]>
+        </if>
+        <if test="Type != null and  Type!=''">
+            <![CDATA[ and d.Type=#{Type}]]>
+        </if>
+        <if test="IsUser != null and  IsUser!=''">
+            <![CDATA[ and ((d.IsUser in (select userId from CarriersInfo where Name like "%"#{IsUser}"%")) or (d.IsUser in (select id from userInfo where NickName like "%"#{IsUser}"%")))]]>
+        </if>
+        <if test="Status != null and  Status>0">
+            <![CDATA[ and d.Status=#{Status}]]>
+        </if>
+        <![CDATA[
+        ORDER BY   d.Status asc,d.UpdateDate desc
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+        ]]>
+    </select>
+
+    <!-- 查询发现列表 -->
+    <select id="DiscoverCarrList" resultMap="discoverInfo">
+        <![CDATA[
+		SELECT * from Discover d  where d.IsUser=#{VendorType}
+		]]>
+        <if test="Title != null and  Title!=''">
+            <![CDATA[ and d.Title like "%"#{Title}"%"]]>
+        </if>
+        <if test="Type != null and  Type!=''">
+            <![CDATA[ and d.Type=#{Type}]]>
+        </if>
+        <if test="IsUser != null and  IsUser!=''">
+            <![CDATA[ and d.IsUser in (select UserID from CarriersInfo where Name like "%"#{IsUser}"%")]]>
+        </if>
+        <if test="Status != null and  Status>0">
+            <![CDATA[ and d.Status=#{Status}]]>
+        </if>
+        <![CDATA[ORDER BY d.Status asc,d.UpdateDate desc
+		LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+
+    <!-- 查询发现列表数据 -->
+    <select id="DisCoverHeandList" resultMap="discoverInfo">
+        <![CDATA[
+			SELECT * from Discover d  where d.IsShow='Y'  and d.Status=2
+			and d.Id in (select ForeignKey from Continuation where  (ExpandText1 IS NULL  OR ExpandText1='0' OR ExpandText1=SUBSTRING(#{Label},1,locate('_',#{Label})-1))
+				OR ExpandText1=SUBSTRING(#{Label},1,(CHAR_LENGTH(#{Label})-locate('_',reverse(#{Label}))))
+				OR ExpandText1=#{Label}) ORDER BY d.Status asc,d.UpdateDate desc LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+
+    <!-- 查询发现列表数据 -->
+    <select id="DisCoverHeandCount" resultType="int">
+        <![CDATA[
+			SELECT count(*) from Discover d  where d.IsShow='Y' and d.Status=2
+			and d.Id in (select ForeignKey from Continuation where  (ExpandText1 IS NULL  OR ExpandText1='0' OR ExpandText1=SUBSTRING(#{Label},0,locate('_',#{Label})))
+				OR ExpandText1=SUBSTRING(#{Label},1,(CHAR_LENGTH(#{Label})-locate('_',reverse(#{Label}))))
+				OR ExpandText1=#{Label})
+		]]>
+    </select>
+
+
+    <!-- 查询发现列表数据 运营商 -->
+    <select id="DisCoverHeandList2" resultMap="discoverInfo">
+        <![CDATA[
+			SELECT *  from Discover d  where d.IsUser=#{IsUser}  and
+			 d.Id in (select ForeignKey from Continuation where   (ExpandText1 IS NULL OR ExpandText1=SUBSTRING(#{Label},0,locate('_',#{Label})))
+				OR ExpandText1=SUBSTRING(#{Label},1,(CHAR_LENGTH(#{Label})-locate('_',reverse(#{Label}))))
+				OR ExpandText1=#{Label}) 	ORDER BY d.Status asc,d.UpdateDate desc LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+		]]>
+    </select>
+
+    <!-- 查询发现列表数据  运营商-->
+    <select id="DisCoverHeandCount2" resultType="int">
+        <![CDATA[
+			SELECT count(d.id)  from Discover d  where d.IsUser=#{IsUser}  and d.Id in (select ForeignKey from Continuation where Type='HandState' and (ExpandText1 IS NULL OR ExpandText1=SUBSTRING(#{Label},0,locate('_',#{Label})))
+				OR ExpandText1=SUBSTRING(#{Label},1,(CHAR_LENGTH(#{Label})-locate('_',reverse(#{Label}))))
+				OR ExpandText1=#{Label})
+		]]>
+    </select>
+
+
+    <!-- 发现统计 -->
+    <select id="DiscoverCount" resultType="int">
+        <![CDATA[
+		SELECT count(*) from Discover d  where 1=1
+		]]>
+        <if test="Title != null and  Title!=''">
+            <![CDATA[ and d.Title like "%"#{Title}"%"]]>
+        </if>
+        <if test="Type != null and  Type!=''">
+            <![CDATA[ and d.Type=#{Type}]]>
+        </if>
+        <if test="IsUser != null and  IsUser!=''">
+            <![CDATA[ and ((d.IsUser in (select userId from CarriersInfo where Name like "%"#{IsUser}"%")) or (d.IsUser in (select id from userInfo where NickName like "%"#{IsUser}"%")))]]>
+        </if>
+        <if test="Status != null and  Status>0">
+            <![CDATA[ and d.Status=#{Status}]]>
+        </if>
+    </select>
+
+    <select id="DiscoverCarrCount" resultType="int">
+        <![CDATA[
+		SELECT count(*) from Discover d  where d.IsUser=#{VendorType}
+		]]>
+        <if test="Title != null and  Title!=''">
+            <![CDATA[ and d.Title like "%"#{Title}"%"]]>
+        </if>
+        <if test="Type != null and  Type!=''">
+            <![CDATA[ and d.Type=#{Type}]]>
+        </if>
+        <if test="IsUser != null and  IsUser!=''">
+            <![CDATA[ and d.IsUser in (select userId from CarriersInfo where Name like "%"#{IsUser}"%")]]>
+        </if>
+        <if test="Status != null and  Status>0">
+            <![CDATA[ and d.Status=#{Status}]]>
+        </if>
+    </select>
+
+    <!-- 查询三条商圈头条的信息小程序C端 -->
+    <select id="HeandLineList" resultMap="discoverInfo">
+        <![CDATA[
+			SELECT *  FROM discover  WHERE  id IN
+				(SELECT ForeignKey FROM Continuation WHERE  type=#{Type} AND 
+				(ExpandText1 IS NULL OR  ExpandText1='0' OR ExpandText1=SUBSTRING(#{Label},0,locate('_',#{Label})))
+				OR ExpandText1=SUBSTRING(#{Label},1,(CHAR_LENGTH(#{Label})-locate('_',reverse(#{Label}))))
+				OR ExpandText1=#{Label}
+			) AND IsShow='Y' and HandLine='Y' and Status=2  ORDER BY UpdateDate desc LIMIT 0,3
+		]]>
+    </select>
+
+    <!-- 新增发现数据 -->
+    <insert id="insertDiscover" parameterType="com.blueteam.entity.po.Discover" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into discover
+        (Title,Type,Label,IsUser,Status,Visits,IsShow,CreateDate,CreateBy,UpdateDate,UpdateBy,Detail,HandLine,VendorType,Groom)
+        values(#{Title},#{Type},#{Label},#{IsUser},#{Status},#{Visits},#{IsShow},#{CreateDate},#{CreateBy},#{UpdateDate},#{UpdateBy},#{Detail},#{HandLine},#{VendorType},#{Groom})
+
+
+    </insert>
+
+    <!-- 发现详情信息 -->
+    <select id="GetDiscover" resultMap="discoverInfo">
+        SELECT * FROM discover WHERE Id =#{Id}
+    </select>
+
+    <!--修改发现信息 -->
+    <update id="updateDiscover" parameterType="com.blueteam.entity.po.Discover">
+        update discover set Title =
+        #{Title},Type=#{Type},Label=#{Label},HandLine=#{HandLine},Detail=#{Detail},Status=#{Status},UpdateDate=#{UpdateDate},Groom=#{Groom}
+        where Id = #{Id}
+    </update>
+
+    <!--修改显示 -->
+    <update id="updateDiscoverShow" parameterType="com.blueteam.entity.po.Discover">
+        update discover set IsShow = #{IsShow}
+        <if test="IsShow eq 'N'.toString()">
+            ,Groom=#{IsShow}
+        </if>
+        where Id = #{Id}
+    </update>
+
+    <!--修改状态 -->
+    <update id="updateDiscoverStatus" parameterType="com.blueteam.entity.po.Discover">
+        update discover set Status = #{Status},Reason=#{Reason} where Id = #{Id}
+    </update>
+
+    <!--修改浏览数 -->
+    <update id="updateDiscoverVisits" parameterType="com.blueteam.entity.po.Discover">
+        update discover set Visits = #{Visits} where Id = #{Id}
+    </update>
+
+    <!--修改推荐信息 -->
+    <update id="updateGroom" parameterType="com.blueteam.entity.po.Discover">
+        update discover set Groom = 'Y' where Id = #{Id}
+    </update>
+
+    <!--修改全部推荐信息 -->
+    <update id="updateAllGroom" parameterType="com.blueteam.entity.po.Discover">
+        update discover set Groom ='N'
+    </update>
+
+    <!--统计推荐信息的数量 -->
+    <select id="groomCount" resultType="int">
+        SELECT count(*) from discover where Groom ='Y'
+    </select>
+
+    <!--统计推荐信息列表-->
+    <select id="lstGroom" resultMap="discoverInfo">
+        SELECT Id,Title,Type from discover where Groom ='Y' and IsShow='Y' order by UpdateDate desc
+    </select>
+
+
+
+    <!--获取发现和运营商信息，根据发现ID-->
+    <select id="selectDiscoverAndCarriersByDiscoverId" resultMap="discoverInfo_cityMap">
+        <!--<include refid="common_citys"></include>-->
+        SELECT TOP 1 dis.*,C.*,CI.ID AS carriersId,ci.userId AS userId FROM Discover AS dis
+        LEFT JOIN CarriersInfo AS CI
+        ON dis.VendorType = 'CARRIERS_TYPE' AND dis.IsUser = CI.UserID
+        LEFT JOIN
+        (SELECT
+        Code,
+        ProvinceCode ProvinceCode,
+        ProvinceName provinceName,
+        CityCode     ocityCode,
+        CityName     cityName,
+        DistrictCode districtCode,
+        DistrictName districtName,
+        FullName     FullName
+        FROM CityInfo
+        WHERE EnableFlag = 'Y'
+        ) AS C
+        ON CI.CityCode = C.Code
+        WHERE dis.Id = #{id}
+    </select>
+</mapper>

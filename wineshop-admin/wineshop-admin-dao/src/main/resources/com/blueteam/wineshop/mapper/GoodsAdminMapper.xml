@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.GoodsAdminMapper">
+    <select id="listGoodsType" resultType="HashMap">
+        SELECT T.GOODS_TYPE_ID goodsTypeId,
+               T.GOODS_TYPE_NAME goodsTypeName
+        FROM   TD_G_GOODS_TYPE T
+        WHERE  T.PARENT_TYPE_ID!=9999
+        ORDER BY T.SHWO_ORDER
+    </select>
+
+    <select id="countGoodsTypeById" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(1)
+        FROM   TD_G_GOODS_TYPE T
+        WHERE  T.GOODS_TYPE_ID =#{goodsTypeId}
+    </select>
+
+
+    <select id="countBaseAttr" parameterType="HashMap" resultType="Integer">
+        SELECT count(A.ATTR_CODE) FROM TD_G_ATTR A
+        WHERE A.ATTR_GOODS_TYPE =#{goodsTypeId}
+        AND A.PARENT_ATTR_CODE IS NOT NULL
+        AND A.ATTR_CODE IN
+        <foreach collection="baseAttrList" index="index" item="item" open="(" separator="," close=")">
+            #{item.attrCode}
+        </foreach>
+    </select>
+
+
+    <select id="getGoodsId" parameterType="Integer" resultType="Long">
+        select GetGoodsUuid(#{getGoodsId})
+    </select>
+
+    <select id="getVerifyInfo" parameterType="HashMap" resultType="GoodsVerifyInfoPO">
+        SELECT V.VERIFY_ID  verifyId,
+        V.VERIFY_BAR_CODE verifyBarCode,
+        V.VERIFY_GOODS_STATE verifyGoodsState,
+        V.VENDOR_ID  vendorId,
+        V.VERIFY_SALE_PRICE verifySalePrice
+        FROM   TF_B_GOODS_VERIFY V
+        WHERE  V.VERIFY_BAR_CODE=#{barCode}
+        AND    V.VERIFY_STATE=#{verifyState}
+    </select>
+
+    <insert id="saveGoodsInfo" parameterType="GoodsInfoPO">
+        INSERT INTO TF_G_GOODS (GOODS_ID, GOODS_NAME, GOODS_LABEL, GOODS_TYPE, BAR_CODE, MAIN_BRAND_ID, BRAND_ID, SUGGEST_PRICE, GOODS_STATE, OPERATE_TAG, CREATE_STAFF_ID, UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        VALUES(#{goodsId},#{goodsName},#{goodsLabel},#{goodsType},#{barCode},#{mainBrandId},#{brandId},#{suggestPrice},#{goodsState},#{operateTag},#{createStaffId},#{updateStaffId},sysdate(),sysdate())
+    </insert>
+
+    <insert id="saveGoodsAttrInfo" parameterType="List">
+        INSERT INTO TF_G_GOODS_ATTR (GOODS_ID, ATTR_CODE, ATTR_VALUE_CODE, ATTR_VALUE_NAME, ATTR_VALUE_SHOW_NAME)
+        <foreach collection="list" index="index" item="item" open="values" separator=",">
+            (#{item.goodsId},#{item.attrCode},#{item.attrValueCode},#{item.attrValueName},#{item.attrValueShowName})
+        </foreach>
+    </insert>
+
+    <insert id="saveGoodsPhotoInfo" parameterType="List">
+        INSERT INTO TF_G_GOODS_PHOTO (GOODS_ID, GOODS_PHOTO, PHOTO_STATE, PHOTO_TONE)
+        <foreach collection="list" index="index" item="item" open="values" separator=",">
+            (#{item.goodsId},#{item.goodsPhoto},#{item.photoState},#{item.photoTone})
+        </foreach>
+    </insert>
+
+    <insert id="saveGoodsDetailInfo" parameterType="GoodsDetailInfoPO">
+        INSERT INTO TF_G_GOODS_DETAIL (GOODS_ID, GOODS_DESC)
+        VALUES     (#{goodsId},#{goodsDesc})
+    </insert>
+
+    <insert id="saveGoodsVendorInfo" parameterType="List">
+        INSERT INTO TF_G_GOODS_VENDOR (GOODS_ID, VENDOR_ID, SALE_PRICE, VENDOR_GOODS_STATE, CREATE_STAFF_ID,
+        UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        <foreach collection="list" index="index" item="item" open="values" separator=",">
+            (#{item.goodsId},#{item.vendorId},#{item.salePrice},#{item.vendorGoodsState},#{item.createStaffId},#{item.updateStaffId},sysdate(),sysdate())
+        </foreach>
+    </insert>
+
+    <insert id="saveVendorBrandInfo" parameterType="HashMap">
+        INSERT INTO TF_G_VENDOR_BRAND (VENDOR_ID, BRAND_ID, BRAND_GOODS_AMOUNT, AUTHORITY_TAG, CREATE_STAFF_ID,
+        UPDATE_STAFF_ID, CREATE_TIME, UPDATE_TIME)
+        <foreach collection="vendorBrandPOList" index="index" item="item" open="values" separator=",">
+            (#{item.vendorId},#{item.brandId},#{item.brandGoodsAmount},#{item.authorityTag},#{item.createStaffId},#{item.updateStaffId},sysdate(),sysdate())
+            <if test="index == maxIndex">
+                ON DUPLICATE KEY UPDATE BRAND_GOODS_AMOUNT = BRAND_GOODS_AMOUNT + 1,
+                UPDATE_STAFF_ID=#{item.updateStaffId},UPDATE_TIME = sysdate()
+            </if>
+        </foreach>
+    </insert>
+
+
+    <update id="updateOldVendorBrandInfo" parameterType="List">
+        UPDATE TF_G_VENDOR_BRAND B
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="B.BRAND_GOODS_AMOUNT= B.BRAND_GOODS_AMOUNT-1,B.UPDATE_TIME=sysdate(), B.UPDATE_STAFF_ID = CASE"
+                  suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when (B.VENDOR_ID=#{item.vendorId} AND B.BRAND_ID=#{item.brandId}) then #{item.updateStaffId}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE
+        <foreach collection="list" index="index" item="item" separator="or">
+            (B.VENDOR_ID=#{item.vendorId} AND B.BRAND_ID=#{item.brandId})
+        </foreach>
+    </update>
+
+
+    <update id="updateGoodsVendorInfo" parameterType="List">
+        UPDATE TF_G_GOODS_VENDOR V
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="V.UPDATE_TIME =sysdate(), V.VENDOR_GOODS_STATE = CASE" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when (V.GOODS_ID=#{item.goodsId} AND V.VENDOR_ID=#{item.vendorId}) then #{item.vendorGoodsState}
+                </foreach>
+            </trim>
+
+            <trim prefix="V.UPDATE_STAFF_ID = CASE" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when (V.GOODS_ID=#{item.goodsId} AND V.VENDOR_ID=#{item.vendorId}) then #{item.updateStaffId}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE
+        <foreach collection="list" index="index" item="item" separator="or">
+            (V.GOODS_ID=#{item.goodsId} AND V.VENDOR_ID=#{item.vendorId})
+        </foreach>
+    </update>
+
+    <select id="countGoodsByBarCode" parameterType="String" resultType="Integer">
+        SELECT COUNT(1) FROM  TF_G_GOODS
+        WHERE BAR_CODE =#{barCode}
+    </select>
+
+    <select id="getGoodsInfo" parameterType="Long" resultType="BaseGoodsBO">
+        SELECT G.GOODS_ID        goodsId,
+        G.GOODS_STATE     goodsState,
+        G.GOODS_NAME      goodsName,
+        G.BAR_CODE        barCode,
+        G.MAIN_BRAND_ID   mainBrandId,
+        M.MAIN_BRAND_NAME mainBrandName,
+        G.BRAND_ID        brandId,
+        S.STATE_TAG       brandStateTag,
+        G.GOODS_TYPE      goodsType,
+        T.GOODS_TYPE_NAME goodsTypeName,
+        D.GOODS_DESC      goodsDesc,
+        G.SUGGEST_PRICE   suggestPrice
+        FROM   TF_G_GOODS G, TF_G_GOODS_DETAIL D, TD_G_GOODS_TYPE T, TD_G_BRAND_MAIN M ,TD_G_BRAND_SUB S
+        WHERE  G.GOODS_ID = D.GOODS_ID
+        AND    G.GOODS_TYPE = T.GOODS_TYPE_ID
+        AND    G.MAIN_BRAND_ID = M.MAIN_BRAND_ID
+        AND    G.BRAND_ID = S.BRAND_ID
+        AND    G.GOODS_ID = #{goodsId}
+        AND    G.OPERATE_TAG =1
+    </select>
+
+    <select id="listGoodsAttr" parameterType="HashMap" resultType="GoodsAttrInfoPO">
+        SELECT GA.GOODS_ID goodsId,
+        GA.ATTR_CODE attrCode,
+        GA.ATTR_VALUE_CODE attrValueCode,
+        GA.ATTR_VALUE_NAME attrValueName,
+        GA.ATTR_VALUE_SHOW_NAME attrValueShowName
+        FROM TF_G_GOODS_ATTR GA INNER JOIN TD_G_ATTR A ON GA.ATTR_CODE = A.ATTR_CODE
+        WHERE GA.GOODS_ID = #{goodsId}
+        <if test="attrListType ==1">
+            AND A.NECESSARY_TAG =#{attrListType}
+        </if>
+        <if test="attrListType ==0">
+            AND A.NECESSARY_TAG =#{attrListType}
+        </if>
+    </select>
+
+    <select id="listGoodsPhoto" parameterType="Long" resultType="AdminPhotoVO">
+        SELECT P.GOODS_PHOTO goodsPhoto,
+        P.PHOTO_STATE photoState,
+        P.PHOTO_TONE  photoTone
+        FROM   TF_G_GOODS_PHOTO P
+        WHERE  P.GOODS_ID =#{goodsId}
+    </select>
+
+    <select id="listGoodsVendor" parameterType="HashMap" resultType="GoodsVendorInfoPO">
+        SELECT V.VENDOR_ID vendorId
+        FROM   TF_G_GOODS_VENDOR V
+        WHERE  V.GOODS_ID =#{goodsId}
+        AND    V.VENDOR_GOODS_STATE =#{vendorGoodsState}
+    </select>
+
+    <update id="updateGoodsInfo" parameterType="GoodsInfoPO">
+        UPDATE TF_G_GOODS G
+        <set>
+            <if test="goodsName != null and goodsName!=''">G.GOODS_NAME=#{goodsName},</if>
+            <if test="goodsLabel != null and goodsLabel!=''">G.GOODS_LABEL=#{goodsLabel},</if>
+            <if test="mainBrandId != null and mainBrandId!=''">G.MAIN_BRAND_ID=#{mainBrandId},</if>
+            <if test="brandId != null and brandId!=''">G.BRAND_ID=#{brandId},</if>
+            <if test="suggestPrice != null and suggestPrice!=''">G.SUGGEST_PRICE =#{suggestPrice},</if>
+            <if test="goodsState != null">G.GOODS_STATE =#{goodsState},</if>
+            G.UPDATE_STAFF_ID=#{updateStaffId},
+            G.UPDATE_TIME =sysdate()
+        </set>
+        WHERE G.GOODS_ID=#{goodsId}
+        <if test="operateTag != null">
+            AND G.OPERATE_TAG=#{operateTag}
+        </if>
+    </update>
+
+
+    <update id="updateGoodsAttrInfo" parameterType="HashMap">
+        UPDATE TF_G_GOODS_ATTR
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="ATTR_VALUE_CODE = CASE" suffix="end,">
+                <foreach collection="goodsAttrPOList" item="item" index="index">
+                    when ATTR_CODE=#{item.attrCode} then #{item.attrValueCode}
+                </foreach>
+            </trim>
+
+            <trim prefix="ATTR_VALUE_NAME = CASE" suffix="end,">
+                <foreach collection="goodsAttrPOList" item="item" index="index">
+                    when ATTR_CODE=#{item.attrCode} then #{item.attrValueName}
+                </foreach>
+            </trim>
+
+            <trim prefix="ATTR_VALUE_SHOW_NAME = CASE" suffix="end,">
+                <foreach collection="goodsAttrPOList" item="item" index="index">
+                    when ATTR_CODE=#{item.attrCode} then #{item.attrValueShowName}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE GOODS_ID=#{goodsId}
+        AND ATTR_CODE IN
+        <foreach collection="goodsAttrPOList" index="index" item="item" open="(" separator="," close=")">
+            #{item.attrCode}
+        </foreach>
+    </update>
+
+    <delete id="removeGoodsPhotoInfo" parameterType="Long">
+        DELETE  FROM TF_G_GOODS_PHOTO
+        WHERE  GOODS_ID=#{goodsId}
+    </delete>
+
+    <update id="updateGoodsDetailInfo" parameterType="GoodsDetailInfoPO">
+        UPDATE TF_G_GOODS_DETAIL
+        SET GOODS_DESC=#{goodsDesc}
+        WHERE GOODS_ID=#{goodsId}
+    </update>
+
+    <select id="countGoodsInfo" parameterType="GoodsListSearchDTO" resultType="Integer">
+        SELECT count(*)
+        FROM
+        (
+        SELECT
+        G.GOODS_ID goodsId,
+        count(G.GOODS_ID) validGoodsAttr,
+        G.GOODS_STATE goodsState,
+        G.GOODS_NAME goodsName,
+        G.BAR_CODE barCode,
+        G.MAIN_BRAND_ID mainBrandId,
+        M.MAIN_BRAND_NAME mainBrandName,
+        G.BRAND_ID brandId,
+        S.BRAND_NAME brandName,
+        G.GOODS_TYPE goodsType,
+        T.GOODS_TYPE_NAME goodsTypeName,
+        G.SUGGEST_PRICE suggestPrice
+        FROM TF_G_GOODS G, TF_G_GOODS_ATTR GA, TD_G_GOODS_TYPE T, TD_G_BRAND_MAIN M, TD_G_BRAND_SUB S
+        WHERE
+        G.GOODS_ID = GA.GOODS_ID
+        AND G.GOODS_TYPE = T.GOODS_TYPE_ID
+        AND G.MAIN_BRAND_ID = M.MAIN_BRAND_ID
+        AND G.BRAND_ID = S.BRAND_ID
+        AND G.OPERATE_TAG = 1
+        <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+            <if test="alcoholAttrCode !=null and alcoholAttrCode!=''">
+                <trim prefix="(" suffix=") OR" suffixOverrides="AND">
+                    <if test="alcoholAttrCode!=null and alcoholAttrCode!=''">
+                        GA.ATTR_CODE = #{alcoholAttrCode} AND
+                    </if>
+                    <if test="alcoholValueNameFrom!=null and alcoholValueNameFrom!=''">
+                        GA.ATTR_VALUE_NAME >= #{alcoholValueNameFrom} AND
+                    </if>
+                    <if test="alcoholValueNameTo!=null and alcoholValueNameTo!=''">
+                        GA.ATTR_VALUE_NAME &lt;= #{alcoholValueNameTo} AND
+                    </if>
+                </trim>
+
+            </if>
+            <if test="packageAttrCode !=null and packageAttrCode!=''">
+                (GA.ATTR_CODE = #{packageAttrCode} AND GA.ATTR_VALUE_CODE = #{packageAttrValueCode}) OR
+            </if>
+        </trim>
+        <if test="goodsType!=null and goodsType!=''">
+            AND G.GOODS_TYPE=#{goodsType}
+        </if>
+        <if test="suggestPriceFrom !=null and suggestPriceFrom!=''">
+            AND G.SUGGEST_PRICE >=#{suggestPriceFrom} * 100
+        </if>
+        <if test="suggestPriceTo !=null and suggestPriceTo!=''">
+            AND G.SUGGEST_PRICE &lt;=#{suggestPriceTo} * 100
+        </if>
+        <if test="searchKey !=null and searchKey!=''">
+            AND (M.MAIN_BRAND_NAME LIKE "%"#{searchKey}"%" OR S.BRAND_NAME LIKE "%"#{searchKey}"%" OR G.GOODS_NAME LIKE
+            "%"#{searchKey}"%" OR G.BAR_CODE LIKE "%"#{searchKey}"%")
+        </if>
+        GROUP BY G.GOODS_ID) A
+        <choose>
+            <when test="(alcoholAttrCode==null or alcoholAttrCode=='') and (packageAttrCode ==null or packageAttrCode=='')">
+            </when>
+            <when test="(alcoholAttrCode!=null and alcoholAttrCode!='') and (packageAttrCode !=null and packageAttrCode!='')">
+                WHERE A.validGoodsAttr = 2
+            </when>
+            <otherwise>
+                WHERE A.validGoodsAttr = 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="listGoodsInfo" parameterType="GoodsListSearchDTO"
+            resultType="AdminGoodsListVO">
+        SELECT A.*
+        FROM
+        (
+        SELECT
+        G.GOODS_ID goodsId,
+        count(G.GOODS_ID) validGoodsAttr,
+        G.GOODS_STATE goodsState,
+        G.GOODS_NAME goodsName,
+        G.BAR_CODE barCode,
+        G.MAIN_BRAND_ID mainBrandId,
+        M.MAIN_BRAND_NAME mainBrandName,
+        G.BRAND_ID brandId,
+        S.BRAND_NAME brandName,
+        G.GOODS_TYPE goodsType,
+        T.GOODS_TYPE_NAME goodsTypeName,
+        G.SUGGEST_PRICE suggestPrice,
+        G.UPDATE_TIME updateTime
+        FROM TF_G_GOODS G, TF_G_GOODS_ATTR GA, TD_G_GOODS_TYPE T, TD_G_BRAND_MAIN M, TD_G_BRAND_SUB S
+        WHERE
+        G.GOODS_ID = GA.GOODS_ID
+        AND G.GOODS_TYPE = T.GOODS_TYPE_ID
+        AND G.MAIN_BRAND_ID = M.MAIN_BRAND_ID
+        AND G.BRAND_ID = S.BRAND_ID
+        AND G.OPERATE_TAG = 1
+        <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+            <if test="alcoholAttrCode !=null and alcoholAttrCode!=''">
+                <trim prefix="(" suffix=") OR" suffixOverrides="AND">
+                    <if test="alcoholAttrCode!=null and alcoholAttrCode!=''">
+                        GA.ATTR_CODE = #{alcoholAttrCode} AND
+                    </if>
+                    <if test="alcoholValueNameFrom!=null and alcoholValueNameFrom!=''">
+                        GA.ATTR_VALUE_NAME >= #{alcoholValueNameFrom} AND
+                    </if>
+                    <if test="alcoholValueNameTo!=null and alcoholValueNameTo!=''">
+                        GA.ATTR_VALUE_NAME &lt;= #{alcoholValueNameTo} AND
+                    </if>
+                </trim>
+            </if>
+            <if test="packageAttrCode !=null and packageAttrCode!=''">
+                (GA.ATTR_CODE = #{packageAttrCode} AND GA.ATTR_VALUE_CODE = #{packageAttrValueCode}) OR
+            </if>
+        </trim>
+        <if test="goodsType!=null and goodsType!=''">
+            AND G.GOODS_TYPE=#{goodsType}
+        </if>
+        <if test="suggestPriceFrom !=null and suggestPriceFrom!=''">
+            AND G.SUGGEST_PRICE >=#{suggestPriceFrom} * 100
+        </if>
+        <if test="suggestPriceTo !=null and suggestPriceTo!=''">
+            AND G.SUGGEST_PRICE &lt;=#{suggestPriceTo} * 100
+        </if>
+        <if test="searchKey !=null and searchKey!=''">
+            AND (M.MAIN_BRAND_NAME LIKE "%"#{searchKey}"%" OR S.BRAND_NAME LIKE "%"#{searchKey}"%" OR G.GOODS_NAME LIKE
+            "%"#{searchKey}"%" OR G.BAR_CODE LIKE "%"#{searchKey}"%")
+        </if>
+        GROUP BY G.GOODS_ID) A
+        <choose>
+            <when test="(alcoholAttrCode==null or alcoholAttrCode=='') and (packageAttrCode ==null or packageAttrCode=='')">
+            </when>
+            <when test="(alcoholAttrCode!=null and alcoholAttrCode!='') and (packageAttrCode !=null and packageAttrCode!='')">
+                WHERE A.validGoodsAttr = 2
+            </when>
+            <otherwise>
+                WHERE A.validGoodsAttr = 1
+            </otherwise>
+        </choose>
+        <trim prefix="ORDER BY" suffixOverrides=",">
+            <if test="suggestPriceTag!=null and suggestPriceTag ==1">
+                A.suggestPrice,
+            </if>
+            <if test="suggestPriceTag!=null and suggestPriceTag ==0">
+                A.suggestPrice DESC,
+            </if>
+            <if test="goodsStateTag!=null and goodsStateTag ==1">
+                A.goodsState,
+            </if>
+            <if test="goodsStateTag!=null and goodsStateTag ==0">
+                A.goodsState DESC,
+            </if>
+            A.updateTime DESC
+        </trim>
+        LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+    </select>
+
+    <select id="getGoodsListShowAttr" parameterType="HashMap" resultType="HashMap">
+        SELECT
+        GA.GOODS_ID goodsId,
+        A.PARENT_ATTR_CODE parentAttrCode,
+        GA.ATTR_VALUE_SHOW_NAME attrValueShowName
+        FROM TF_G_GOODS_ATTR GA JOIN TD_G_ATTR A
+        ON GA.ATTR_CODE =A.ATTR_CODE LEFT JOIN TD_G_ATTR_VAL V
+        ON GA.ATTR_VALUE_CODE = V.ATTR_VALUE_CODE
+        WHERE GA.GOODS_ID IN
+        <foreach collection="goodsListVOS" index="index" item="item" open="(" separator="," close=")">
+            #{item.goodsId}
+        </foreach>
+        AND A.PARENT_ATTR_CODE IN
+        <foreach collection="showAttrList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+</mapper>

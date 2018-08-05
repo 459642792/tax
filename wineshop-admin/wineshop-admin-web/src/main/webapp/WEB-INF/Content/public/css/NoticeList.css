@@ -1,0 +1,126 @@
+﻿.header_inner img {
+    border: none;
+}
+
+.notice_container {
+    width: 1160px;
+    padding: 20px;
+    background: #fff;
+    margin: 20px auto;
+}
+
+.notice_title {
+    margin: 10px 0 30px 0;
+}
+
+.news_list ul li {
+    height: 60px;
+    background: #f7f7f7;
+    margin-top: 10px;
+    line-height: 60px;
+    padding: 0 20px;
+    position: relative;
+}
+
+.news_list ul li a {
+    display: inline-block;
+    color: #333333;
+    max-width: 930px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.news_list ul li a:hover {
+    color: #cc0000;
+}
+
+.news_list ul li a + span {
+    position: absolute;
+    right: 20px;
+    top: 0;
+    color: #999999;
+}
+
+.pages {
+    width: 600px;
+    margin: 45px auto;
+}
+
+.pages ul {
+    overflow: hidden;
+}
+
+.pages ul li {
+    color: #999999;
+    font-size: 16px;
+    text-align: center;
+    line-height: 38px;
+    float: left;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.prev, .next {
+    width: 88px;
+    height: 38px;
+    border: 1px solid #eeeeee;
+}
+
+.dotted {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+}
+
+.number {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #eeeeee;
+}
+
+.number:hover {
+    border: 1px solid #cc0000;
+    color: #cc0000 !important;
+}
+
+.prev:hover, .next:hover {
+    border: 1px solid #cc0000;
+    color: #cc0000 !important;
+}
+
+.active {
+    border: 1px solid #cc0000;
+    color: #cc0000 !important;
+}
+
+.detail_cotainer {
+    width: 1120px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 40px;
+}
+
+.detail_top {
+    border-bottom: 1px solid #dadada;
+    padding-bottom: 20px;
+}
+
+.title, .desc {
+    text-align: center;
+    color: #333333;
+}
+
+.title {
+    font-size: 18px;
+}
+
+.desc {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.content {
+    margin-top: 20px;
+}

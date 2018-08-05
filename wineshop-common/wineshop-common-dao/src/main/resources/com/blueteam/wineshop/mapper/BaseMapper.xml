@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blueteam.wineshop.mapper.BaseMapper">
+
+    <!--判断订单状态通用sql片段-->
+    <sql id="judgeOrderState">
+        <trim prefix=" (" suffix=")">
+            <foreach collection="orderStateBOList" index="index" item="item" separator="or">
+                <trim prefix="(" prefixOverrides="AND" suffix=")">
+                    <if test="item.completeState !=null">
+                        AND ${orderTable}.complete_state=#{item.completeState}
+                    </if>
+                    <if test="item.orderState !=null">
+                        AND ${orderTable}.order_state=#{item.orderState}
+                    </if>
+                    <if test="item.refundState !=null">
+                        AND ${orderTable}.refund_state=#{item.refundState}
+                    </if>
+                    <if test="item.commentState !=null">
+                        AND ${orderTable}.comment_state=#{item.commentState}
+                    </if>
+                </trim>
+            </foreach>
+        </trim>
+    </sql>
+
+
+</mapper>

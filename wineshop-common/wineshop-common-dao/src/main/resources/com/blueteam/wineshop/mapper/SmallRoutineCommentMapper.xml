@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.blueteam.wineshop.mapper.SmallRoutineCommentMapper">
+    <resultMap id="comment" type="com.blueteam.entity.po.SmallRoutineComment">
+        <id column="Id" jdbcType="INTEGER" property="Id"/>
+        <result column="UpVote" jdbcType="INTEGER" property="UpVote"/>
+        <result column="UserId" jdbcType="INTEGER" property="UserId"/>
+        <result column="ForeignKey" jdbcType="INTEGER" property="ForeignKey"/>
+        <result column="UserName" jdbcType="VARCHAR" property="UserName"/>
+        <result column="UserImage" jdbcType="VARCHAR" property="UserImage"/>
+        <result column="Content" jdbcType="VARCHAR" property="Content"/>
+        <result column="Type" jdbcType="VARCHAR" property="Type"/>
+        <result column="CreateDate" jdbcType="VARCHAR" property="CreateDate"/>
+        <result column="CreateBy" jdbcType="VARCHAR" property="CreateBy"/>
+        <result column="UpdateDate" jdbcType="VARCHAR" property="UpdateDate"/>
+        <result column="UpdateBy" jdbcType="VARCHAR" property="UpdateBy"/>
+    </resultMap>
+
+    <!-- 新增评论信息-->
+    <insert id="insertComment" parameterType="com.blueteam.entity.po.SmallRoutineComment" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into SmallRoutineComment
+        (UpVote,UserId,UserName,UserImage,CreateDate,CreateBy,UpdateDate,UpdateBy,Content,Type,ForeignKey)
+        values(#{UpVote},#{UserId},#{UserName},#{UserImage},#{CreateDate},#{CreateBy},#{UpdateDate},#{UpdateBy},#{Content},#{Type},#{ForeignKey})
+
+
+    </insert>
+
+    <!-- 查询评论列表信息数组 -->
+    <select id="CommentListC" resultMap="comment">
+        <![CDATA[
+		SELECT * from SmallRoutineComment d  where ForeignKey=#{ForeignKey} and Type=#{Type}ORDER BY d.UpdateDate desc
+		LIMIT ${(pageIndex-1)*pageSize},${pageSize}
+	]]>
+    </select>
+
+    <!-- 查询统计评论列表的总条数 -->
+    <select id="CommentCount" resultType="java.lang.Integer">
+        SELECT count(id) from SmallRoutineComment d where ForeignKey=#{ForeignKey} and Type=#{Type}
+    </select>
+
+    <!-- 查询详情信息 -->
+    <select id="CommentDetail" resultMap="comment">
+        <![CDATA[
+			SELECT *  FROM SmallRoutineComment where Id=#{Id}
+		 ]]>
+    </select>
+
+    <!-- 修改评论数 -->
+    <update id="updateUpVote" parameterType="com.blueteam.entity.po.SmallRoutineComment">
+        update SmallRoutineComment set UpVote=#{UpVote} where Id=#{Id}
+    </update>
+
+    <!-- 删除评论信息 -->
+    <delete id="deleteComment" parameterType="java.lang.Integer">
+        delete from SmallRoutineComment where Id = #{Id}
+    </delete>
+</mapper>
